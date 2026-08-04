@@ -1,0 +1,23 @@
+{
+  "name": "alexratmanpl",
+  "owner": {
+    "name": "alexratmanpl",
+    "url": "https://github.com/alexratmanpl"
+  },
+  "description": "Agent skills for business and career work, installable as a Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "business-agent-skills",
+      "source": "./",
+      "description": "Research a company, judge whether you fit a role, prepare for the interview, and get the money right.",
+      "category": "productivity",
+      "keywords": [
+        "company-research",
+        "job-search",
+        "interview",
+        "salary",
+        "careers"
+      ]
+    }
+  ]
+}

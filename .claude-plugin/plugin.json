@@ -1,0 +1,27 @@
+{
+  "name": "business-agent-skills",
+  "version": "1.0.0",
+  "description": "Four agent skills for business and career work: research a company, judge whether you fit a role, prepare for the interview, and get the money right. Honest rather than encouraging.",
+  "author": {
+    "name": "alexratmanpl",
+    "url": "https://github.com/alexratmanpl"
+  },
+  "homepage": "https://github.com/alexratmanpl/business-agent-skills",
+  "repository": "https://github.com/alexratmanpl/business-agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "company-research",
+    "job-search",
+    "interview",
+    "salary",
+    "negotiation",
+    "careers",
+    "business"
+  ],
+  "skills": [
+    "./skills/business/company-research",
+    "./skills/careers/role-fit",
+    "./skills/careers/pay-check",
+    "./skills/careers/interview-prep"
+  ]
+}
