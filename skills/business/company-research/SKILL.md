@@ -51,7 +51,13 @@ Ordered by how hard the source is for a company to change. Work down the list.
 
 Accounts are filed months after the period they cover, so date them and treat them as historical. Small companies may file abbreviated accounts that omit revenue; record that as a gap.
 
-**What the company publishes.** Useful for what the company intends, weak as evidence. Take specifics — dates, names, numbers — and attribute the framing. Open roles and their locations show where the company is spending. Case studies and customer logos carry dates; check them. Changelogs and release notes show whether the product is moving. Press releases are reliable for what was announced, and for amounts and dates.
+**The company's own site.** Useful for what the company intends, weak as evidence. Take specifics — dates, names, numbers — and attribute the framing. Read the product pages, the pricing page, the customer stories and their dates, and the open roles with their locations, which show where the company is spending. Check the documentation and the status page: both show whether the product is in real use. Press releases are reliable for what was announced, and for amounts and dates.
+
+**Company and engineering blogs.** Post frequency and dates show whether the company is still writing. Engineering posts name the technology in use and the problems being solved, in more detail than the marketing pages. Conference talks and published slides do the same. Record the author and the date.
+
+**Social accounts and communities.** Company accounts show what is announced and how often. Posts by employees, especially engineers and executives, describe the work in more detail than the company site. Professional networks show headcount over time, open roles, arrivals and departures, and how long people stay. Forums, question sites, developer communities and local-language groups carry what customers and former staff say unprompted.
+
+Treat everything here as one person speaking, not the company. Record who said it and when. One post is one account of events; the same detail from several unconnected people is worth more.
 
 Any statement a company makes about its own performance is a claim. Write it as "they say".
 
@@ -63,9 +69,9 @@ Any statement a company makes about its own performance is a claim. Write it as 
 
 ## Write the dossier
 
-Write it as markdown, saved as `company-dossier-NAME.md`. Markdown rather than a rendered page: role-fit and interview-prep read this file afterwards and need text they can parse.
+Write it as markdown, saved as `company-dossier-NAME.md`. Markdown keeps it useful after this session: it can be reread, quoted, extended as more is learned, and passed to whatever needs it next without conversion.
 
-Then make sure the user actually has it. Use whatever the environment offers — attach or send the file, write it to a folder they have connected, or leave it in the working directory if they can reach that. Tell them the filename either way, so another skill can be pointed at it. If no file can reach them, put the dossier in the reply instead. A rendered version can be offered alongside the file where the environment displays one; it does not replace the file.
+Then make sure the user actually has it. Use whatever the environment offers — attach or send the file, write it to a folder they have connected, or leave it in the working directory if they can reach that. Tell them the filename either way, so it can be found again. If no file can reach them, put the dossier in the reply instead. A rendered version can be offered alongside the file where the environment displays one; it does not replace the file.
 
 Sections: what they do, money, competitors, what makes them different, working there, people, risks, what could not be established.
 
