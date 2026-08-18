@@ -21,7 +21,7 @@ If nobody is watching — a background job, a scheduled run, a delegated task �
 
 **What they do.** Identify the product and the buyer. Keep reading until you can state who pays and what problem they are paying to solve. Record whether pricing is published and whether any customers are named. Report both as observations; do not infer a sales model or a stage from them.
 
-**Money.** Funding amounts, dates and investors. Revenue and profit figures, with the source of each. For young companies, how long the funding covers at current spending, if that can be established. For established ones, published results, layoffs and legal proceedings. Compare money raised against headcount and say what the comparison shows.
+**Money.** Funding amounts, dates and investors. Revenue and profit figures, with the source of each. For young companies, how long the funding covers at current spending, if that can be established. For established ones, published results, layoffs and legal proceedings. Record money raised and headcount together, with the ratio, and leave the reader to draw from it.
 
 **Competitors.** For each candidate, establish who signs the cheque and which problem is solved. Where those differ from the company under research, the two are not competitors — say so. Record which have raised more money, and any acquisitions between them.
 
@@ -31,6 +31,18 @@ If nobody is watching — a background job, a scheduled run, a delegated task �
 
 **People.** Leadership backgrounds and tenure. Compare the founding story against early filings and archived pages, and report any difference without explaining it. At small companies, record advisers and investors.
 
+## When to stop
+
+Research is done when each of these holds, at the depth agreed in the first question:
+
+- You can state who pays and what problem they are paying to solve.
+- The most recent funding round or filed accounts is recorded, with its date.
+- At least two competitors are established, each with buyer and problem.
+- Review counts and date range are recorded, or no reviews were found.
+- Current leadership is recorded, with tenure where it is published.
+
+Anything still unestablished at that point is a gap. Write it in the gaps section and stop looking. Continuing past this without a reason turns research into browsing.
+
 ## Where to look
 
 Ordered by how hard the source is for a company to change. Work down the list.
@@ -39,7 +51,13 @@ Ordered by how hard the source is for a company to change. Work down the list.
 
 Accounts are filed months after the period they cover, so date them and treat them as historical. Small companies may file abbreviated accounts that omit revenue; record that as a gap.
 
-**What the company publishes.** Useful for what the company intends, weak as evidence. Take specifics — dates, names, numbers — and attribute the framing. Open roles and their locations show where the company is spending. Case studies and customer logos carry dates; check them. Changelogs and release notes show whether the product is moving. Press releases are reliable for what was announced, and for amounts and dates.
+**The company's own site.** Useful for what the company intends, weak as evidence. Take specifics — dates, names, numbers — and attribute the framing. Read the product pages, the pricing page, the customer stories and their dates, and the open roles with their locations, which show where the company is spending. Check the documentation and the status page: both show whether the product is in real use. Press releases are reliable for what was announced, and for amounts and dates.
+
+**Company and engineering blogs.** Post frequency and dates show whether the company is still writing. Engineering posts name the technology in use and the problems being solved, in more detail than the marketing pages. Conference talks and published slides do the same. Record the author and the date.
+
+**Social accounts and communities.** Company accounts show what is announced and how often. Posts by employees, especially engineers and executives, describe the work in more detail than the company site. Professional networks show headcount over time, open roles, arrivals and departures, and how long people stay. Forums, question sites, developer communities and local-language groups carry what customers and former staff say unprompted.
+
+Treat everything here as one person speaking, not the company. Record who said it and when. One post is one account of events; the same detail from several unconnected people is worth more.
 
 Any statement a company makes about its own performance is a claim. Write it as "they say".
 
@@ -51,12 +69,15 @@ Any statement a company makes about its own performance is a claim. Write it as 
 
 ## Write the dossier
 
-Save as `company-dossier-NAME.md` and tell the user the filename, so another skill can be pointed at it later.
+Write it as markdown, saved as `company-dossier-NAME.md`. Markdown keeps it useful after this session: it can be reread, quoted, extended as more is learned, and passed to whatever needs it next without conversion.
+
+Then make sure the user actually has it. Use whatever the environment offers — attach or send the file, write it to a folder they have connected, or leave it in the working directory if they can reach that. Tell them the filename either way, so it can be found again. If no file can reach them, put the dossier in the reply instead. A rendered version can be offered alongside the file where the environment displays one; it does not replace the file.
 
 Sections: what they do, money, competitors, what makes them different, working there, people, risks, what could not be established.
 
 - **Plain words.** Explain any term of art on first use. Write "money raised from investors" rather than "Series B".
 - **Mark confidence.** Every fact carries a source and a date. Company claims are attributed. Estimates are labelled as estimates. Nothing that is uncertain should read as settled.
+- **Say when a fact is old.** Give the age of anything more than a year out of date. Funding, headcount and leadership all change, and a three-year-old figure is evidence about then, not now.
 - **Report gaps.** End with what could not be established, so the reader knows what to ask about.
 
 ## Rules
