@@ -8,7 +8,7 @@ flags, fix what is genuinely unclear, ignore the rest.
 Checks:
   long sentences     hard to parse quickly, especially in a second language
   abbreviations      used before being spelled out
-  jargon             business filler that carries no information
+  machine phrasing   words and stock phrases that read as AI-written
   length             a brief is one to two pages, read in twenty minutes
 
 Usage: plain_check.py BRIEF.md [--max-sentence-words 25] [--max-words 1000]
@@ -18,18 +18,45 @@ import argparse
 import re
 import sys
 
-# Filler with no legitimate use in a brief. Kept deliberately short: an advisory
-# tool dies from noise, and a flag the reader disagrees with costs more than the
-# one it catches. Words with a real use in context -- leverage as bargaining
-# power, a robust test suite, a company's ecosystem -- are left out on purpose.
-JARGON = {
-    "circle back", "touch base", "move the needle", "low-hanging fruit",
-    "deep dive", "going forward", "learnings", "ideate",
-    "operationalise", "operationalize", "synergy", "synergies",
-    "value-add", "best-in-class", "thought leader", "core competency",
-    "north star", "utilise", "utilize",
-    "world-class", "cutting-edge", "game-changing",
+# Vocabulary that reads as machine-written. These are words that are rare in
+# ordinary speech but common in model output, so their presence is informative.
+#
+# Words like "significant", "crucial", "comprehensive" and "additionally" are
+# deliberately absent. Corpus work on post-2023 academic writing found those rose
+# alongside the others but kept rising after the tells became known, precisely
+# because they are ordinary words whose presence tells you nothing. Flagging them
+# produces noise, and a checklist that cries wolf stops being read.
+TELLS = {
+    "delve", "intricate", "tapestry", "realm", "pivotal",
+    "underscore", "underscores", "underscoring", "testament", "foster",
+    "harness", "illuminate", "bolster", "showcase", "showcasing",
+    "myriad", "plethora", "nuanced", "meticulous", "meticulously",
+    "transformative", "revolutionize", "revolutionise", "seamless",
+    "seamlessly", "ever-evolving", "multifaceted", "paramount", "resonate",
+    "elevate", "streamline", "unlock", "vibrant",
+    "profound", "holistic", "cutting-edge", "game-changing", "world-class",
+    "utilise", "utilize", "synergy", "synergies",
 }
+
+# Stock phrases. Stronger signals than any single word: a person writing notes
+# for their own interview does not reach for these.
+STOCK_PHRASES = {
+    "it's worth noting", "it is worth noting",
+    "it's important to note", "it is important to note",
+    "that being said", "at its core", "to put it simply",
+    "a key takeaway", "shed light on", "sheds light on",
+    "underscores the importance", "in today's", "in conclusion",
+    "when it comes to", "plays a crucial role", "plays a vital role",
+    "the ever-evolving", "in the realm of", "navigating the complexities",
+}
+
+# "It's not X, it's Y" and "not just X, but Y". Catalogued by Wikipedia editors
+# as negative parallelism: a rhetorical shape that sounds emphatic and asserts
+# nothing. Rare in writing meant to be read once, under time pressure.
+PARALLELISM = re.compile(
+    r"\b(?:it's|it is|this is|that's|that is)\s+not\s+(?:just\s+)?[^.,;]{2,40}[,.]?\s*"
+    r"(?:it's|it is|it)\b|\bnot\s+just\s+[^.,;]{2,40},?\s+but\b",
+    re.IGNORECASE)
 
 # Abbreviations a reader will not stumble over. Everything else gets flagged the
 # first time it appears without an expansion.
@@ -90,12 +117,23 @@ def check_abbreviations(text, lines):
             yield number, f"'{token}' used without being spelled out"
 
 
-def check_jargon(lines):
+def check_tells(lines):
     for number, line in lines:
         lowered = line.lower()
-        for term in sorted(JARGON):
+        hit_phrases = [p for p in sorted(STOCK_PHRASES) if p in lowered]
+        for phrase in hit_phrases:
+            yield number, f"stock phrase: '{phrase}'"
+        for term in sorted(TELLS):
+            # A word already reported as part of a stock phrase is one problem,
+            # not two. Reporting it twice pads the count and buries the rest.
+            if any(term in phrase for phrase in hit_phrases):
+                continue
             if re.search(rf"\b{re.escape(term)}\b", lowered):
-                yield number, f"jargon: '{term}'"
+                yield number, f"reads as machine-written: '{term}'"
+        match = PARALLELISM.search(line)
+        if match:
+            yield number, (f"negative parallelism: '{match.group(0).strip()}' — "
+                           f"sounds emphatic, asserts nothing")
 
 
 def check_length(text, limit):
@@ -126,7 +164,7 @@ def main():
     findings += list(check_length(text, args.max_words))
     findings += list(check_sentences(lines, args.max_sentence_words))
     findings += list(check_abbreviations(text, lines))
-    findings += list(check_jargon(lines))
+    findings += list(check_tells(lines))
 
     if not findings:
         print("nothing flagged")

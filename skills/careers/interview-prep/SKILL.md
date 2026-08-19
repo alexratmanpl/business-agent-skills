@@ -84,7 +84,7 @@ It is read in the twenty minutes before a call, possibly on a phone, possibly by
 - **Marked confidence**, because confident wrongness in an interview is expensive. A **fact** carries a source and a date. A company claim is attributed — *they say*. An estimate is labelled *roughly*. If something couldn't be established, say so rather than leaving a gap they'll fill with an assumption.
 - **Glanceable.** Short sections. Questions in a numbered list. Scripted lines in block quotes so they can be found at speed. Bold only for what must not be missed — bold everywhere is bold nowhere.
 
-If code can run, check it with `scripts/plain_check.py` in this skill's directory — `${CLAUDE_SKILL_DIR}/scripts/plain_check.py` in Claude Code. It flags jargon, unexplained abbreviations, long sentences, excess length. A checklist, not a judge. Otherwise apply the rules by hand.
+If code can run, check it with `scripts/plain_check.py` in this skill's directory — `${CLAUDE_SKILL_DIR}/scripts/plain_check.py` in Claude Code. It flags phrasing that reads as machine-written, abbreviations used before being spelled out, long sentences and excess length. A checklist, not a judge. Otherwise apply the rules by hand.
 
 Save it, present it, offer a Word version.
 
