@@ -9,11 +9,13 @@ Checks:
   - frontmatter parses, and has a name and a description
   - the name matches the directory it lives in, since that is what installs
   - every bundled file the body points at actually exists
+  - the body is not still a placeholder
 
-The last check exists because the two real defects found in this repository were
-both pointers to files that were never committed. A skill that references a
-missing file does not fail loudly at runtime; the instruction is simply read and
-nothing is found.
+The last two checks exist because both defects found in this repository were
+invisible at runtime. A skill referencing a missing file does not fail loudly;
+the instruction is read and nothing is found. A skill whose body was never
+written installs cleanly and produces a confident answer from the description
+alone.
 
 Usage: build_skills.py [--out dist] [--check-only]
 """
@@ -33,6 +35,24 @@ EXCLUDE_SUFFIXES = (".pyc",)
 # ships, and flagging those produces noise instead of findings.
 PATH_PATTERN = re.compile(r"`([^`\n]*?/[^`\n]*?\.(?:md|py|sh|json|ya?ml|txt|csv))`")
 LINK_PATTERN = re.compile(r"\[[^\]]*\]\(([^)\s]+/[^)\s]+)\)")
+
+# Lines that mean "this skill was never written". Matched against a whole line,
+# normalised, not against the text anywhere in the body: a skill may legitimately
+# tell the model to leave a TODO comment, and only a line that is nothing but the
+# marker indicates a placeholder. Extend this list as new phrasings turn up.
+PLACEHOLDER_LINES = {
+    "instructions to follow",
+    "content to follow",
+    "to follow",
+    "to be written",
+    "to be completed",
+    "coming soon",
+    "placeholder",
+    "todo",
+    "tbd",
+    "wip",
+    "work in progress",
+}
 
 
 def find_skills(root):
@@ -70,6 +90,25 @@ def referenced_paths(body):
     return sorted(cleaned)
 
 
+def body_after_frontmatter(text):
+    if not text.startswith("---\n"):
+        return text
+    end = text.find("\n---", 4)
+    if end == -1:
+        return text
+    return text[end + 4:]
+
+
+def normalise_line(line):
+    line = line.strip().strip("*_#>-` ").strip()
+    return line.rstrip(".:!").strip().lower()
+
+
+def placeholder_lines(body):
+    return [line.strip() for line in body.split("\n")
+            if normalise_line(line) in PLACEHOLDER_LINES]
+
+
 def check(skill_dir):
     problems = []
     name = os.path.basename(skill_dir)
@@ -91,6 +130,11 @@ def check(skill_dir):
     for path in referenced_paths(text):
         if not os.path.exists(os.path.join(skill_dir, path)):
             problems.append(f"{name}: points at '{path}', which is not in the skill")
+
+    for line in placeholder_lines(body_after_frontmatter(text)):
+        problems.append(
+            f"{name}: body contains the placeholder line '{line}'. The skill has a "
+            f"description but no instructions behind it")
 
     return problems
 
