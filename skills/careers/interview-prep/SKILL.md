@@ -92,9 +92,13 @@ Save it, present it, offer a Word version.
 
 ## The record, for the call itself
 
-The brief prepares them. It does not help during the conversation: scrolling a document mid-call loses your place, and there is nowhere to type. Build `interview-record.html` for any scheduled conversation where they will be both answering and assessing.
+The brief prepares them. It does not help during the conversation: scrolling a document mid-call loses your place, and there is nowhere to type. Build `interview-record.html` for any conversation where they will be told things they need later.
 
-Skip it for a twenty-minute screening call, and for a hands-on session — a live coding round needs a different shape entirely, not a page of question cards.
+That includes a recruiter screening call. It is short, but it is usually where the budget, the real scope, the process and the timeline are named for the first time, and where the recruiter's own conduct is evidence about the employer. Early is not the same as unimportant.
+
+On a screening call the signals matter more than the questions. Whether they knew the technical content of the role, whether they answered the money question or moved past it, whether they could name the hiring manager — those are judgments about the employer, and they are the reason to keep the record open.
+
+Skip it for scheduling and logistics, and for a hands-on session — a live coding round needs a different shape entirely, not a page of question cards.
 
 It is one self-contained page, filled by swapping two arrays at the top of its script:
 
