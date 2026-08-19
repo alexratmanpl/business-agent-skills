@@ -1,0 +1,37 @@
+name: Package skills
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate and package
+        run: python3 scripts/build_skills.py --out dist
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: skills
+          path: dist/*.skill
+          if-no-files-found: error
+
+      - name: Publish rolling release
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest dist/*.skill \
+            --title "Latest skills" \
+            --notes "Built from ${GITHUB_SHA:0:7}." \
+            --prerelease
