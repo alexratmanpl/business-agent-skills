@@ -30,10 +30,12 @@ SKILLS_DIR = "skills"
 EXCLUDE_NAMES = {"__pycache__", ".DS_Store", "evals"}
 EXCLUDE_SUFFIXES = (".pyc",)
 
-# Only paths containing a slash are treated as bundled files. A bare filename in
-# the prose is usually something the skill writes at runtime, not something it
-# ships, and flagging those produces noise instead of findings.
-PATH_PATTERN = re.compile(r"`([^`\n]*?/[^`\n]*?\.(?:md|py|sh|json|ya?ml|txt|csv))`")
+# Bundled files are referenced by a fixed, lowercase name. A filename carrying a
+# placeholder -- company-dossier-NAME.md, report-<date>.md -- is something the
+# skill writes at runtime, not something it ships, so those are skipped. Without
+# that distinction the check either misses flat bundled files or invents errors
+# about files that are supposed to be created later.
+PATH_PATTERN = re.compile(r"`([^`\n\s]*?\.(?:md|py|sh|json|ya?ml|txt|csv|html))`")
 LINK_PATTERN = re.compile(r"\[[^\]]*\]\(([^)\s]+/[^)\s]+)\)")
 
 # Lines that mean "this skill was never written". Matched against a whole line,
@@ -86,6 +88,9 @@ def referenced_paths(body):
         path = re.sub(r"^\$\{[A-Z_]+\}/", "", path)  # ${CLAUDE_SKILL_DIR}/...
         if path.startswith(("http://", "https://", "/")):
             continue
+        name = os.path.basename(path)
+        if any(c.isupper() for c in name) or "<" in name or ">" in name:
+            continue  # a filename to be produced at runtime, not a bundled file
         cleaned.add(path)
     return sorted(cleaned)
 

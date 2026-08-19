@@ -71,9 +71,11 @@ If they decline the fit check, say once that preparation built on an untested vi
 
 What was asked, what landed, what didn't, what the questions reveal about what they actually care about, what to fix next. Update the brief.
 
+If they used the record, ask them to paste what it copied out. Working from that beats working from recall, and the gap between the two grows by the hour.
+
 ## The brief
 
-Structure: `brief-template.md`.
+Open with the company, the role, which round this is, the date, and who they are meeting. Then the sections from **Build**, in that order. Leave space at the end for what actually happened: asked, landed, didn't, what it reveals, what to fix next.
 
 It is read in the twenty minutes before a call, possibly on a phone, possibly by someone whose second language it is, and always by someone who is nervous. Everything below follows from that.
 
@@ -87,6 +89,21 @@ It is read in the twenty minutes before a call, possibly on a phone, possibly by
 If code can run, check it with `scripts/plain_check.py` in this skill's directory — `${CLAUDE_SKILL_DIR}/scripts/plain_check.py` in Claude Code. It flags phrasing that reads as machine-written, abbreviations used before being spelled out, long sentences and excess length. A checklist, not a judge. Otherwise apply the rules by hand.
 
 Save it, present it, offer a Word version.
+
+## The record, for the call itself
+
+The brief prepares them. It does not help during the conversation: scrolling a document mid-call loses your place, and there is nowhere to type. Build `interview-record.html` for any scheduled conversation where they will be both answering and assessing.
+
+Skip it for a twenty-minute screening call, and for a hands-on session — a live coding round needs a different shape entirely, not a page of question cards.
+
+It is one self-contained page, filled by swapping two arrays at the top of its script:
+
+- **`QUESTIONS`** — each is `[question, what the answer reveals]`. The second string is the point: mid-call they need to see what they are listening for, not a restatement of what they asked.
+- **`SIGNALS`** — judgments formed across the whole conversation, not questions. Whether the work really happens here, whether the worry about their weak spot is real. One click records confirmed or not the case, so a judgment can be caught without breaking eye contact. These are the things nobody remembers by the end of a call.
+
+The panels on the right take the same content as the brief — why this company, the weak spots said first, the harder questions held back. One preparation pass fills both; the brief is read beforehand, the record is open during.
+
+**Copy everything** produces plain text. That is the point of the whole thing: it comes back into a later session as the input for **After a round**, instead of being reconstructed from memory two days later.
 
 ## Several companies
 
