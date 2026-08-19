@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interview record</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDF0F3;
+    --card:#FFFFFF;
+    --ink:#16222E;
+    --ink-2:#546675;
+    --ink-3:#8797A4;
+    --rule:#D3DCE4;
+    --blue:#1F5C8B;
+    --blue-soft:#E7EEF5;
+    --ochre:#A8681A;
+    --ochre-soft:#F7EEE0;
+    --green:#2A6349;
+    --green-soft:#E4EFE9;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --sans:"IBM Plex Sans",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 18px 60px}
+
+  /* ---------- header ---------- */
+  .masthead{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:12px;margin-bottom:20px;
+  }
+  .eyebrow{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-3);margin:0 0 6px;
+  }
+  h1{font-size:23px;line-height:1.15;margin:0 0 12px;letter-spacing:-.015em;font-weight:700}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .meta input{
+    font-family:var(--mono);font-size:12px;color:var(--ink);
+    background:var(--card);border:1px solid var(--rule);border-radius:3px;
+    padding:6px 9px;
+  }
+  .meta input#who{min-width:190px}
+  .meta input#role{min-width:150px}
+  .meta input#when{min-width:130px}
+
+  .clock{
+    margin-left:auto;display:flex;align-items:center;gap:8px;
+    font-family:var(--mono);
+  }
+  .clock output{font-size:19px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+  button{font-family:var(--sans);cursor:pointer}
+  .btn{
+    border:1px solid var(--rule);background:var(--card);color:var(--ink);
+    border-radius:3px;padding:6px 11px;font-size:12.5px;font-weight:500;
+  }
+  .btn:hover{border-color:var(--ink-2)}
+  .btn-dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn-dark:hover{background:#0C161F}
+  :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+  /* ---------- layout ---------- */
+  .cols{display:grid;grid-template-columns:1fr 322px;gap:22px;align-items:start}
+  @media (max-width:900px){.cols{grid-template-columns:1fr}}
+
+  .sec-label{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-2);
+    display:flex;align-items:center;gap:9px;margin:0 0 10px;
+  }
+  .sec-label::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  /* ---------- question cards ---------- */
+  .q{
+    background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--blue);
+    border-radius:3px;padding:13px 15px;margin-bottom:10px;
+  }
+  .q.done{border-left-color:var(--green);background:#FBFCFB}
+  .q.done .qtext{color:var(--ink-2)}
+  .qhead{display:flex;gap:11px;align-items:flex-start}
+  .qnum{
+    font-family:var(--mono);font-size:11px;color:var(--ink-3);
+    padding-top:3px;flex-shrink:0;
+  }
+  .qtext{font-weight:600;font-size:14.5px;line-height:1.4;flex:1}
+  .tick{
+    flex-shrink:0;width:22px;height:22px;border:1px solid var(--rule);
+    border-radius:3px;background:var(--card);color:transparent;
+    font-size:13px;line-height:1;padding:0;
+  }
+  .q.done .tick{background:var(--green);border-color:var(--green);color:#fff}
+  .hint{
+    font-size:12.5px;color:var(--ink-2);margin:7px 0 0 32px;
+    padding-left:9px;border-left:2px solid var(--blue-soft);
+  }
+  .q textarea{
+    width:100%;margin-top:9px;min-height:52px;resize:vertical;
+    font-family:var(--sans);font-size:14px;line-height:1.5;color:var(--ink);
+    background:#FCFDFE;border:1px solid var(--rule);border-radius:3px;padding:9px 10px;
+  }
+  .q textarea:focus{background:#fff;border-color:var(--blue)}
+  .q textarea::placeholder{color:var(--ink-3)}
+
+  .addq{display:flex;gap:7px;margin:4px 0 22px}
+  .addq input{
+    flex:1;font-family:var(--sans);font-size:13.5px;padding:8px 10px;
+    border:1px dashed var(--rule);border-radius:3px;background:transparent;color:var(--ink);
+  }
+  .addq input:focus{background:#fff;border-style:solid;border-color:var(--blue)}
+
+  /* free notes */
+  .scratch{
+    width:100%;min-height:150px;resize:vertical;background:var(--card);
+    border:1px solid var(--rule);border-radius:3px;padding:12px;
+    font-family:var(--sans);font-size:14px;line-height:1.6;color:var(--ink);
+  }
+  .scratch:focus{border-color:var(--blue)}
+
+  /* ---------- rail ---------- */
+  .rail{position:sticky;top:20px}
+  @media (max-width:900px){.rail{position:static}}
+  .panel{
+    background:var(--card);border:1px solid var(--rule);border-radius:3px;
+    padding:13px 14px;margin-bottom:14px;
+  }
+  .panel h3{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--ink-2);margin:0 0 10px;font-weight:500;
+  }
+
+  /* signal chips — the signature element */
+  .sig{
+    display:block;width:100%;text-align:left;border:1px solid var(--rule);
+    background:#FBFCFD;border-radius:3px;padding:8px 10px;margin-bottom:6px;
+    font-size:13px;line-height:1.35;color:var(--ink-2);position:relative;
+    padding-left:30px;transition:none;
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .sig{transition:background .12s ease,border-color .12s ease}
+  }
+  .sig::before{
+    content:"";position:absolute;left:10px;top:50%;transform:translateY(-50%);
+    width:9px;height:9px;border:1px solid var(--ink-3);border-radius:50%;
+  }
+  .sig[data-state="yes"]{background:var(--green-soft);border-color:#B9D3C6;color:var(--ink);font-weight:500}
+  .sig[data-state="yes"]::before{background:var(--green);border-color:var(--green)}
+  .sig[data-state="no"]{background:var(--ochre-soft);border-color:#E3CDAA;color:var(--ink);font-weight:500}
+  .sig[data-state="no"]::before{background:var(--ochre);border-color:var(--ochre)}
+  .sig-key{
+    font-family:var(--mono);font-size:10px;color:var(--ink-3);
+    margin-top:8px;line-height:1.5;
+  }
+  .sig-key b{color:var(--green);font-weight:600}
+  .sig-key i{color:var(--ochre);font-style:normal;font-weight:600}
+
+  .panel ul{margin:0;padding-left:17px;font-size:13px;color:var(--ink-2);line-height:1.55}
+  .panel ul li{margin-bottom:5px}
+  .panel ul li b{color:var(--ink)}
+  details summary{
+    font-size:13px;font-weight:600;cursor:pointer;color:var(--blue);
+    list-style:none;display:flex;align-items:center;gap:6px;
+  }
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"+";font-family:var(--mono);font-weight:600}
+  details[open] summary::before{content:"–"}
+  details[open] summary{margin-bottom:8px}
+  .later{
+    font-size:12.5px;color:var(--ink-2);background:var(--blue-soft);
+    border-radius:3px;padding:9px 10px;margin-top:8px;line-height:1.45;
+  }
+
+  /* footer bar */
+  .bar{
+    display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+    border-top:1px solid var(--rule);margin-top:22px;padding-top:14px;
+  }
+  .status{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-left:auto}
+  .toast{
+    position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:#fff;font-size:13px;padding:9px 15px;
+    border-radius:3px;opacity:0;pointer-events:none;
+  }
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <p class="eyebrow">Interview record</p>
+    <h1>COMPANY — notes while I listen</h1>
+    <div class="meta">
+      <input id="who" placeholder="Who I'm speaking to">
+      <input id="role" placeholder="Their role">
+      <input id="when" type="date">
+      <div class="clock">
+        <output id="clock">00:00</output>
+        <button class="btn" id="timer">Start</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cols">
+
+    <main>
+      <p class="sec-label">What I want to ask</p>
+      <div id="qlist"></div>
+      <form class="addq" id="addq">
+        <input id="newq" placeholder="Add a question that comes up…" aria-label="Add a question">
+        <button class="btn" type="submit">Add</button>
+      </form>
+
+      <p class="sec-label">Anything else worth writing down</p>
+      <textarea class="scratch" id="scratch" placeholder="Names, tools, numbers, things to look up after."></textarea>
+    </main>
+
+    <aside class="rail">
+      <div class="panel">
+        <h3>What I'm listening for</h3>
+        <div id="sigs"></div>
+        <p class="sig-key">Click once for <b>confirmed</b>, twice for <i>not the case</i>, three times to clear.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Ready for the obvious ones</h3>
+        <details>
+          <summary>Why this company</summary>
+          <ul>
+            <li>A concrete link between their work and yours.</li>
+            <li>Evidence you have done the thing they need, not an assertion.</li>
+            <li>Something you found that most applicants will not have.</li>
+          </ul>
+        </details>
+      </div>
+
+      <div class="panel">
+        <h3>My weak spots — say them first</h3>
+        <ul>
+          <li><b>The gap they will spot:</b> what you did, where it stops, what you would learn.</li>
+          <li><b>The second one:</b> stated plainly, with the reason it matters less than it looks.</li>
+          <li><b>Anything odd in the history:</b> said first, without apology.</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Only if it fits</h3>
+        <p class="later">A harder question, held back for a moment when the conversation has warmed up.</p>
+        <p class="later">A second one, built on something specific you found rather than on their marketing.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Send or do afterwards</h3>
+        <textarea class="scratch" id="followups" style="min-height:88px" placeholder="One line each."></textarea>
+      </div>
+    </aside>
+  </div>
+
+  <div class="bar">
+    <button class="btn btn-dark" id="copy">Copy everything</button>
+    <button class="btn" id="fresh">Start a new record</button>
+    <span class="status" id="status">Loading…</span>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ------------------------------------------------------------------
+   Swap these two arrays for each interview. Everything else stays.
+
+   QUESTIONS: [question, what the answer reveals]
+     The second string is the point. It is not a restatement of the
+     question, it is why you are asking -- so that mid-call you can see
+     what you are listening for without re-reading your own notes.
+
+   SIGNALS: judgments you form across the whole conversation.
+     Not questions. Things you will only know by the end, and will have
+     forgotten by then unless you record them as they land. One click
+     each: confirmed, not the case, clear.
+   ------------------------------------------------------------------ */
+const QUESTIONS = [
+  ["What does this team actually own day to day?",
+   "Whether the job is what the advert implied."],
+  ["What is the hardest problem on your plate this quarter?",
+   "Where I could be useful, and whether they will be candid."],
+  ["How does the team work -- reviews, testing, who carries the pager?",
+   "Whether 'flexible' also means unstructured."],
+  ["What would you want from me in the first three months?",
+   "Their real expectation, and a hook for the next round."],
+  ["What happens after this conversation, and what should I read first?",
+   "Practical. Ask it -- they expect it."]
+];
+
+const SIGNALS = [
+  "The role is what the advert described",
+  "This is where the work actually happens",
+  "They have customers, not just plans",
+  "Room to own something myself",
+  "They are worried about my weak spot",
+  "Someone I would want to work for"
+];
+
+const KEY = "interview-record";
+let S = { meta:{}, answers:{}, done:{}, sigs:{}, extra:[], scratch:"", followups:"", seconds:0 };
+let running = false, tick = null, saveTimer = null, memoryOnly = false;
+
+const $ = id => document.getElementById(id);
+const toast = m => { const t=$("toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1600); };
+const setStatus = m => $("status").textContent = m;
+
+function allQuestions(){ return QUESTIONS.concat((S.extra||[]).map(q=>[q,""])); }
+
+function drawQuestions(){
+  const list = $("qlist");
+  list.innerHTML = "";
+  allQuestions().forEach(([text,hint],i)=>{
+    const card = document.createElement("div");
+    card.className = "q" + (S.done[i] ? " done" : "");
+
+    const head = document.createElement("div");
+    head.className = "qhead";
+    head.innerHTML = `<span class="qnum">${String(i+1).padStart(2,"0")}</span>
+                      <span class="qtext"></span>`;
+    head.querySelector(".qtext").textContent = text;
+
+    const tick = document.createElement("button");
+    tick.className = "tick";
+    tick.type = "button";
+    tick.textContent = "✓";
+    tick.setAttribute("aria-label", S.done[i] ? "Mark as not asked" : "Mark as asked");
+    tick.onclick = () => { S.done[i] = !S.done[i]; drawQuestions(); queueSave(); };
+    head.appendChild(tick);
+    card.appendChild(head);
+
+    if(hint){
+      const h = document.createElement("p");
+      h.className = "hint";
+      h.textContent = hint;
+      card.appendChild(h);
+    }
+
+    const ta = document.createElement("textarea");
+    ta.placeholder = "What they said…";
+    ta.value = S.answers[i] || "";
+    ta.setAttribute("aria-label", "Answer to question " + (i+1));
+    ta.oninput = e => {
+      S.answers[i] = e.target.value;
+      if(e.target.value.trim() && !S.done[i]){ S.done[i] = true; card.classList.add("done"); }
+      queueSave();
+    };
+    card.appendChild(ta);
+    list.appendChild(card);
+  });
+}
+
+function drawSignals(){
+  const box = $("sigs");
+  box.innerHTML = "";
+  SIGNALS.forEach((label,i)=>{
+    const b = document.createElement("button");
+    b.className = "sig";
+    b.type = "button";
+    b.textContent = label;
+    const st = S.sigs[i] || "";
+    if(st) b.dataset.state = st;
+    b.onclick = () => {
+      const now = S.sigs[i] || "";
+      S.sigs[i] = now === "" ? "yes" : now === "yes" ? "no" : "";
+      drawSignals(); queueSave();
+    };
+    box.appendChild(b);
+  });
+}
+
+/* ---------- timer ---------- */
+function showClock(){
+  const m = Math.floor(S.seconds/60), s = S.seconds%60;
+  $("clock").textContent = String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+}
+$("timer").onclick = () => {
+  running = !running;
+  $("timer").textContent = running ? "Pause" : "Start";
+  if(running){ tick = setInterval(()=>{ S.seconds++; showClock(); if(S.seconds%15===0) queueSave(); },1000); }
+  else { clearInterval(tick); queueSave(); }
+};
+
+/* ---------- storage ---------- */
+function queueSave(){
+  clearTimeout(saveTimer);
+  setStatus("Saving…");
+  saveTimer = setTimeout(save, 700);
+}
+async function save(){
+  S.meta = { who:$("who").value, role:$("role").value, when:$("when").value };
+  S.scratch = $("scratch").value;
+  S.followups = $("followups").value;
+  if(memoryOnly){ setStatus("Kept in this tab only"); return; }
+  try{
+    const r = await window.storage.set(KEY, JSON.stringify(S));
+    setStatus(r ? "Saved " + new Date().toLocaleTimeString() : "Not saved");
+  }catch(e){
+    memoryOnly = true;
+    setStatus("Kept in this tab only");
+  }
+}
+async function load(){
+  try{
+    const r = await window.storage.get(KEY);
+    if(r && r.value){
+      const saved = JSON.parse(r.value);
+      S = Object.assign(S, saved);
+      S.answers = S.answers||{}; S.done = S.done||{}; S.sigs = S.sigs||{}; S.extra = S.extra||[];
+      if(S.meta){
+        if(S.meta.who) $("who").value = S.meta.who;
+        if(S.meta.role) $("role").value = S.meta.role;
+        if(S.meta.when) $("when").value = S.meta.when;
+      }
+      $("scratch").value = S.scratch||"";
+      $("followups").value = S.followups||"";
+      setStatus("Loaded earlier notes");
+    } else {
+      setStatus("New record");
+    }
+  }catch(e){
+    setStatus("New record");
+  }
+  if(!$("when").value) $("when").value = new Date().toISOString().slice(0,10);
+  showClock(); drawQuestions(); drawSignals();
+}
+
+/* ---------- actions ---------- */
+$("addq").onsubmit = e => {
+  e.preventDefault();
+  const v = $("newq").value.trim();
+  if(!v) return;
+  S.extra.push(v); $("newq").value = "";
+  drawQuestions(); queueSave();
+};
+
+$("copy").onclick = async () => {
+  const L = [];
+  L.push(`${$("who").value || "Interview"} — ${$("role").value}`);
+  L.push($("when").value + "  ·  " + $("clock").textContent + " on the call");
+  L.push("");
+  allQuestions().forEach(([q],i)=>{
+    const a = (S.answers[i]||"").trim();
+    if(a){ L.push("Q: "+q); L.push("A: "+a); L.push(""); }
+  });
+  const yes = SIGNALS.filter((_,i)=>S.sigs[i]==="yes");
+  const no  = SIGNALS.filter((_,i)=>S.sigs[i]==="no");
+  if(yes.length){ L.push("Confirmed: "+yes.join("; ")); }
+  if(no.length){ L.push("Not the case: "+no.join("; ")); }
+  if(yes.length||no.length) L.push("");
+  if(($("scratch").value||"").trim()){ L.push("Other notes:"); L.push($("scratch").value.trim()); L.push(""); }
+  if(($("followups").value||"").trim()){ L.push("Afterwards:"); L.push($("followups").value.trim()); }
+  const text = L.join("\n");
+  try{ await navigator.clipboard.writeText(text); toast("Copied"); }
+  catch(e){
+    const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy"); ta.remove(); toast("Copied");
+  }
+};
+
+$("fresh").onclick = async () => {
+  if(!confirm("Clear these notes and start a new record?")) return;
+  const who = $("who").value;
+  S = { meta:{}, answers:{}, done:{}, sigs:{}, extra:[], scratch:"", followups:"", seconds:0 };
+  running = false; clearInterval(tick); $("timer").textContent = "Start";
+  $("who").value = who; $("role").value = ""; $("scratch").value = ""; $("followups").value = "";
+  $("when").value = new Date().toISOString().slice(0,10);
+  showClock(); drawQuestions(); drawSignals(); save();
+  toast("New record");
+};
+
+["who","role","when"].forEach(id => $(id).oninput = queueSave);
+$("scratch").oninput = queueSave;
+$("followups").oninput = queueSave;
+
+load();
+</script>
+</body>
+</html>
