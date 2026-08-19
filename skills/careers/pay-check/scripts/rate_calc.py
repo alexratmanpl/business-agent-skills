@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
 """Pay arithmetic: day rates, annual figures, and employment against contracting.
 
-This script does arithmetic only. It holds no market data, contacts no network,
-and knows nothing about any country's tax system. Every rate, percentage and day
-count is supplied by the caller, and every result repeats the inputs it used, so
-any figure can be traced back to the assumptions behind it.
+This script does arithmetic only. It holds no rates for any country, contacts no
+network, and has no opinion about anyone's tax position. Every figure is supplied
+by the caller, and every result repeats the inputs it used, so any number can be
+traced back to the assumption behind it.
+
+Tax is handled by passing a rate file with --rates: thresholds, percentages, caps
+and reliefs, each with the source it came from. The caller researches those
+parameters; this script applies them. That split is deliberate. Looking up a
+published threshold is checkable against a government page in a minute; an
+"effective rate of 33%" is somebody's arithmetic and cannot be checked at all.
+
+No country data is stored here, including in the tests, which use a fictional
+country. Stored rates go stale silently, and a wrong tax figure presented
+confidently is worse than no tax figure.
 
 Subcommands (run each with --help for its options):
 
@@ -13,6 +23,7 @@ Subcommands (run each with --help for its options):
   annual-to-day   an annual figure to a day rate
   compare         employment against contracting, like for like
   convert         currency conversion at a rate you supply
+  rates-template  print the rate file this script expects, for filling in
   selftest        check the arithmetic
 
 Add --json to any subcommand for machine-readable output.
@@ -56,7 +67,8 @@ def annual_to_day(annual, days):
 
 
 def compare(salary, day_rate, days, employer_pension, benefits_value,
-            business_costs, own_pension, employee_tax_pct, contractor_tax_pct):
+            business_costs, own_pension, employee_tax_pct, contractor_tax_pct,
+            rates=None):
     """Employment against contracting on a comparable basis.
 
     Paid leave is not added to the employed side: it is already inside the
@@ -76,7 +88,7 @@ def compare(salary, day_rate, days, employer_pension, benefits_value,
             "benefits_value": benefits_value,
             "business_costs": business_costs,
             "own_pension": own_pension,
-            "tax_applied": False,
+            "tax_basis": "none",
         },
         "employment": {
             "salary": salary,
@@ -90,27 +102,212 @@ def compare(salary, day_rate, days, employer_pension, benefits_value,
         },
     }
 
-    if employee_tax_pct is not None and contractor_tax_pct is not None:
-        employed_net = employed_package * (1 - employee_tax_pct / 100)
-        contract_net = contract_after_costs * (1 - contractor_tax_pct / 100)
-        result["assumptions"]["tax_applied"] = True
-        result["assumptions"]["employee_tax_pct"] = employee_tax_pct
-        result["assumptions"]["contractor_tax_pct"] = contractor_tax_pct
+    if rates:
+        emp = employment_tax(salary, rates)
+        sef = self_employed_tax(contract_gross, business_costs + own_pension, rates)
+        result["assumptions"].update({
+            "tax_basis": "rate file",
+            "country": rates.get("country", ""),
+            "tax_year": rates.get("tax_year", ""),
+            "sources": rates.get("sources", []),
+            "notes": rates.get("notes", ""),
+        })
+        result["employment"]["tax"] = emp
+        result["contracting"]["tax"] = sef
+        # benefits and employer pension are added after tax here: they are not
+        # cash the person is taxed on in this model. Say so rather than hide it.
+        employed_net = emp["net"] + employer_pension + benefits_value
+        contract_net = sef["net"]
         result["employment"]["after_tax"] = round(employed_net, 2)
         result["contracting"]["after_tax"] = round(contract_net, 2)
-        basis, a, b = "after tax", employed_net, contract_net
-    else:
-        basis, a, b = "before tax", employed_package, contract_after_costs
+        a, b = employed_net, contract_net
+        match_rate = solve_match_rate(a, days, business_costs, own_pension, rates)
 
+    elif employee_tax_pct is not None and contractor_tax_pct is not None:
+        employed_net = employed_package * (1 - employee_tax_pct / 100)
+        contract_net = contract_after_costs * (1 - contractor_tax_pct / 100)
+        result["assumptions"].update({
+            "tax_basis": "flat rates supplied by the caller",
+            "employee_tax_pct": employee_tax_pct,
+            "contractor_tax_pct": contractor_tax_pct,
+            "warning": ("flat effective rates ignore brackets, caps and reliefs. "
+                        "Pass --rates for a result anyone can check"),
+        })
+        result["employment"]["after_tax"] = round(employed_net, 2)
+        result["contracting"]["after_tax"] = round(contract_net, 2)
+        a, b = employed_net, contract_net
+        match_rate = (a / (1 - contractor_tax_pct / 100)
+                      + business_costs + own_pension) / days
+
+    else:
+        a, b = employed_package, contract_after_costs
+        match_rate = (a + business_costs + own_pension) / days
+
+    basis = result["assumptions"]["tax_basis"]
     result["comparison"] = {
-        "basis": basis,
+        "basis": "before tax" if basis == "none" else f"after tax ({basis})",
         "difference": round(b - a, 2),
         "contracting_vs_employment_pct": round((b / a - 1) * 100, 2) if a else None,
-        "day_rate_to_match_employment": round(
-            (a / (1 - contractor_tax_pct / 100) if basis == "after tax" else a
-             ) / days + (business_costs + own_pension) / days, 2),
+        "day_rate_to_match_employment": round(match_rate, 2),
     }
     return result
+
+
+# --- tax engine -------------------------------------------------------------
+# Everything below works from parameters in a rate file. Nothing here knows any
+# country's rules; it knows how brackets, caps, floors and credits behave.
+
+RATES_TEMPLATE = {
+    "country": "",
+    "currency": "",
+    "tax_year": 0,
+    "sources": ["url of the tax authority page each figure came from"],
+    "notes": "anything a reader needs to judge whether these apply to them",
+    "employment": {
+        "income_tax_bands": [[0, 0.0]],
+        "credits": [{"name": "", "amount": 0}],
+        "contributions": [{"name": "", "pct": 0.0, "cap": None}],
+    },
+    "self_employed": {
+        "income_tax_bands": [[0, 0.0]],
+        "credits": [{"name": "", "amount": 0}],
+        "expense_allowance": {"pct": 0.0, "cap": None},
+        "contributions": [{"name": "", "pct": 0.0, "base_pct": 100.0,
+                           "cap": None, "min_annual": 0}],
+    },
+    "reliefs": [{
+        "name": "",
+        "conditions": "who qualifies, and for how long",
+        "applies_to": "employment | self_employed | both",
+        "exempt_income": 0,
+    }],
+}
+
+
+def tax_on(amount, bands):
+    """Progressive tax. Bands are [lower_threshold, percent], lowest first."""
+    if amount <= 0 or not bands:
+        return 0.0
+    bands = sorted(bands, key=lambda b: b[0])
+    total = 0.0
+    for i, (floor, pct) in enumerate(bands):
+        if amount <= floor:
+            break
+        ceiling = bands[i + 1][0] if i + 1 < len(bands) else None
+        top = min(amount, ceiling) if ceiling is not None else amount
+        total += (top - floor) * pct / 100.0
+        # the band above starts where this one ended
+    return total
+
+
+def contributions_on(base, specs):
+    """Percentage charges, each with an optional cap and annual minimum."""
+    out, total = [], 0.0
+    for spec in specs or []:
+        charge_base = base * (spec.get("base_pct", 100.0) / 100.0)
+        cap = spec.get("cap")
+        if cap is not None:
+            charge_base = min(charge_base, cap)
+        amount = charge_base * spec.get("pct", 0.0) / 100.0
+        floor = spec.get("min_annual") or 0
+        if amount < floor:
+            amount = floor
+        out.append(f"{spec.get('name', 'contribution')}: "
+                   f"{round(amount, 2)} on a base of {round(charge_base, 2)}")
+        total += amount
+    return round(total, 2), out
+
+
+def exempt_for(rates, side):
+    """Total income exempted by reliefs that apply to this side."""
+    total, applied = 0.0, []
+    for relief in rates.get("reliefs") or []:
+        scope = relief.get("applies_to", "both")
+        if scope not in (side, "both"):
+            continue
+        amount = relief.get("exempt_income") or 0
+        if amount:
+            total += amount
+            applied.append(relief.get("name", "relief"))
+    return total, applied
+
+
+def employment_tax(gross, rates):
+    side = rates.get("employment") or {}
+    contributions, breakdown = contributions_on(gross, side.get("contributions"))
+    exempt, applied = exempt_for(rates, "employment")
+    taxable = max(0.0, gross - exempt)
+    tax = tax_on(taxable, side.get("income_tax_bands"))
+    credits = sum(c.get("amount", 0) for c in side.get("credits") or [])
+    tax = max(0.0, tax - credits)
+    return {
+        "gross": round(gross, 2),
+        "exempt_income": round(exempt, 2),
+        "reliefs_applied": applied,
+        "taxable": round(taxable, 2),
+        "income_tax_after_credits": round(tax, 2),
+        "credits": round(credits, 2),
+        "contributions": contributions,
+        "contribution_detail": breakdown,
+        "net": round(gross - contributions - tax, 2),
+    }
+
+
+def self_employed_tax(gross, actual_costs, rates):
+    side = rates.get("self_employed") or {}
+    allowance = side.get("expense_allowance") or {}
+    if allowance.get("pct"):
+        deduction = gross * allowance["pct"] / 100.0
+        if allowance.get("cap") is not None:
+            deduction = min(deduction, allowance["cap"])
+        basis = "expense allowance"
+    else:
+        deduction = actual_costs
+        basis = "actual costs"
+
+    profit = max(0.0, gross - deduction)
+    contributions, breakdown = contributions_on(profit, side.get("contributions"))
+    exempt, applied = exempt_for(rates, "self_employed")
+    taxable = max(0.0, profit - exempt)
+    tax = tax_on(taxable, side.get("income_tax_bands"))
+    credits = sum(c.get("amount", 0) for c in side.get("credits") or [])
+    tax = max(0.0, tax - credits)
+    return {
+        "gross": round(gross, 2),
+        "deduction_basis": basis,
+        "deduction": round(deduction, 2),
+        "taxable_profit": round(profit, 2),
+        "exempt_income": round(exempt, 2),
+        "reliefs_applied": applied,
+        "taxable": round(taxable, 2),
+        "income_tax_after_credits": round(tax, 2),
+        "credits": round(credits, 2),
+        "contributions": contributions,
+        "contribution_detail": breakdown,
+        # actual costs leave the bank account whether or not they were deductible
+        "net": round(gross - actual_costs - contributions - tax, 2),
+    }
+
+
+def solve_match_rate(target_net, days, business_costs, own_pension, rates,
+                     iterations=60):
+    """The day rate whose after-tax result equals target_net.
+
+    Solved by bisection rather than by scaling a take-home ratio. Under
+    progressive tax the ratio changes as income does, so scaling gives a rate
+    that is wrong by more the further it moves -- and this is the number someone
+    actually decides on.
+    """
+    low, high = 0.0, max(target_net, 1.0) * 10 / max(days, 1)
+    costs = business_costs + own_pension
+    for _ in range(iterations):
+        mid = (low + high) / 2
+        net = self_employed_tax(mid * days, costs, rates)["net"]
+        if net < target_net:
+            low = mid
+        else:
+            high = mid
+    return (low + high) / 2
 
 
 def convert(amount, from_ccy, to_ccy, rate):
@@ -135,6 +332,15 @@ def _print_block(data, indent):
         if isinstance(value, dict):
             print(f"{pad}{label}:")
             _print_block(value, indent + 2)
+        elif isinstance(value, list):
+            if not value:
+                continue
+            print(f"{pad}{label}:")
+            for item in value:
+                if isinstance(item, dict):
+                    _print_block(item, indent + 2)
+                else:
+                    print(f"{pad}  {item}")
         else:
             print(f"{pad}{label}: {value}")
 
@@ -163,6 +369,52 @@ def selftest():
     checks.append(("day rate to match employment", c["comparison"]["day_rate_to_match_employment"], 513.64))
 
     checks.append(("currency conversion", convert(1000, "eur", "czk", 25.3)["converted"], 25300.0))
+
+    # A fictional country, so no real rates are stored anywhere in this
+    # repository -- including here, where they would look authoritative.
+    rates = {
+        "country": "Exampleland", "tax_year": 2026, "sources": ["fictional"],
+        "employment": {
+            "income_tax_bands": [[0, 10], [500000, 30]],
+            "credits": [{"name": "basic", "amount": 20000}],
+            "contributions": [{"name": "social", "pct": 10, "cap": 600000},
+                              {"name": "health", "pct": 5}],
+        },
+        "self_employed": {
+            "income_tax_bands": [[0, 10], [500000, 30]],
+            "credits": [{"name": "basic", "amount": 20000}],
+            "expense_allowance": {"pct": 40, "cap": 300000},
+            "contributions": [{"name": "social", "pct": 20, "base_pct": 50,
+                               "min_annual": 30000}],
+        },
+        "reliefs": [{"name": "returning resident", "applies_to": "both",
+                     "exempt_income": 100000}],
+    }
+
+    checks.append(("progressive bands", tax_on(600000, [[0, 10], [500000, 30]]), 80000.0))
+    checks.append(("below the first threshold", tax_on(100000, [[0, 10], [500000, 30]]), 10000.0))
+    checks.append(("no income, no tax", tax_on(0, [[0, 10]]), 0.0))
+
+    capped, _ = contributions_on(800000, [{"name": "s", "pct": 10, "cap": 600000}])
+    checks.append(("contribution cap applied", capped, 60000.0))
+    floored, _ = contributions_on(10000, [{"name": "s", "pct": 20, "min_annual": 30000}])
+    checks.append(("contribution floor applied", floored, 30000.0))
+    based, _ = contributions_on(700000, [{"name": "s", "pct": 20, "base_pct": 50}])
+    checks.append(("contribution base fraction", based, 70000.0))
+
+    e = employment_tax(800000, rates)
+    checks.append(("employment contributions", e["contributions"], 100000.0))
+    checks.append(("employment tax after credits", e["income_tax_after_credits"], 90000.0))
+    checks.append(("employment net", e["net"], 610000.0))
+
+    se = self_employed_tax(1000000, 100000, rates)
+    checks.append(("expense allowance capped", se["deduction"], 300000.0))
+    checks.append(("self-employed tax after credits", se["income_tax_after_credits"], 60000.0))
+    checks.append(("self-employed net, actual costs deducted", se["net"], 770000.0))
+
+    solved = solve_match_rate(610000, 200, 100000, 0, rates)
+    landed = self_employed_tax(solved * 200, 100000, rates)["net"]
+    checks.append(("solved match rate lands on target", round(landed), 610000))
 
     failed = 0
     for name, got, want in checks:
@@ -224,6 +476,11 @@ def main():
                          "are needed or neither is applied")
     sp.add_argument("--contractor-tax-pct", type=float, default=None,
                     help="effective tax rate on contracting, percent")
+    sp.add_argument("--rates", default=None,
+                    help="JSON rate file: thresholds, contributions and reliefs, "
+                         "with the sources they came from. Run rates-template to "
+                         "see the shape. Preferred over the flat --*-tax-pct "
+                         "options, which cannot express brackets or caps")
     add_json(sp)
 
     sp = sub.add_parser("convert", help="currency conversion at a rate you supply")
@@ -234,6 +491,10 @@ def main():
                     help="units of --to per one unit of --from")
     add_json(sp)
 
+    sp = sub.add_parser("rates-template",
+                        help="print the rate file this script expects")
+    add_json(sp)
+
     sub.add_parser("selftest", help="check the arithmetic")
 
     a = p.parse_args()
@@ -241,6 +502,9 @@ def main():
     try:
         if a.cmd == "selftest":
             return selftest()
+        if a.cmd == "rates-template":
+            print(json.dumps(RATES_TEMPLATE, indent=2))
+            return 0
         if a.cmd == "days":
             out = billable_days(a.working_days, a.public_holidays, a.leave_days,
                                 a.non_billable_days, a.utilisation)
@@ -253,9 +517,25 @@ def main():
                 print("both --employee-tax-pct and --contractor-tax-pct are needed, "
                       "or neither", file=sys.stderr)
                 return 2
+            rates = None
+            if a.rates:
+                try:
+                    rates = json.load(open(a.rates, encoding="utf-8"))
+                except (OSError, ValueError) as error:
+                    print(f"cannot read rate file {a.rates}: {error}", file=sys.stderr)
+                    return 2
+                missing = [f for f in ("country", "tax_year", "sources")
+                           if not rates.get(f)]
+                if missing:
+                    print("rate file is missing " + ", ".join(missing) +
+                          ". A tax figure without a year and a source cannot be "
+                          "checked by anyone, so it is not produced.",
+                          file=sys.stderr)
+                    return 2
             out = compare(a.annual_salary, a.day_rate, a.billable_days,
                           a.employer_pension, a.benefits_value, a.business_costs,
-                          a.own_pension, a.employee_tax_pct, a.contractor_tax_pct)
+                          a.own_pension, a.employee_tax_pct, a.contractor_tax_pct,
+                          rates)
         elif a.cmd == "convert":
             out = convert(a.amount, a.from_ccy, a.to_ccy, a.rate)
         else:
