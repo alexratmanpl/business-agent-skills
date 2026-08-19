@@ -1,0 +1,41 @@
+{
+  "country": "Exampleland",
+  "currency": "EXL",
+  "tax_year": 2026,
+  "sources": [
+    "https://tax.exampleland.invalid/rates-2026 — income tax bands and credit",
+    "https://social.exampleland.invalid/2026 — contribution rates, cap and minimum"
+  ],
+  "notes": "Exampleland is not a real country. This file exists to show the shape and is safe to copy, but every figure in it is invented. Replace all of them, and replace these sources with the pages you actually read.",
+
+  "employment": {
+    "income_tax_bands": [[0, 10], [500000, 30]],
+    "credits": [
+      {"name": "basic taxpayer credit", "amount": 20000}
+    ],
+    "contributions": [
+      {"name": "social insurance", "pct": 10, "cap": 600000},
+      {"name": "health insurance", "pct": 5}
+    ]
+  },
+
+  "self_employed": {
+    "income_tax_bands": [[0, 10], [500000, 30]],
+    "credits": [
+      {"name": "basic taxpayer credit", "amount": 20000}
+    ],
+    "expense_allowance": {"pct": 40, "cap": 300000},
+    "contributions": [
+      {"name": "social insurance", "pct": 20, "base_pct": 50, "min_annual": 30000}
+    ]
+  },
+
+  "reliefs": [
+    {
+      "name": "returning resident relief",
+      "conditions": "Under 35, resident abroad for at least three of the last five years, first four tax years after moving back. Confirm every condition before applying this.",
+      "applies_to": "both",
+      "exempt_income": 100000
+    }
+  ]
+}
