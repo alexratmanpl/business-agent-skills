@@ -18,17 +18,17 @@ import argparse
 import re
 import sys
 
-# Words that add length without adding meaning. A brief is short; anything here
-# is either filler or has a plainer equivalent the reader does not have to decode.
+# Filler with no legitimate use in a brief. Kept deliberately short: an advisory
+# tool dies from noise, and a flag the reader disagrees with costs more than the
+# one it catches. Words with a real use in context -- leverage as bargaining
+# power, a robust test suite, a company's ecosystem -- are left out on purpose.
 JARGON = {
-    "leverage", "synergy", "synergies", "stakeholder", "stakeholders",
-    "bandwidth", "deep dive", "ecosystem", "value-add", "best-in-class",
-    "utilise", "utilize", "going forward", "at scale", "north star",
-    "learnings", "ideate", "operationalise", "operationalize", "holistic",
-    "paradigm", "disrupt", "disruptive", "circle back", "touch base",
-    "move the needle", "low-hanging fruit", "core competency", "mission-critical",
-    "thought leader", "best practice", "best practices", "robust", "seamless",
-    "cutting-edge", "world-class", "game-changing", "actionable",
+    "circle back", "touch base", "move the needle", "low-hanging fruit",
+    "deep dive", "going forward", "learnings", "ideate",
+    "operationalise", "operationalize", "synergy", "synergies",
+    "value-add", "best-in-class", "thought leader", "core competency",
+    "north star", "utilise", "utilize",
+    "world-class", "cutting-edge", "game-changing",
 }
 
 # Abbreviations a reader will not stumble over. Everything else gets flagged the

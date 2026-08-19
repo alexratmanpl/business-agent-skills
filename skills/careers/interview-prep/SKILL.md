@@ -73,12 +73,16 @@ What was asked, what landed, what didn't, what the questions reveal about what t
 
 ## The brief
 
-Structure: `assets/brief-template.md`. Full rules: `references/plain-language.md`.
+Structure: `brief-template.md`.
 
-- **One to two pages.** Read in the twenty minutes before a call, possibly on a phone, possibly in a second language.
-- **Plain words.** No jargon unless they need it to talk to the interviewer, and then explain it once. Never an abbreviation without spelling it out.
-- **Marked confidence.** Facts, company claims and estimates must look different. Confident wrongness in an interview is expensive.
-- **Glanceable.** Short sections, questions in a clean list.
+It is read in the twenty minutes before a call, possibly on a phone, possibly by someone whose second language it is, and always by someone who is nervous. Everything below follows from that.
+
+- **One to two pages**, a thousand words at most. What is left out can be asked about; what is unread cannot.
+- **Plain words.** The plainest word that carries the meaning — "money raised from investors", not "Series B". Keep a term of art only when they need it in the room, then explain it once, where it first appears. Cut business filler entirely.
+- **Spell out every abbreviation on first use**, in one of the two conventional forms: "applicant tracking system (ATS)" or "ATS (applicant tracking system)". Names they already know — CV, CEO, HR — don't need it.
+- **One idea per sentence.** Twenty-five words is a useful ceiling; past that, split it. Two short sentences are read faster than one long one, and misread less often. Prefer the active form: shorter, and it names who acts.
+- **Marked confidence**, because confident wrongness in an interview is expensive. A **fact** carries a source and a date. A company claim is attributed — *they say*. An estimate is labelled *roughly*. If something couldn't be established, say so rather than leaving a gap they'll fill with an assumption.
+- **Glanceable.** Short sections. Questions in a numbered list. Scripted lines in block quotes so they can be found at speed. Bold only for what must not be missed — bold everywhere is bold nowhere.
 
 If code can run, check it with `scripts/plain_check.py` in this skill's directory — `${CLAUDE_SKILL_DIR}/scripts/plain_check.py` in Claude Code. It flags jargon, unexplained abbreviations, long sentences, excess length. A checklist, not a judge. Otherwise apply the rules by hand.
 
