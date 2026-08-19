@@ -16,6 +16,21 @@ It holds no market data and reaches no network. Rates, percentages and day count
 
 If code can't run, do the arithmetic explicitly and show every step: working days assumed, whether holiday is paid, exchange rate used.
 
+## Tax, and where the numbers come from
+
+The calculator holds no rates for any country. For after-tax figures, look the parameters up and pass them in a rate file — `rates-template` prints the shape it expects.
+
+Look them up rather than recalling them. Thresholds and percentages change every year, and a remembered figure is the one most likely to be a year out of date.
+
+- The tax authority's own pages first. An accountancy firm's summary second, and mainly to find out what to go and look up.
+- Record the source URL and the tax year. The file has fields for both, and the calculator refuses to produce after-tax numbers without them, because a tax figure nobody can check is worse than none.
+- Reliefs for people arriving from abroad are conditional — on age, on prior residence, on how long they run. Put the conditions in the file, and say which were applied. Never apply one because the country happens to have it.
+- VAT is usually not part of take-home. A registered contractor charges it and passes it on. It changes the answer only under a flat-rate scheme, or where a client will not pay it on top.
+
+If nothing can be looked up, say so and fall back to `--employee-tax-pct` and `--contractor-tax-pct` with their own estimate. The output labels that result as built on flat rates. A comparison somebody knowingly built on their own guess beats no comparison, as long as it says so.
+
+Either way the result is an estimate. Give the tax year, name the sources, and say it wants checking with an accountant before anything is signed.
+
 A day rate quoted without saying whether holiday is paid can be out by a tenth. A contract rate compared to an employed salary with no adjustment for holiday, sick pay, pension and employer taxes is not a comparison.
 
 ## Asking
