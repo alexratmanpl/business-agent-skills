@@ -31,6 +31,7 @@ Add --json to any subcommand for machine-readable output.
 
 import argparse
 import json
+import os
 import sys
 
 DEFAULT_WORKING_DAYS = 260  # 52 weeks x 5 days, before holiday or anything else
@@ -415,6 +416,20 @@ def selftest():
     solved = solve_match_rate(610000, 200, 100000, 0, rates)
     landed = self_employed_tax(solved * 200, 100000, rates)["net"]
     checks.append(("solved match rate lands on target", round(landed), 610000))
+
+    # rates-example.json ships beside SKILL.md so the format is readable without
+    # running anything. Checking it here is what stops the file and this engine
+    # drifting apart: a schema change that forgets the example breaks this test.
+    example = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           "..", "rates-example.json")
+    if os.path.exists(example):
+        shipped = json.load(open(example, encoding="utf-8"))
+        checks.append(("example file, employment net",
+                       employment_tax(800000, shipped)["net"], 610000.0))
+        checks.append(("example file, self-employed net",
+                       self_employed_tax(1000000, 100000, shipped)["net"], 770000.0))
+    else:
+        print("note: rates-example.json not found beside the skill, skipped")
 
     failed = 0
     for name, got, want in checks:

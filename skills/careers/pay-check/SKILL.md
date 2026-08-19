@@ -18,7 +18,7 @@ If code can't run, do the arithmetic explicitly and show every step: working day
 
 ## Tax, and where the numbers come from
 
-The calculator holds no rates for any country. For after-tax figures, look the parameters up and pass them in a rate file — `rates-template` prints the shape it expects.
+The calculator holds no rates for any country. For after-tax figures, look the parameters up and pass them in a rate file. `rates-example.json` in this skill's directory is a filled example — copy it and replace every figure, including the sources. `rate_calc.py rates-template` prints the same shape empty, if that is easier to fill.
 
 Look them up rather than recalling them. Thresholds and percentages change every year, and a remembered figure is the one most likely to be a year out of date.
 
