@@ -13,9 +13,10 @@ Get them into the room knowing more than the average candidate, aware of their w
 Don't assume this starts at the beginning.
 
 - **Stage** — deciding whether to bother, first call, between rounds, final, or just finished one.
-- **Who and what format.** A recruiter, a hiring manager, a technical assessment and a founder need different preparation.
+- **Who and what format.** A recruiter, a hiring manager, a technical assessment and a founder are four different conversations.
 - **Applied or approached?** Approached means leverage. Say so; most people forget it.
 - **What's already been said**, especially money. A number given in screening is an anchor.
+- **How far the domain is from them.** Whether they could hold a conversation in this field or only recognise its words. Ask; job titles do not show it.
 
 Skip anything settled.
 
@@ -61,6 +62,7 @@ If they decline the fit check, say once that preparation built on an untested vi
 ## Build
 
 - **What to expect at this stage.** A recruiter checks basics, budget, motivation. A hiring manager checks whether you can do the job. A founder checks whether you understand the business.
+- **The domain, where it is unfamiliar.** Explain the field before the brief rests on it. Readable prose about an unfamiliar subject gets someone as far as asking the question and no further: the answer arrives and there is nothing to say next. Two tests — can they say what each term means and why it matters, and has each hard part of the domain been matched to something in their own history, the same problem under another name. The second is the cheapest credibility available to anyone entering a new field.
 - **The two or three things to land.** Not everything good about them — the points that answer this employer's actual worry. Lead with the one that reframes the rest.
 - **The opening move.** Any elephant — title mismatch, career break, unrelated-looking background — gets scripted for the first few minutes. Early is control; late is an apology.
 - **The weak spot, in words.** What they did, where it stops, what they'd learn. Rehearse the version where the interviewer pushes twice.
