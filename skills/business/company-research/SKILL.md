@@ -73,12 +73,13 @@ Write it as markdown, saved as `company-dossier-NAME.md`. Markdown keeps it usef
 
 Then make sure the user actually has it. Use whatever the environment offers — attach or send the file, write it to a folder they have connected, or leave it in the working directory if they can reach that. Tell them the filename either way, so it can be found again. If no file can reach them, put the dossier in the reply instead. A rendered version can be offered alongside the file where the environment displays one; it does not replace the file.
 
-Sections: what they do, money, competitors, what makes them different, working there, people, risks, what could not be established.
+Sections: what they do, money, competitors, what makes them different, working there, people, risks, what could not be established. Anything derived rather than found goes after all of them, under its own heading, never inside one.
 
 - **Plain words.** Explain any term of art on first use. Write "money raised from investors" rather than "Series B".
-- **Mark confidence.** Every fact carries a source and a date. Company claims are attributed. Estimates are labelled as estimates. Nothing that is uncertain should read as settled.
+- **Mark confidence.** Every fact carries a source and a date. Company claims are attributed. Estimates are labelled as estimates. Anything not directly evidenced is marked as such wherever it appears. Nothing that is uncertain should read as settled.
 - **Say when a fact is old.** Give the age of anything more than a year out of date. Funding, headcount and leadership all change, and a three-year-old figure is evidence about then, not now.
 - **Report gaps.** End with what could not be established, so the reader knows what to ask about.
+- **Keep your own reasoning apart from the findings.** Suggestions, recommendations, inferences and questions to put to the company are the one thing here with no source behind it, so it is the one thing that must not sit among the sourced sections or share their register. Put it under a final heading — *What this suggests: our reading, not sourced* — after the gaps. The test is whether someone skimming can tell which lines rest on a source and which are our own reasoning, without checking either. Material drawn from the company's own published wording is derived, not found: it belongs here, however closely it follows the source.
 
 ## Rules
 
