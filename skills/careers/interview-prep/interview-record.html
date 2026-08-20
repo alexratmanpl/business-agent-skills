@@ -217,10 +217,10 @@
     <main>
       <p class="sec-label">What I want to ask</p>
       <div id="qlist"></div>
-      <form class="addq" id="addq">
+      <div class="addq">
         <input id="newq" placeholder="Add a question that comes up…" aria-label="Add a question">
-        <button class="btn" type="submit">Add</button>
-      </form>
+        <button class="btn" type="button" id="addq">Add</button>
+      </div>
 
       <p class="sec-label">Anything else worth writing down</p>
       <textarea class="scratch" id="scratch" placeholder="Names, tools, numbers, things to look up after."></textarea>
@@ -272,6 +272,9 @@
     <button class="btn" id="fresh">Start a new record</button>
     <span class="status" id="status">Loading…</span>
   </div>
+
+  <textarea id="copyout" hidden aria-label="Everything from this record, as text"
+    style="width:100%;min-height:180px;margin-top:12px;padding:10px;font-family:var(--mono);font-size:12px;line-height:1.6"></textarea>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -441,13 +444,16 @@ async function load(){
 }
 
 /* ---------- actions ---------- */
-$("addq").onsubmit = e => {
-  e.preventDefault();
+/* Button and keydown rather than a form submit: viewers often render this page in a
+   sandbox that blocks form submission, where the control looks fine and does nothing. */
+function addQuestion(){
   const v = $("newq").value.trim();
   if(!v) return;
   S.extra.push(v); $("newq").value = "";
   drawQuestions(); queueSave();
-};
+}
+$("addq").onclick = addQuestion;
+$("newq").onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); addQuestion(); } };
 
 $("copy").onclick = async () => {
   const L = [];
@@ -466,11 +472,13 @@ $("copy").onclick = async () => {
   if(($("scratch").value||"").trim()){ L.push("Other notes:"); L.push($("scratch").value.trim()); L.push(""); }
   if(($("followups").value||"").trim()){ L.push("Afterwards:"); L.push($("followups").value.trim()); }
   const text = L.join("\n");
-  try{ await navigator.clipboard.writeText(text); toast("Copied"); }
-  catch(e){
-    const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta);
-    ta.select(); document.execCommand("copy"); ta.remove(); toast("Copied");
-  }
+  const out = $("copyout");
+  try{ await navigator.clipboard.writeText(text); out.hidden = true; toast("Copied"); return; }
+  catch(e){ /* commonly withheld from a sandboxed viewer */ }
+  /* Show the text rather than claim a copy that did not happen. */
+  out.hidden = false; out.value = text; out.focus(); out.select();
+  try{ if(document.execCommand("copy")){ toast("Copied"); return; } }catch(e){}
+  toast("Copying is blocked here — the text is selected below");
 };
 
 $("fresh").onclick = async () => {
@@ -480,6 +488,7 @@ $("fresh").onclick = async () => {
   running = false; clearInterval(tick); $("timer").textContent = "Start";
   $("who").value = who; $("role").value = ""; $("scratch").value = ""; $("followups").value = "";
   $("when").value = new Date().toISOString().slice(0,10);
+  $("copyout").hidden = true; $("copyout").value = "";
   showClock(); drawQuestions(); drawSignals(); save();
   toast("New record");
 };
