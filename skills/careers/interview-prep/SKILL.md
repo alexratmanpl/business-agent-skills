@@ -16,6 +16,7 @@ Don't assume this starts at the beginning.
 - **Who and what format.** A recruiter, a hiring manager, a technical assessment and a founder need different preparation.
 - **Applied or approached?** Approached means leverage. Say so; most people forget it.
 - **What's already been said**, especially money. A number given in screening is an anchor.
+- **How far the domain is from them.** Whether they could hold a conversation in this field, or only recognise its words. Ask; do not read it off their job titles. This decides whether preparation can go straight to the brief, and it is the one gap that cannot be closed in the room.
 
 Skip anything settled.
 
@@ -61,10 +62,11 @@ If they decline the fit check, say once that preparation built on an untested vi
 ## Build
 
 - **What to expect at this stage.** A recruiter checks basics, budget, motivation. A hiring manager checks whether you can do the job. A founder checks whether you understand the business.
+- **The domain, where it is unfamiliar.** Where the distance is large, explain the field before anything else rests on it. A brief can be perfectly readable and still be unusable, because readable prose about an unfamiliar subject gets someone as far as asking the question and no further; the answer arrives and there is nothing to say next. Two tests: for every term the brief uses, they can say what it means and why it matters; and for every hard part of the domain, something in their own history has been named as the same problem under another name. The second is the cheapest credibility available to anyone entering a new field, and nobody finds it for them.
 - **The two or three things to land.** Not everything good about them — the points that answer this employer's actual worry. Lead with the one that reframes the rest.
 - **The opening move.** Any elephant — title mismatch, career break, unrelated-looking background — gets scripted for the first few minutes. Early is control; late is an apology.
 - **The weak spot, in words.** What they did, where it stops, what they'd learn. Rehearse the version where the interviewer pushes twice.
-- **Questions to ask.** Three to five, each built on a research fact absent from the company's marketing — a strategic tension, an odd decision, a competitor doing the opposite. Anything answerable from the homepage is wasted. Two good ones beat eight generic.
+- **Questions to ask.** Three to five, each built on a research fact absent from the company's marketing — a strategic tension, an odd decision, a competitor doing the opposite. The job advert, press releases and launch posts are marketing too, so a question *derived* from where one of them puts its emphasis is as wasted as one answerable from the homepage; it merely sounds researched. Write the fact and its source beside each question while drafting, and leave them there until the brief is finished. A question with no fact to name is cut, or moved out of this section and labelled as their own interest — a fair thing to ask, and not the same as having done the reading. Two good ones beat eight generic.
 - **Practical now.** References, a tool worth a weekend, anything the advert says about applications, travel, timing.
 
 ## After a round
@@ -88,6 +90,8 @@ It is read in the twenty minutes before a call, possibly on a phone, possibly by
 
 If code can run, check it with `scripts/plain_check.py` in this skill's directory — `${CLAUDE_SKILL_DIR}/scripts/plain_check.py` in Claude Code. It flags phrasing that reads as machine-written, abbreviations used before being spelled out, long sentences and excess length. A checklist, not a judge. Otherwise apply the rules by hand.
 
+Then read the questions section against the facts recorded beside it, one question at a time. Every question names the fact it came from, or it does not belong there. No checker sees this, and of the two failures it is much the more expensive: bad prose is noticed while reading, an ungrounded question is noticed in the room.
+
 Save it, present it, offer a Word version.
 
 ## The record, for the call itself
@@ -108,6 +112,8 @@ It is one self-contained page, filled by swapping two arrays at the top of its s
 The panels on the right take the same content as the brief — why this company, the weak spots said first, the harder questions held back. One preparation pass fills both; the brief is read beforehand, the record is open during.
 
 **Copy everything** produces plain text. That is the point of the whole thing: it comes back into a later session as the input for **After a round**, instead of being reconstructed from memory two days later.
+
+**Use it before handing it over.** Filling the arrays settles the content and says nothing about whether the page still works, and this is the one output where that distinction bites: it is open during a conversation, in front of someone else, at the one moment a fault cannot be repaired. Opening it and reading it proves nothing — a control can work from a local file and fail in a viewer, because pages like this are commonly rendered inside a sandbox that withholds ordinary browser behaviours. Open it the way they will open it, then work it: add a question mid-conversation, mark one answered, cycle a signal chip, and run **Copy everything** and read what came out. The tempting shortcut is to try only what was edited, and the copy-out is usually not what was edited. Where a control can be built without relying on a behaviour a sandbox may withhold, build it that way; the page should degrade in appearance, never in function.
 
 ## Several companies
 
