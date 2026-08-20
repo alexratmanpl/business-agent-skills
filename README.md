@@ -1,6 +1,6 @@
 # Business & Career Skills
 
-Four Agent Skills for business and career work: research a company, judge whether you fit a role,
+Agent Skills for business and career work: research a company, judge whether you fit a role,
 prepare for the interview, and get the money right.
 
 Built on the [Agent Skills open standard](https://agentskills.io), so they work in Claude, Claude
@@ -20,7 +20,3 @@ skills/
 
 Categories organise this repository only. Installing flattens them, so skill names must be unique
 across all categories.
-
-## Status
-
-Scaffold. Skill instructions, tooling and documentation follow.
