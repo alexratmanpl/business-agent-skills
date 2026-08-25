@@ -69,16 +69,17 @@ Any statement a company makes about its own performance is a claim. Write it as 
 
 ## Write the dossier
 
-Write it as markdown, saved as `company-dossier-NAME.md`. Markdown keeps it useful after this session: it can be reread, quoted, extended as more is learned, and passed to whatever needs it next without conversion.
+Write it as markdown, saved as `company-dossier-NAME.md`. Markdown keeps it useful after this session: quotable, extendable as more is learned, and readable by whatever needs it next without conversion.
 
 Then make sure the user actually has it. Use whatever the environment offers — attach or send the file, write it to a folder they have connected, or leave it in the working directory if they can reach that. Tell them the filename either way, so it can be found again. If no file can reach them, put the dossier in the reply instead. A rendered version can be offered alongside the file where the environment displays one; it does not replace the file.
 
-Sections: what they do, money, competitors, what makes them different, working there, people, risks, what could not be established.
+Sections: what they do, money, competitors, what makes them different, working there, people, risks, what could not be established. Anything derived rather than found — suggestions, recommendations, questions to put to them — comes last, under a heading that says so, never inside a section above.
 
 - **Plain words.** Explain any term of art on first use. Write "money raised from investors" rather than "Series B".
 - **Mark confidence.** Every fact carries a source and a date. Company claims are attributed. Estimates are labelled as estimates. Nothing that is uncertain should read as settled.
 - **Say when a fact is old.** Give the age of anything more than a year out of date. Funding, headcount and leadership all change, and a three-year-old figure is evidence about then, not now.
 - **Report gaps.** End with what could not be established, so the reader knows what to ask about.
+- **Keep your own reasoning apart.** Anything reasoned from the material rather than found in it is derived, however closely it follows the source — reading a company's own wording is still reading, not evidence. The test is whether someone skimming can tell which lines rest on a source and which are your reading, without checking either.
 
 ## Rules
 
