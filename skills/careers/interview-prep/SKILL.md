@@ -111,7 +111,7 @@ The panels on the right take the same content as the brief — why this company,
 
 **Copy everything** produces plain text. That is the point of the whole thing: it comes back into a later session as the input for **After a round**, instead of being reconstructed from memory two days later.
 
-**Work it before handing it over.** Filling the arrays settles the content, not whether the page still works, and opening it and reading it proves nothing — a control can work from a local file and fail in a viewer that sandboxes the page. Open it the way they will open it, then add a question, mark one answered, cycle a signal chip, and run **Copy everything** and read what comes out. The shortcut is to try only what was edited, and the copy-out rarely is.
+**Work it before handing it over.** Filling the arrays settles the content, not whether the page still works, and opening it and reading it proves nothing — a control can work from a local file and fail in a viewer that sandboxes the page. Open it the way they will open it, then add a question, mark one answered, cycle a signal chip, reload the page and confirm the notes are still there, and run **Copy everything** and read what comes out. The shortcut is to try only what was edited, and the copy-out rarely is.
 
 ## Several companies
 
