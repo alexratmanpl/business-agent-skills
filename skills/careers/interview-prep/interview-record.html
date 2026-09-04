@@ -405,24 +405,24 @@ function queueSave(){
   setStatus("Saving…");
   saveTimer = setTimeout(save, 700);
 }
-async function save(){
+function save(){
   S.meta = { who:$("who").value, role:$("role").value, when:$("when").value };
   S.scratch = $("scratch").value;
   S.followups = $("followups").value;
   if(memoryOnly){ setStatus("Kept in this tab only"); return; }
   try{
-    const r = await window.storage.set(KEY, JSON.stringify(S));
-    setStatus(r ? "Saved " + new Date().toLocaleTimeString() : "Not saved");
+    localStorage.setItem(KEY, JSON.stringify(S));
+    setStatus("Saved " + new Date().toLocaleTimeString());
   }catch(e){
     memoryOnly = true;
     setStatus("Kept in this tab only");
   }
 }
-async function load(){
+function load(){
   try{
-    const r = await window.storage.get(KEY);
-    if(r && r.value){
-      const saved = JSON.parse(r.value);
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      const saved = JSON.parse(raw);
       S = Object.assign(S, saved);
       S.answers = S.answers||{}; S.done = S.done||{}; S.sigs = S.sigs||{}; S.extra = S.extra||[];
       if(S.meta){
@@ -437,6 +437,7 @@ async function load(){
       setStatus("New record");
     }
   }catch(e){
+    memoryOnly = true;
     setStatus("New record");
   }
   if(!$("when").value) $("when").value = new Date().toISOString().slice(0,10);
