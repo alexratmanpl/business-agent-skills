@@ -61,11 +61,11 @@ If they decline the fit check, say once that preparation built on an untested vi
 
 ## Build
 
-- **What to expect at this stage.** A recruiter checks basics, budget, motivation. A hiring manager checks whether you can do the job. A founder checks whether you understand the business.
+- **What to expect at this stage.** A recruiter checks basics, budget, motivation. A hiring manager checks whether you can do the job. A founder checks whether you understand the business. A technical assessment checks whether they can hold a position under scrutiny, not recite the material: open with a stated decision, treat each follow-up as a test of it rather than a request for more scope, and leave room for how it holds up as the system grows. Before the round, they should be able to say in one sentence what they'd decide and what they're giving up.
 - **The domain, where it is unfamiliar.** Explain the field before the brief rests on it. Readable prose about an unfamiliar subject gets someone as far as asking the question and no further: the answer arrives and there is nothing to say next. Two tests — can they say what each term means and why it matters, and has each hard part of the domain been matched to something in their own history, the same problem under another name. The second is the cheapest credibility available to anyone entering a new field.
 - **The two or three things to land.** Not everything good about them — the points that answer this employer's actual worry. Lead with the one that reframes the rest.
 - **The opening move.** Any elephant — title mismatch, career break, unrelated-looking background — gets scripted for the first few minutes. Early is control; late is an apology.
-- **The weak spot, in words.** What they did, where it stops, what they'd learn. Rehearse the version where the interviewer pushes twice.
+- **The weak spot, in words.** What they did, where it stops, what they'd learn. Rehearse the version where the interviewer pushes twice — the same drill covers a decision they have to defend in a technical assessment.
 - **Questions to ask.** Three to five, each built on a research fact absent from the company's marketing — a strategic tension, an odd decision, a competitor doing the opposite. The advert, press releases and launch posts are marketing too, so a question drawn from where one of them puts its emphasis only sounds researched. Write the fact beside each question while drafting. One with no fact to name is cut, or moved out of the section and labelled as their own interest — a fair thing to ask, and not the same as having done the reading. Two good ones beat eight generic.
 - **Practical now.** References, a tool worth a weekend, anything the advert says about applications, travel, timing.
 
