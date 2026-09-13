@@ -23,17 +23,9 @@ scripts need code execution, and each says what to do instead where there is non
 
 ## Install
 
-This repository is also a Claude Code plugin marketplace. `.claude-plugin/marketplace.json`
-declares the marketplace as `alexratmanpl` and one plugin, `business-agent-skills`:
-
-```
-/plugin marketplace add alexratmanpl/business-agent-skills
-/plugin install business-agent-skills@alexratmanpl
-```
-
-For a single skill, copy its directory — `SKILL.md` and everything beside it — into wherever the
-agent reads skills from. Packaged `.skill` archives for all four are attached to the `latest`
-release, which CI rebuilds from `master` on every push.
+Copy a skill's directory — `SKILL.md` and everything beside it — into wherever the agent reads
+skills from. Packaged `.skill` archives for all four are attached to the `latest` release, which
+CI rebuilds from `master` on every push.
 
 ## Layout
 
