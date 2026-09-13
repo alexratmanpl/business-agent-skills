@@ -102,8 +102,9 @@ That includes a recruiter screening call: short, but usually where the budget, t
 
 Skip it for scheduling and logistics, and for a hands-on session — a live coding round needs a different shape entirely, not a page of question cards.
 
-It is one self-contained page, filled by swapping two arrays at the top of its script:
+It is one self-contained page, filled by setting three things at the top of its script:
 
+- **`RECORD_ID`** — a short name for this interview, unique among the records this browser already holds. It is what keeps one employer's notes out of another's. Left empty, the page still works, saves nothing, and says so on screen.
 - **`QUESTIONS`** — each is `[question, what the answer reveals]`. The second string is the point: mid-call they need to see what they are listening for, not a restatement of what they asked.
 - **`SIGNALS`** — judgments formed across the whole conversation, not questions. Whether the work really happens here, whether the worry about their weak spot is real. One click records confirmed or not the case, so a judgment can be caught without breaking eye contact. These are the things nobody remembers by the end of a call.
 
@@ -111,7 +112,7 @@ The panels on the right take the same content as the brief — why this company,
 
 **Copy everything** produces plain text. That is the point of the whole thing: it comes back into a later session as the input for **After a round**, instead of being reconstructed from memory two days later.
 
-**Work it before handing it over.** Filling the arrays settles the content, not whether the page still works, and opening it and reading it proves nothing — a control can work from a local file and fail in a viewer that sandboxes the page. Open it the way they will open it, then add a question, mark one answered, cycle a signal chip, and run **Copy everything** and read what comes out. The shortcut is to try only what was edited, and the copy-out rarely is.
+**Work it before handing it over.** Filling the arrays settles the content, not whether the page still works, and opening it and reading it proves nothing — a control can work from a local file and fail in a viewer that sandboxes the page. Open it the way they will open it, then add a question, mark one answered, and cycle a signal chip. Reload the page and confirm the notes are still there, then run **Copy everything** and read what comes out. The shortcut is to try only what was edited, and the copy-out rarely is.
 
 ## Several companies
 
