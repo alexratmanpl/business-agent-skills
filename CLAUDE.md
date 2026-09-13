@@ -2,8 +2,6 @@
 
 See [AGENTS.md](AGENTS.md) for repository conventions.
 
-Claude Code specifics to follow.
-
 ## Commit and PR hygiene
 
 Never put a Claude Code session link anywhere that reaches this repository: no `Claude-Session:`
