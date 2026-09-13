@@ -102,8 +102,9 @@ That includes a recruiter screening call: short, but usually where the budget, t
 
 Skip it for scheduling and logistics, and for a hands-on session — a live coding round needs a different shape entirely, not a page of question cards.
 
-It is one self-contained page, filled by swapping two arrays at the top of its script:
+It is one self-contained page, filled by setting three things at the top of its script:
 
+- **`RECORD_ID`** — a short name for this interview, unique among the records this browser already holds. It is what keeps one employer's notes out of another's. Left empty, the page still works, saves nothing, and says so on screen.
 - **`QUESTIONS`** — each is `[question, what the answer reveals]`. The second string is the point: mid-call they need to see what they are listening for, not a restatement of what they asked.
 - **`SIGNALS`** — judgments formed across the whole conversation, not questions. Whether the work really happens here, whether the worry about their weak spot is real. One click records confirmed or not the case, so a judgment can be caught without breaking eye contact. These are the things nobody remembers by the end of a call.
 
