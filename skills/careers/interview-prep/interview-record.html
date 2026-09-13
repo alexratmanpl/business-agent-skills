@@ -187,6 +187,10 @@
     border-top:1px solid var(--rule);margin-top:22px;padding-top:14px;
   }
   .status{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-left:auto}
+  .notice{
+    font-size:12.5px;line-height:1.45;margin:22px 0 0;padding:9px 10px;
+    border-radius:3px;background:#FFF4E5;border:1px solid #E7C79A;color:#6B4A12;
+  }
   .toast{
     position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
     background:var(--ink);color:#fff;font-size:13px;padding:9px 15px;
@@ -267,6 +271,11 @@
     </aside>
   </div>
 
+  <p class="notice" id="notice" hidden>
+    <strong>RECORD_ID is not set,</strong> so these notes will not survive a reload. Set it at the
+    top of this page's script, beside QUESTIONS and SIGNALS.
+  </p>
+
   <div class="bar">
     <button class="btn btn-dark" id="copy">Copy everything</button>
     <button class="btn" id="fresh">Start a new record</button>
@@ -281,7 +290,12 @@
 
 <script>
 /* ------------------------------------------------------------------
-   Swap these two arrays for each interview. Everything else stays.
+   Three things to set for each interview. Everything else stays.
+
+   RECORD_ID: a short name for this interview, unique among the records
+     kept in this browser -- "acme-staff-eng", say. It is what keeps one
+     employer's notes out of another's record. Leave it empty and the
+     page still works, but nothing is saved and it says so.
 
    QUESTIONS: [question, what the answer reveals]
      The second string is the point. It is not a restatement of the
@@ -315,7 +329,11 @@ const SIGNALS = [
   "Someone I would want to work for"
 ];
 
-const KEY = "interview-record";
+const RECORD_ID = "";  // set this per interview, e.g. "acme-staff-eng"
+const KEY = RECORD_ID ? "interview-record:" + RECORD_ID : null;
+const storageNote = () => RECORD_ID
+  ? "Kept in this tab only"
+  : "Kept in this tab only — RECORD_ID is not set";
 let S = { meta:{}, answers:{}, done:{}, sigs:{}, extra:[], scratch:"", followups:"", seconds:0 };
 let running = false, tick = null, saveTimer = null, memoryOnly = false;
 
@@ -405,23 +423,40 @@ function queueSave(){
   setStatus("Saving…");
   saveTimer = setTimeout(save, 700);
 }
+function storageUsable(){
+  if(!KEY) return false;
+  try{
+    localStorage.setItem("interview-record-probe", "1");
+    localStorage.removeItem("interview-record-probe");
+    return true;
+  }catch(e){ return false; }
+}
 function save(){
   S.meta = { who:$("who").value, role:$("role").value, when:$("when").value };
   S.scratch = $("scratch").value;
   S.followups = $("followups").value;
-  if(memoryOnly){ setStatus("Kept in this tab only"); return; }
+  if(memoryOnly){ setStatus(storageNote()); return; }
   try{
     localStorage.setItem(KEY, JSON.stringify(S));
     setStatus("Saved " + new Date().toLocaleTimeString());
   }catch(e){
-    memoryOnly = true;
-    setStatus("Kept in this tab only");
+    /* A failed write is usually a full store, and usually temporary. Say so and let the
+       next edit try again: one refusal must not turn the rest of the call memory-only. */
+    setStatus("Not saved — no room. Use Copy everything.");
   }
 }
 function load(){
-  try{
-    const raw = localStorage.getItem(KEY);
-    if(raw){
+  if(!RECORD_ID) $("notice").hidden = false;
+  memoryOnly = !storageUsable();
+  let raw = null;
+  if(!memoryOnly){
+    try{ raw = localStorage.getItem(KEY); }
+    catch(e){ memoryOnly = true; }
+  }
+  if(memoryOnly){
+    setStatus(storageNote());
+  } else if(raw){
+    try{
       const saved = JSON.parse(raw);
       S = Object.assign(S, saved);
       S.answers = S.answers||{}; S.done = S.done||{}; S.sigs = S.sigs||{}; S.extra = S.extra||[];
@@ -433,11 +468,12 @@ function load(){
       $("scratch").value = S.scratch||"";
       $("followups").value = S.followups||"";
       setStatus("Loaded earlier notes");
-    } else {
+    }catch(e){
+      /* Unreadable saved data is not a broken store. Start fresh and let the next save
+         replace it, rather than refusing to save for the rest of this call and the next. */
       setStatus("New record");
     }
-  }catch(e){
-    memoryOnly = true;
+  } else {
     setStatus("New record");
   }
   if(!$("when").value) $("when").value = new Date().toISOString().slice(0,10);
