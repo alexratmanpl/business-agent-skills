@@ -1,3 +1,5 @@
+<!-- Never paste a Claude Code session link (claude.ai/code/session_…) in this PR or its commits. -->
+
 ## What changed
 
 <!-- One or two lines. Which skill, and what is different about it now. -->
