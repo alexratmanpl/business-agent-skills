@@ -26,7 +26,7 @@ there is none.
 ## Install
 
 Copy a skill's directory — `SKILL.md` and everything beside it — into wherever the agent reads
-skills from. Packaged `.skill` archives for all four are attached to the `latest` release, which
+skills from. Packaged `.skill` archives for all five are attached to the `latest` release, which
 CI rebuilds from `master` on every push.
 
 ## Layout
