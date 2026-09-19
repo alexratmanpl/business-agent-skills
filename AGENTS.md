@@ -17,9 +17,12 @@ A skill is one directory. Which file a thing belongs in follows from when it is 
 | `scripts/` | what can be **checked** rather than read | run, never read |
 | `assets/` | templates and fixtures the skill ships | as used |
 
-`SKILL.md` is loaded in full on every run, so its length is a cost paid every time: it is capped
-at 1,000 words, counted by `wc -w` on the file. An addition that would breach the cap means a
-construct-shaped section moves to `references/` first — not that the addition is dropped.
+`SKILL.md` is loaded in full on every run, so its length is a cost paid every time. Every skill
+has a word budget: 1,000 by default, or whatever `budget:` in its frontmatter declares.
+`build_skills.py` counts the file and fails the build when it is over. An addition that would
+breach the budget means a construct-shaped section moves to `references/` first — not that the
+addition is dropped. Raise the budget only when nothing is left to move, and say why in the
+pull request.
 
 A rule a script can enforce belongs in the script, with one line in `SKILL.md` to run it. Prose
 restating a shipped check is one rule in two places.
@@ -27,5 +30,4 @@ restating a shipped check is one rule in two places.
 No two sections in one skill may be read as the same step. An agent told to add something to the
 step that asks the user for input must have exactly one candidate section.
 
-Why this shape, and what was rejected:
-[docs/adr/0001-skill-file-layout.md](docs/adr/0001-skill-file-layout.md).
+Why this shape, and what was rejected: [the decision records](docs/adr/).
