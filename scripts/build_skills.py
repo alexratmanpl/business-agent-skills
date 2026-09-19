@@ -10,12 +10,18 @@ Checks:
   - the name matches the directory it lives in, since that is what installs
   - every bundled file the body points at actually exists
   - the body is not still a placeholder
+  - SKILL.md fits the word budget it declares, or the default
 
-The last two checks exist because both defects found in this repository were
-invisible at runtime. A skill referencing a missing file does not fail loudly;
-the instruction is read and nothing is found. A skill whose body was never
-written installs cleanly and produces a confident answer from the description
-alone.
+The bundled-file and placeholder checks exist because both defects found in
+this repository were invisible at runtime. A skill referencing a missing file
+does not fail loudly; the instruction is read and nothing is found. A skill
+whose body was never written installs cleanly and produces a confident answer
+from the description alone.
+
+The budget check is here rather than in prose because a limit nothing measures
+is not a limit. Every SKILL.md is loaded in full whenever its skill fires, so
+its length is a cost paid on every run; a skill that needs more than the default
+says so in its frontmatter, where raising it shows up in the diff.
 
 Usage: build_skills.py [--out dist] [--check-only]
 """
@@ -55,6 +61,36 @@ PLACEHOLDER_LINES = {
     "wip",
     "work in progress",
 }
+
+
+# A skill that needs more than this declares `budget: <n>` in its frontmatter.
+DEFAULT_BUDGET = 1000
+
+# A word is a whitespace-separated token holding at least one letter or digit.
+# Markdown punctuation -- bullet dashes, table pipes, emphasis markers -- is not
+# words. Nor is the em dash, and that one matters: `wc -w` counts an em dash as
+# a word in a UTF-8 locale and skips it in the C locale, so the same file
+# measured on two machines differs by the number of em dashes in it. A budget
+# has to mean the same thing everywhere it is checked.
+ALPHANUMERIC = re.compile(r"[0-9A-Za-z]")
+
+
+def word_count(text):
+    return sum(1 for token in text.split() if ALPHANUMERIC.search(token))
+
+
+def declared_budget(fields):
+    """The skill's own budget, or the default. Returns (budget, error)."""
+    raw = fields.get("budget")
+    if raw is None or raw == "":
+        return DEFAULT_BUDGET, None
+    try:
+        budget = int(raw)
+    except ValueError:
+        return None, f"frontmatter budget is '{raw}', which is not a whole number"
+    if budget < 1:
+        return None, f"frontmatter budget is {budget}; a budget has to be positive"
+    return budget, None
 
 
 def find_skills(root):
@@ -141,7 +177,29 @@ def check(skill_dir):
             f"{name}: body contains the placeholder line '{line}'. The skill has a "
             f"description but no instructions behind it")
 
+    budget, error = declared_budget(fields)
+    if error:
+        problems.append(f"{name}: {error}")
+    else:
+        words = word_count(text)
+        if words > budget:
+            problems.append(
+                f"{name}: SKILL.md is {words} words against a budget of {budget}. "
+                f"Move a construct-shaped section to references/ -- or raise "
+                f"'budget:' in the frontmatter and say why in the pull request")
+
     return problems
+
+
+def budget_line(skill_dir):
+    text = open(os.path.join(skill_dir, "SKILL.md"), encoding="utf-8").read()
+    fields, error = parse_frontmatter(text)
+    if error:
+        return ""
+    budget, error = declared_budget(fields)
+    if error:
+        return ""
+    return f"{word_count(text)}/{budget} words"
 
 
 def package(skill_dir, out_dir):
@@ -188,11 +246,13 @@ def main():
 
     for skill_dir in skill_dirs:
         name = os.path.basename(skill_dir)
+        words = budget_line(skill_dir)
         if args.check_only:
-            print(f"ok  {name}")
+            print(f"ok  {name}  {words}")
             continue
         target, count = package(skill_dir, args.out)
-        print(f"ok  {name} -> {target} ({count} file{'s' if count != 1 else ''})")
+        print(f"ok  {name}  {words} -> {target} "
+              f"({count} file{'s' if count != 1 else ''})")
 
     print(f"\n{len(skill_dirs)} skill(s) checked")
     return 0
