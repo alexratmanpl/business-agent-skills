@@ -45,7 +45,7 @@ If they've already researched the company, ask them to paste what they have rath
 
 **Invoke by name, only for the pieces they asked for.** In a command-line agent that means `/company-research`; in a chat or agentic interface, naming the skill and its task is enough. Never construct file paths — install locations differ, names resolve everywhere.
 
-If one is unavailable, do that step inline and mention once at the end that a fuller version exists. `references/without-companions.md` says what each covers.
+If one is unavailable, do that step inline and mention once at the end that a fuller version exists. `references/without-companions.md` says what to cover.
 
 If they decline the fit check, say once that preparation built on an untested view of fit can prepare them for the wrong conversation — then respect the answer.
 
@@ -58,11 +58,11 @@ If they decline the fit check, say once that preparation built on an untested vi
 ## Build
 
 - **What to expect at this stage.** A recruiter checks basics, budget, motivation. A hiring manager checks whether you can do the job. A founder checks whether you understand the business. A technical assessment checks whether you can hold a position under scrutiny, not recite the material. Open with a stated decision, and treat each follow-up as a test of it rather than a request for more scope. Leave room for how it holds up as the system grows. Before the round, they should be able to say in one sentence what they'd decide and what they're giving up.
-- **The domain, where it is unfamiliar.** Explain the field before the brief rests on it. Two tests — can they say what each term means and why it matters, and has each hard part of the domain been matched to something in their own history, the same problem under another name. The second is the cheapest credibility available to anyone entering a new field.
+- **The domain, where it is unfamiliar.** Explain the field before the brief rests on it. Readable prose about an unfamiliar subject gets someone as far as asking the question and no further: the answer arrives and there is nothing to say next. Two tests — can they say what each term means and why it matters, and has each hard part of the domain been matched to something in their own history, the same problem under another name. The second is the cheapest credibility available to anyone entering a new field.
 - **The two or three things to land.** Not everything good about them — the points that answer this employer's actual worry. Lead with the one that reframes the rest.
 - **The opening move.** Any elephant — title mismatch, career break, unrelated-looking background — gets scripted for the first few minutes. Early is control; late is an apology.
 - **The weak spot, in words.** What they did, where it stops, what they'd learn. Rehearse the version where the interviewer pushes twice — the same drill covers a decision they have to defend in a technical assessment.
-- **Questions to ask.** Three to five, each built on a research fact absent from the company's marketing — a strategic tension, an odd decision, a competitor doing the opposite. The advert, press releases and launch posts are marketing too. Write the fact beside each question while drafting. One with no fact to name is cut, or moved out of the section and labelled as their own interest. Two good ones beat eight generic.
+- **Questions to ask.** Three to five, each built on a research fact absent from the company's marketing — a strategic tension, an odd decision, a competitor doing the opposite. The advert, press releases and launch posts are marketing too, so a question drawn from where one of them puts its emphasis only sounds researched. Write the fact beside each question while drafting. One with no fact to name is cut, or moved out of the section and labelled as their own interest — a fair thing to ask, and not the same as having done the reading. Two good ones beat eight generic.
 - **Practical now.** References, a tool worth a weekend, anything the advert says about applications, travel, timing.
 
 ## After a round
@@ -75,9 +75,9 @@ If they used the record, ask them to paste what it copied out. Working from that
 
 Open with the company, the role, which round this is, the date, and who they are meeting. Then the sections from **Build**, in that order. Leave space at the end for what actually happened: asked, landed, didn't, what it reveals, what to fix next.
 
-One to two pages, a thousand words at most, read in the twenty minutes before a call by someone who is nervous. Mark confidence: a **fact** carries a source and a date, a company claim is attributed, an estimate is labelled *roughly*. `references/brief.md` holds the rest of the rules.
+One to two pages, a thousand words at most. Mark confidence: a **fact** carries a source and a date, a company claim is attributed — *they say* — and an estimate is labelled *roughly*. If something couldn't be established, say so rather than leaving a gap they'll fill with an assumption. Read `references/brief.md` before writing one; it holds the writing rules.
 
-Check it with `scripts/plain_check.py` in this skill's directory — `${CLAUDE_SKILL_DIR}/scripts/plain_check.py` in Claude Code. It cannot see whether each question names the fact it came from, so read the questions against those facts by hand.
+If code can run, check it with `scripts/plain_check.py` in this skill's directory — `${CLAUDE_SKILL_DIR}/scripts/plain_check.py` in Claude Code. Otherwise apply the rules by hand. The checker cannot see whether each question names the fact it came from, so read the questions against those facts yourself.
 
 Save it, present it, offer a Word version.
 
@@ -85,7 +85,7 @@ Save it, present it, offer a Word version.
 
 Build `interview-record.html` for any conversation where they will be told things they need later, a recruiter screening call included. Skip it for scheduling and logistics, and for a hands-on session — a live coding round needs a different shape entirely, not a page of question cards.
 
-Set `RECORD_ID`, `QUESTIONS` and `SIGNALS` at the top of its script. Then work the page before handing it over: add a question, mark one answered, cycle a signal chip. Reload and confirm the notes survived, then run **Copy everything**. `references/record.md` explains each and says why the reload matters.
+Set `RECORD_ID`, `QUESTIONS` and `SIGNALS` at the top of its script. Then work the page before handing it over, opening it the way they will open it. Add a question, mark one answered, and cycle a signal chip. Reload and confirm the notes survived, then run **Copy everything** and read what comes out. Read `references/record.md` before building one; it explains the three settings and why each test step is there.
 
 ## Several companies
 
