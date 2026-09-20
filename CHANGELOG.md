@@ -14,11 +14,11 @@ named version.
 
 ### Changed
 
-- `interview-prep` is the first skill moved onto the file layout in `AGENTS.md`. `SKILL.md`
-  drops from 1,925 words to 1,119; what it specified about writing a brief, filling
-  `interview-record.html`, and working without the companion skills now lives in
-  `references/brief.md`, `references/record.md` and `references/without-companions.md`, which
-  are read only at the step that needs them. The packaged `interview-prep.skill` carries all
+- `interview-prep` is the first skill moved onto the file layout in `AGENTS.md`. `SKILL.md` drops
+  from 1,925 words to 1,119, by the counter the next entry describes; what it specified about
+  writing a brief, filling `interview-record.html`, and working without the companion skills now
+  lives in `references/brief.md`, `references/record.md` and `references/without-companions.md`,
+  which are read only at the step that needs them. The packaged `interview-prep.skill` carries all
   three. The decisions stay in `SKILL.md`, and nothing was added.
 - `SKILL.md` length is a per-skill budget enforced by `build_skills.py`, replacing a flat cap
   enforced by nothing. The default is 1,000 words; a skill needing more declares `budget:` in
