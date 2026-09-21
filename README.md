@@ -49,8 +49,8 @@ across all categories.
 
 `python3 scripts/build_skills.py --check-only` validates every skill: frontmatter parses and has a
 name and description, the name matches the directory that gets installed, every bundled file the
-body points at exists, and the body is not still a placeholder. Drop `--check-only` to write
-`.skill` archives to `dist/`. CI runs it on every pull request.
+body points at exists, the body is not still a placeholder, and `SKILL.md` fits its word budget.
+Drop `--check-only` to write `.skill` archives to `dist/`. CI runs it on every pull request.
 
 `skills/careers/interview-prep/scripts/plain_check.py` reads a drafted brief — or the skill's own
 prose — for long sentences, abbreviations used before being spelled out, machine phrasing and
