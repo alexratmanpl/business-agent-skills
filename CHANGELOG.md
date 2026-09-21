@@ -12,6 +12,21 @@ named version.
 
 ## [Unreleased]
 
+### Added
+
+- `career-direction`, a fifth skill: where to point a career when no particular job is on the
+  table. It runs a six-pass intake, groups the market into families by the asset each one buys,
+  and reads three to five years ahead without forecasting — every shift has to be visible in
+  something dated and has to name what would prove it wrong.
+- `career-direction` ships `direction-report.html`, one self-contained page holding its own data
+  as JSON, and `scripts/report_check.py`, which reads that same data and fails on a claim with no
+  source, a forecast with no falsifier, demand asserted rather than counted, a family missing its
+  pay range, entry bar or corroboration mark, contact details left in the file, and any key the
+  page does not read.
+- A privacy rule with a check behind it: the intake stays in the conversation, the market is
+  researched without ever searching the person, and the report carries a first name or initials
+  rather than contact details.
+
 ### Changed
 
 - `interview-prep` is the first skill moved onto the file layout in `AGENTS.md`. `SKILL.md` drops
@@ -25,6 +40,11 @@ named version.
   its frontmatter, so raising it shows up in the diff. `company-research` declares 1,400 and
   `interview-prep` 1,150. `wc -w` is no longer the counter: it disagrees with itself across
   locales by the number of em dashes in the file.
+- `career-direction` is on the file layout in `AGENTS.md` from the start. `SKILL.md` is 1,429
+  words against a declared budget of 1,450; the intake passes, the market craft, the horizon
+  discipline and the report contract — 2,080 words — live in `references/intake.md`,
+  `references/market.md`, `references/horizon.md` and `references/report.md`, each read only at
+  the step that needs it. The packaged skill carries all four.
 
 ## [1.1.0] - 2026-09-13
 

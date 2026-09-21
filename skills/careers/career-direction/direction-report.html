@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction report</title>
+<!-- No web fonts, no analytics, no external request of any kind. This file gets
+     forwarded; it should not tell anybody that it was opened. -->
+<style>
+  :root{
+    --paper:#f5f7fa; --ink:#1b2330; --muted:#5a6676; --line:#d6dde6; --surface:#eaeef3;
+    --accent:#1f5f8b; --accent-ink:#164a6d; --accent-soft:#dce9f3;
+    --amber:#a8661f; --amber-bg:#f7ecd9;
+    --good:#2c6e49; --good-bg:#dff0e4;
+    --bad:#9b3b2e; --bad-bg:#f5dfda;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --display:system-ui,-apple-system,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+    --body:Georgia,"Iowan Old Style","Times New Roman",serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#121821; --ink:#e4e9f0; --muted:#98a4b4; --line:#273140; --surface:#1a2230;
+      --accent:#6fb0dd; --accent-ink:#9fcbea; --accent-soft:#1c3448;
+      --amber:#e0a35a; --amber-bg:#2c2214;
+      --good:#7fc79a; --good-bg:#16291e;
+      --bad:#e08b7c; --bad-bg:#33201c;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#121821; --ink:#e4e9f0; --muted:#98a4b4; --line:#273140; --surface:#1a2230;
+    --accent:#6fb0dd; --accent-ink:#9fcbea; --accent-soft:#1c3448;
+    --amber:#e0a35a; --amber-bg:#2c2214;
+    --good:#7fc79a; --good-bg:#16291e;
+    --bad:#e08b7c; --bad-bg:#33201c;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+       padding:36px 16px 90px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:74ch;margin:0 auto}
+  .wide{max-width:1080px;margin:18px auto}
+  section[hidden]{display:none}
+
+  header{border-bottom:1px solid var(--line);padding-bottom:12px;display:flex;
+         justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  h1{font-family:var(--display);font-size:clamp(32px,6vw,52px);font-weight:700;line-height:1.05;
+     letter-spacing:-.025em;margin:30px 0 8px;text-wrap:balance}
+  .lede{font-size:18px;line-height:1.5;color:var(--muted);margin:0 0 22px}
+  h2{font-family:var(--display);font-size:25px;font-weight:700;letter-spacing:-.015em;margin:50px 0 8px;text-wrap:balance}
+  h3{font-family:var(--display);font-size:17px;font-weight:700;margin:22px 0 6px}
+  h4{font-family:var(--display);font-size:16px;font-weight:600;margin:0 0 5px}
+  p{margin:0 0 12px}
+  .note{font-size:14.5px;color:var(--muted);margin:0 0 10px;line-height:1.5}
+  .src{font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.45}
+  a{color:var(--accent);text-underline-offset:3px}
+
+  .themer{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+          border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:999px;
+          padding:4px 11px;cursor:pointer}
+  .themer:hover{border-color:var(--accent);color:var(--accent)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  .shape{background:var(--surface);border-left:3px solid var(--accent);padding:16px 20px;
+         border-radius:0 10px 10px 0;margin:18px 0}
+  .shape p:last-child{margin:0}
+
+  .asset{border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:0 0 10px}
+  .asset p{margin:0 0 6px;font-size:15.5px}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0 16px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface)}
+  .card .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
+  .card h4{margin:4px 0 5px;font-size:17px}
+  .card p{margin:0;font-size:15px}
+
+  .habits{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+  .habit{border:1px solid var(--line);border-radius:10px;padding:10px 12px;flex:1 1 230px;font-size:14.5px}
+  .habit .chip{margin-bottom:7px}
+
+  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+        padding:0 9px;height:22px;border-radius:999px;white-space:nowrap;display:inline-flex;
+        align-items:center;line-height:1;font-weight:500}
+  .chip.good{background:var(--good-bg);color:var(--good)}
+  .chip.amb{background:var(--amber-bg);color:var(--amber)}
+  .chip.bad{background:var(--bad-bg);color:var(--bad)}
+  .chip.acc{background:var(--accent-soft);color:var(--accent-ink)}
+  .chip.plain{background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+  td .chip{white-space:normal;height:auto;padding:3px 8px;line-height:1.35;border-radius:8px;display:inline-block}
+  .chip-note{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+
+  .tl-row{display:grid;grid-template-columns:78px 26px 1fr;gap:0 12px;align-items:start;position:relative;padding:0 0 16px}
+  .tl-row::before{content:"";position:absolute;left:102px;top:22px;bottom:-4px;width:2px;background:var(--line)}
+  .tl-row:last-child::before{display:none}
+  .tl-year{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:3px;text-align:right}
+  .tl-dot{width:18px;height:18px;border-radius:50%;margin:3px 0 0 4px;border:3px solid var(--paper);
+          box-shadow:0 0 0 1px var(--line);position:relative;z-index:1;background:var(--muted)}
+  .tl-dot.turn{background:var(--amber)} .tl-dot.build{background:var(--accent)} .tl-dot.test{background:var(--bad)}
+  .tl-body h4{margin:0 0 2px}
+  .tl-body p{margin:0 0 6px;font-size:14.5px;color:var(--muted)}
+
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0 6px}
+  th,td{text-align:left;vertical-align:top;padding:8px 9px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+  .tablewrap{overflow-x:auto}
+  td.grp{font-family:var(--display);font-weight:700;font-size:13px;border-right:1px solid var(--line);width:112px}
+  #families{min-width:900px} #positions{min-width:940px}
+
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px;margin:12px 0}
+  .col{border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+  .col h4{font-size:15px}
+  .col ul{margin:0;padding-left:18px;font-size:15px}
+  .col li{margin-bottom:6px}
+  ul.plainlist{font-size:15px;line-height:1.5;padding-left:18px;margin:6px 0 12px}
+  ul.plainlist li{margin-bottom:5px}
+
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  .pill{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;background:var(--surface);
+        display:inline-flex;align-items:center;gap:8px;line-height:1.3}
+  .pill b{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--amber);font-weight:500}
+
+  .skillrow{display:grid;grid-template-columns:minmax(130px,1.1fr) 2fr max-content;gap:12px;
+            align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+  .skillrow b{font-weight:600;display:block}
+  .skillrow i{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--muted);display:block;margin-top:2px}
+  .skillbar{height:10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);overflow:hidden}
+  .skillbar span{display:block;height:100%;background:var(--accent)}
+  .skillrow .n{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+  @media (max-width:560px){.skillrow{grid-template-columns:1fr max-content}.skillbar{grid-column:1 / -1}}
+  .linecards{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;margin:12px 0}
+  .linecard{border:1px solid var(--line);border-radius:12px;padding:13px 16px;font-size:15px}
+  .linecard .src{display:block;margin-top:6px}
+
+  .fbtn{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);
+        background:var(--paper);color:var(--muted);border-radius:999px;padding:0 12px;height:28px;
+        display:inline-flex;align-items:center;cursor:pointer}
+  .fbtn.on{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
+  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+  .bar .lab{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .count{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-left:6px}
+  .pos-emp{font-weight:600} .pos-title{display:block;font-size:13.5px}
+  .pos-loc{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  figure{margin:0}
+  figcaption{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .frame{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:14px;overflow-x:auto}
+  svg{display:block;max-width:100%;height:auto}
+  svg text{font-family:var(--body);fill:var(--ink)}
+  svg .mono{font-family:var(--mono);fill:var(--muted)}
+  svg .grid{stroke:var(--line);stroke-width:1}
+  svg .axis{stroke:var(--muted);stroke-width:1.2}
+
+  .shift{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;
+         padding:14px 18px;margin:0 0 12px}
+  .shift h4{font-size:16.5px;margin-bottom:6px}
+  .shift dl{display:grid;grid-template-columns:max-content 1fr;gap:5px 14px;margin:0;font-size:15px}
+  .shift dt{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:4px}
+  .shift dd{margin:0}
+  .shift .falsi{color:var(--amber)}
+
+  .lanes{display:grid;gap:10px;margin:10px 0}
+  .lane{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface)}
+  .lane-head{display:flex;gap:10px;align-items:baseline;margin-bottom:8px}
+  .lane-head h4{font-size:15px;margin:0}
+  .lane-head span{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .track{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;align-items:stretch}
+  .step{border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:8px 10px;font-size:13.5px;position:relative}
+  .step.acc{border-color:var(--accent);background:var(--accent-soft)}
+  .step.amb{border-color:var(--amber);background:var(--amber-bg)}
+  .step.good{border-color:var(--good);background:var(--good-bg)}
+  .step.bad{border-color:var(--bad);background:var(--bad-bg)}
+  .step b{display:block;font-family:var(--display);font-size:13.5px}
+  .step i{font-style:normal;color:var(--muted);font-size:12.5px;display:block;margin-top:2px}
+  .step::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);
+               color:var(--accent);font-size:13px;z-index:2}
+  .step:last-child::after,.step.nolink::after{content:""}
+  .axislabels{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;margin:4px 0 0;
+              font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+  @media (max-width:760px){
+    .track,.axislabels{display:flex;flex-direction:column}
+    .step::after{content:"↓";right:auto;left:14px;top:auto;bottom:-13px;transform:none}
+  }
+
+  .gloss{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;font-size:14.5px;margin:10px 0}
+  .gloss dt{font-family:var(--mono);font-size:12.5px;color:var(--accent-ink);padding-top:2px}
+  .gloss dd{margin:0}
+  .foot{border-top:1px solid var(--line);margin-top:44px;padding-top:12px;font-family:var(--mono);
+        font-size:12px;color:var(--muted);line-height:1.6}
+  .err{border:1px solid var(--bad);background:var(--bad-bg);color:var(--bad);border-radius:12px;
+       padding:16px 20px;font-family:var(--mono);font-size:13px;line-height:1.6;white-space:pre-wrap}
+  @media (max-width:520px){.gloss,.shift dl{grid-template-columns:1fr}.tl-row{grid-template-columns:58px 26px 1fr}.tl-row::before{left:82px}}
+  @media print{body{padding:0}.themer,.bar{display:none}.frame{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow"></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span class="eyebrow" id="date"></span>
+      <button class="themer" id="themer" type="button">theme</button>
+    </div>
+  </header>
+  <h1 id="title"></h1>
+  <p class="lede" id="lede"></p>
+  <div class="shape" id="shape"></div>
+  <div id="error"></div>
+
+  <section id="s-evidence" hidden>
+    <h2>What the evidence supports</h2>
+    <p class="note">Every claim names where it came from. <strong>Self</strong> means their own account; anything else is someone else&rsquo;s words or a record.</p>
+    <div id="evidence"></div>
+  </section>
+
+  <section id="s-selling" hidden>
+    <h2>What they are actually selling</h2>
+    <p class="note">Not the job title. The assets a buyer pays for, in the order they would pay for them.</p>
+    <div class="cards" id="selling"></div>
+  </section>
+
+  <section id="s-habits" hidden>
+    <h2>What a buyer will also notice</h2>
+    <p class="note">Red costs interviews, amber costs some, green is why people trust them.</p>
+    <div class="habits" id="habits"></div>
+  </section>
+
+  <section id="s-thread" hidden>
+    <h2>One thread, not a zig-zag</h2>
+    <p class="note" id="thread-intro"></p>
+    <div id="thread"></div>
+    <p class="note" id="thread-outro"></p>
+  </section>
+
+  <section id="s-gaps" hidden>
+    <h2>The gaps, with the same honesty</h2>
+    <p class="note"><strong>Decides</strong> gates the seat outright · <strong>slows</strong> costs applications · <strong>closes doors</strong> removes whole employers.</p>
+  </section>
+</div>
+<div class="wide"><div class="tablewrap"><table id="gaps"></table></div></div>
+<div class="wrap">
+
+  <section id="s-constraints" hidden>
+    <h2>Constraints the research applies</h2>
+    <div class="grid2" id="constraints"></div>
+  </section>
+
+  <section id="s-decisions" hidden>
+    <h2>Decisions only they can make</h2>
+    <p class="note">Open questions the research cannot close. Each one changes which families stay on the list.</p>
+    <div class="pills" id="decisions"></div>
+  </section>
+
+  <section id="s-corrections" hidden>
+    <h2>Corrections applied during the research</h2>
+    <p class="note">Things they put right once the first reading was shown to them, in their words.</p>
+    <ul class="plainlist" id="corrections"></ul>
+  </section>
+
+  <section id="s-market" hidden>
+    <h2>What the market is buying</h2>
+    <p class="note" id="market-note"></p>
+    <div class="linecards" id="lines"></div>
+  </section>
+
+  <section id="s-skills" hidden>
+    <h2>Skills the postings ask for</h2>
+    <p class="note">Counted across the postings read in full, not inferred from the field. The note says whether it is already held.</p>
+    <div id="skills"></div>
+  </section>
+
+  <section id="s-families" hidden>
+    <h2>Role families</h2>
+    <p class="note">Grouped by the asset they buy, because the same work carries a different title at every employer. <strong>Demand</strong> is what was counted in a named source on a named date, not an impression.</p>
+  </section>
+</div>
+<div class="wide"><div class="tablewrap"><table id="families"></table></div><p class="note wrap" id="skipped"></p></div>
+
+<div class="wrap">
+  <section id="s-quadrant" hidden>
+    <h2>Demand now against how it ages</h2>
+    <p class="note">The trade-off in one picture. Right is hiring today; up keeps paying as seniority grows. The top-right corner is where both hold &mdash; and it is usually the emptiest.</p>
+  </section>
+</div>
+<div class="wide" id="quadrant-wrap" hidden>
+  <figure><div class="frame" id="quadrant"></div><figcaption id="quadrant-cap"></figcaption></figure>
+</div>
+
+<div class="wrap">
+  <section id="s-positions" hidden>
+    <h2>Concrete positions</h2>
+    <p class="note">One row per posting. <strong>Evidence</strong> is how much confirms the seat: <span class="chip good">strong</span> employer page plus a family with five or more open seats · <span class="chip amb">some</span> employer page, thin family · <span class="chip bad">thin</span> closed, recurring or pattern only. Odds are estimates; &ldquo;after&rdquo; assumes the gap named in the row is closed.</p>
+  </section>
+</div>
+<div class="wide" id="positions-wrap" hidden>
+  <div class="bar" id="filters"></div>
+  <div class="bar" id="sorts"></div>
+  <div class="tablewrap"><table id="positions"></table></div>
+</div>
+
+<div class="wrap">
+  <section id="s-horizon" hidden>
+    <h2>The next three to five years</h2>
+    <p class="note" id="horizon-note"></p>
+    <div id="shifts"></div>
+    <div class="grid2" id="ageing" hidden>
+      <div class="col"><h4>Ages well &mdash; seniority is the asset</h4><div class="chips" id="ages-well"></div></div>
+      <div class="col"><h4>Ages badly &mdash; energy or novelty is the asset</h4><div class="chips" id="ages-badly"></div></div>
+    </div>
+  </section>
+</div>
+<div class="wide" id="clocks-wrap" hidden>
+  <h3 class="wrap" id="clocks-title"></h3>
+  <p class="note wrap">Two clocks run at once. The fast one pays; the slow one builds the seat the fast one cannot reach.</p>
+  <div class="lanes" id="lanes"></div>
+  <div class="axislabels" id="axislabels"></div>
+</div>
+<div class="wide" id="calendar-wrap" hidden>
+  <div class="tablewrap"><table id="calendar"></table></div>
+</div>
+
+<div class="wrap">
+  <section id="s-glossary" hidden>
+    <h2>Abbreviations used above</h2>
+    <dl class="gloss" id="glossary"></dl>
+  </section>
+
+  <section id="s-sources" hidden>
+    <h2>Sources</h2>
+    <div id="src-produced-wrap" hidden><h3>Produced in this research</h3><ul class="plainlist" id="src-produced"></ul></div>
+    <div id="src-checked-wrap" hidden><h3>Checked directly</h3><ul class="plainlist" id="src-checked"></ul></div>
+    <div id="src-not-wrap" hidden><h3>Not confirmed &mdash; treat as unknown, not as absent</h3><ul class="plainlist" id="src-not"></ul></div>
+  </section>
+  <div class="foot" id="foot"></div>
+</div>
+
+<!-- ------------------------------------------------------------------
+     THE REPORT. Replace everything between the script tags below with
+     the filled report, as JSON. Nothing else in this file changes.
+
+     It is JSON, not JavaScript: double quotes, no trailing commas, no
+     comments. That is deliberate -- scripts/report_check.py reads this
+     same block and checks it before the report is handed over.
+
+     Every section is optional. A section whose data is missing or empty
+     hides itself, so a first pass can ship with evidence and gaps alone.
+     The example below is a shape to copy, not content to keep.
+
+     Two fields are not self-explanatory. horizon.clocks.lanes[].steps[]
+     takes "at" and "span" as whole columns on a twelve-column track: the
+     axis labels decide what a column means, and they do not have to be
+     evenly spaced in time. market.families[].demandN is a count of open
+     positions, and it is what the chart plots, so an estimate there is a
+     lie with a dot on it. market.families[].sourcing is "confirmed" when
+     two independent sources back the row and "unconfirmed" when one does;
+     entryBar is what the lowest rung is and what the paying grade demands,
+     because a family priced only at its ceiling reads as reachable when it
+     is not.
+     ------------------------------------------------------------------ -->
+<script type="application/json" id="report-data">
+{
+  "meta": {
+    "name": "R.",
+    "date": "19 September 2026",
+    "eyebrow": "Direction review · profile, market, horizon",
+    "lede": "From one intake, three written references and a sweep of 40 employers. Not from the CV.",
+    "footer": "Odds are estimates. Nothing here was sent to a third party."
+  },
+  "shape": [
+    "Not a specialist who would like to manage. Someone who twice built what the organisation needed before it was asked for, then got others to use it.",
+    "The gap is not depth. It is holding a position in front of a group. Three sources say so."
+  ],
+  "evidence": [
+    {
+      "title": "Builds shared things and makes them stick",
+      "text": "Chose the platform, built the library ten teams run on, ran a fortnightly session a third of the department attended voluntarily.",
+      "src": "Two written references; self (attendance)"
+    },
+    {
+      "title": "Owns systems end to end, under pressure",
+      "text": "Sole engineer on a live consumer backend through a funding crunch, including a migration with a rehearsed rollback.",
+      "src": "Commit history 2022-2026; self (staying)"
+    }
+  ],
+  "selling": [
+    { "title": "Adoption", "text": "Gets a practice to land with people they have no authority over. Rare, and invisible on paper." },
+    { "title": "Ownership without a net", "text": "Kept a production system alive alone. This is what a buyer means by trust." },
+    { "title": "Accountability as a habit", "text": "Audit years, data separation, the security role nobody wanted. Worth more each year regulation lands." }
+  ],
+  "habits": [
+    { "label": "Talks too much", "tone": "bad", "text": "Reviews say it; the panel confirmed it. Under load it flips to going quiet." },
+    { "label": "Yields under challenge", "tone": "amb", "text": "Good in a team, costly in a panel. Trainable." },
+    { "label": "Delivers despite obstacles", "tone": "good", "text": "Shipped through the cash crunch when nobody else could hold the code." }
+  ],
+  "thread": {
+    "intro": "Amber marks choosing the uncomfortable path; blue marks building something others then depended on.",
+    "events": [
+      { "year": "2010", "kind": "build", "title": "Public-sector auditor", "detail": "Reporting upward when it mattered.", "verdict": "start", "verdictText": "the accountability habit begins" },
+      { "year": "2015", "kind": "turn", "title": "Moves country, no language", "detail": "Gave a conference talk in it eight years later.", "verdict": "confirms", "verdictText": "leaves comfort" },
+      { "year": "2025", "kind": "build", "title": "Platform practice", "detail": "Library adopted by ten teams; the teaching session.", "verdict": "confirms", "verdictText": "builds the shared thing" },
+      { "year": "2026", "kind": "test", "title": "First panel interview", "detail": "First test in front of strangers.", "verdict": "fails", "verdictText": "the room test — failed" }
+    ],
+    "outro": "The thread survived every turn. What failed was holding a position in a room."
+  },
+  "gaps": [
+    {
+      "gap": "Holding a position in front of a group",
+      "weight": "decides",
+      "evidence": "Rejection letter; a reference asking for more decisiveness; self",
+      "fix": "A four-sentence opening, two banned phrases, push-twice drills with a real person.",
+      "cost": "hours, from this month"
+    },
+    {
+      "gap": "No governance vocabulary",
+      "weight": "decides",
+      "evidence": "The instinct is on the record; the standards language is not",
+      "fix": "One lead-auditor course, then a published assessment of a system they know.",
+      "cost": "€2-4k, 6 months"
+    },
+    {
+      "gap": "The CV describes the wrong person",
+      "weight": "slows",
+      "evidence": "One title three times; adoption and the audit years absent",
+      "fix": "Rewrite around the three assets. The references give the sentences.",
+      "cost": "one weekend"
+    },
+    {
+      "gap": "No German",
+      "weight": "closes doors",
+      "evidence": "Removes the assessor bodies and most public institutions in that market",
+      "fix": "Two years. Only worth it if that country becomes the landing spot.",
+      "cost": "2 years"
+    }
+  ],
+  "constraints": {
+    "hard": [
+      "Income floor stated as a figure. It rules out one family below.",
+      "No direct sales. Advising is fine.",
+      "Current city by default, two countries acceptable, one ruled out for family reasons."
+    ],
+    "soft": [
+      "Travel: none ideal, a third negotiable.",
+      "Small enough to matter, funded, with a route to market.",
+      "Runway of six to twelve months, so one build can be afforded."
+    ]
+  },
+  "decisions": [
+    { "label": "Relocation", "text": "two roles, one city, decide by October" },
+    { "label": "Variable pay", "text": "does a team-linked bonus count as sales?" }
+  ],
+  "corrections": [
+    "One language listed as daily is intermediate. Odds on two families cut.",
+    "Air-gapped deployment: read about, never done. Removed from the evidence."
+  ],
+  "market": {
+    "asOf": "13 September 2026",
+    "lines": [
+      { "text": "Employers here do not pay by sector. Three role shapes buy the same asset.", "src": "Families brief, 40 employers" },
+      { "text": "The architecture seat pays for accountability, not code output.", "src": "Nine postings, read in full" }
+    ],
+    "skills": [
+      { "name": "Evidence and audit trails", "countN": 8, "note": "Held. Nowhere on the CV." },
+      { "name": "One named standard", "countN": 7, "note": "Gap. See row two of the gaps." },
+      { "name": "Cloud platform, any", "countN": 6, "note": "Held, and stated at the level asked for." },
+      { "name": "Stakeholder teaching", "countN": 4, "note": "Held. Two references describe it." }
+    ],
+    "families": [
+      {
+        "name": "Architecture in a regulated company",
+        "buys": "Accountability",
+        "why": "Pays for the audit years and the ownership record together",
+        "demandN": 9,
+        "demandNote": "9 open, 3 career pages, 13 Sep",
+        "pay": "Above the floor in 6 of 9 postings",
+        "entryBar": "Analyst at €45k; the architect grade asks 5 yrs plus a named standard",
+        "sourcing": "confirmed",
+        "trend": "Compliance dates already fixed in law",
+        "ages": "well",
+        "verdict": "first lane",
+        "verdictTone": "good",
+        "note": "Two need the standards vocabulary"
+      },
+      {
+        "name": "Field engineer at a vendor",
+        "buys": "Adoption",
+        "why": "The teaching record is the job description",
+        "demandN": 6,
+        "demandNote": "6 open across 4 vendors, 13 Sep",
+        "pay": "Base below the floor; variable pay unresolved",
+        "entryBar": "No formal gate; 3 yrs customer-facing is the stated norm",
+        "sourcing": "confirmed",
+        "trend": "Grows while vendors sell to teams, not procurement",
+        "ages": "mixed",
+        "verdict": "bridge",
+        "verdictTone": "amb",
+        "note": "Travel and variable pay are the open questions"
+      },
+      {
+        "name": "Platform engineering, generalist",
+        "buys": "Output",
+        "why": "Closest to the current title, so the least work to enter",
+        "demandN": 21,
+        "demandNote": "21 open, one job board, 13 Sep",
+        "pay": "At the floor, and flat since 2025",
+        "entryBar": "Open at every grade — which is why it pays what it does",
+        "sourcing": "unconfirmed",
+        "trend": "Volume high, prices falling as tooling absorbs the work",
+        "ages": "badly",
+        "verdict": "fallback only",
+        "verdictTone": "bad",
+        "note": "Pays now, worth less each year"
+      }
+    ],
+    "skipped": "Two families dropped: one failed the income floor, one needed a language not held.",
+    "positions": [
+      {
+        "employer": "Regulated mid-size, named in the sources",
+        "title": "Solution architect",
+        "loc": "Current city, hybrid",
+        "family": "Architecture in a regulated company",
+        "status": "open",
+        "statusDate": "13 Sep",
+        "evidence": "strong",
+        "oddsNow": "30-35%",
+        "oddsAfter": "55%",
+        "when": "now",
+        "note": "Apply before the course, not after"
+      },
+      {
+        "employer": "Infrastructure vendor",
+        "title": "Field engineer",
+        "loc": "Remote, 30% travel",
+        "family": "Field engineer at a vendor",
+        "status": "recurs",
+        "statusDate": "twice in 2026",
+        "evidence": "some",
+        "oddsNow": "20%",
+        "oddsAfter": "40%",
+        "when": "build",
+        "note": "Blocked until the variable-pay question is settled"
+      }
+    ]
+  },
+  "horizon": {
+    "note": "Not predictions. Each shift is visible in something dated and names what would prove it wrong.",
+    "shifts": [
+      {
+        "title": "Someone has to be answerable for what the machines produced",
+        "mechanism": "Output rises; the liability does not move. A named person signs.",
+        "alreadyVisible": "Nine postings ask for evidence and sign-off, not for output.",
+        "src": "Families brief, 13 Sep",
+        "falsifier": "Those postings drop the sign-off language within a year.",
+        "worthTo": "Direct. This is the audit habit, already on the record."
+      },
+      {
+        "title": "Compliance dates already in law",
+        "mechanism": "A law with a date is the most reliable forecast there is. The evidence trail must exist before it.",
+        "alreadyVisible": "Two employers in the sweep hire for it by name.",
+        "src": "Sweep, 13 Sep",
+        "falsifier": "Enforcement slips two years and hiring follows.",
+        "worthTo": "High, and it rewards the auditor years over the engineering ones."
+      },
+      {
+        "title": "Tooling absorbs the generalist platform work",
+        "mechanism": "Work that is mostly assembly gets cheaper each year. Volume stays, price falls.",
+        "alreadyVisible": "Highest count in the sweep, lowest stated band.",
+        "src": "Sweep, 13 Sep",
+        "falsifier": "Bands in that family rise instead.",
+        "worthTo": "Negative. Pays now, worth less each year."
+      }
+    ],
+    "agesWell": ["Accountability", "Domain knowledge", "Judgement under scrutiny", "Trust with a system"],
+    "agesBadly": ["Raw output speed", "One vendor's tooling", "Being the newest at something"],
+    "clocks": {
+      "title": "Two clocks",
+      "axis": ["now", "3 months", "6 months", "12 months", "2 years", "3 years"],
+      "lanes": [
+        {
+          "name": "Fast",
+          "sub": "pays, and builds the record the slow lane needs",
+          "steps": [
+            { "at": 0, "span": 3, "label": "Rewrite, then apply", "detail": "Six applications, first family", "tone": "acc" },
+            { "at": 3, "span": 4, "label": "Bridge seat", "detail": "Family one or the vendor", "tone": "acc" },
+            { "at": 7, "span": 5, "label": "The seat that ages well", "detail": "Entered with a record, not a course", "tone": "good" }
+          ]
+        },
+        {
+          "name": "Slow",
+          "sub": "cannot be bought later",
+          "steps": [
+            { "at": 0, "span": 4, "label": "The room gap", "detail": "Drills weekly, with a person", "tone": "amb" },
+            { "at": 4, "span": 4, "label": "Standards vocabulary", "detail": "Course, then a published assessment", "tone": "amb" },
+            { "at": 8, "span": 4, "label": "Named for it publicly", "detail": "One talk, one write-up", "tone": "acc" }
+          ]
+        }
+      ]
+    },
+    "calendar": [
+      { "date": "20 Sep 2026", "what": "One posting closes. Decide before it." },
+      { "date": "Q1 2027", "what": "Course enrolment. Missing it moves the slow lane by six months." }
+    ]
+  },
+  "glossary": [
+    ["asset", "What a buyer pays for, as distinct from a job title"],
+    ["family", "Roles that buy the same asset under different titles"],
+    ["demand counted", "Positions counted in a named source on a named date"]
+  ],
+  "sources": {
+    "produced": ["Intake, 19 Sep 2026", "Employer sweep, 40 companies, 13 Sep 2026"],
+    "checked": ["Three written references", "Nine postings read in full"],
+    "notConfirmed": ["Pay bands for two families", "Whether the vendor role is open outside one country"]
+  }
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(s){ return (s==null?"":String(s))
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+  var chip = function(t,tone){ return '<span class="chip '+(tone||"plain")+'">'+esc(t)+"</span>"; };
+  var has = function(x){ return Array.isArray(x) ? x.length>0 : (x!=null && x!=="" ); };
+  var show = function(id){ var el=$(id); if(el) el.hidden=false; };
+
+  // theme toggle: follows the system until someone presses it
+  $("themer").onclick = function(){
+    var now = document.documentElement.getAttribute("data-theme");
+    var dark = now ? now==="dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
+  };
+
+  var D;
+  try {
+    D = JSON.parse($("report-data").textContent);
+  } catch (e) {
+    $("error").innerHTML = '<div class="err">The report data is not valid JSON, so nothing below could '
+      + "be built.\n\n" + esc(e.message)
+      + "\n\nJSON is strict: double quotes on every key and string, no trailing commas, no comments.</div>";
+    $("title").textContent = "Report data could not be read";
+    return;
+  }
+
+  var meta = D.meta || {};
+  $("eyebrow").textContent = meta.eyebrow || "Direction review";
+  $("date").textContent = meta.date || "";
+  $("title").textContent = meta.title || ((meta.name || "Someone") + ", where next");
+  $("lede").textContent = meta.lede || "";
+  if (has(D.shape)) {
+    $("shape").innerHTML = D.shape.map(function(s,i){
+      return "<p>" + (i===0 ? "<strong>The shape.</strong> " : "") + esc(s) + "</p>"; }).join("");
+  } else { $("shape").hidden = true; }
+
+  if (has(D.evidence)) {
+    show("s-evidence");
+    $("evidence").innerHTML = D.evidence.map(function(a){
+      return '<div class="asset"><h4>' + esc(a.title) + "</h4><p>" + esc(a.text)
+        + '</p><p class="src">' + esc(a.src || "source not recorded") + "</p></div>"; }).join("");
+  }
+
+  if (has(D.selling)) {
+    show("s-selling");
+    $("selling").innerHTML = D.selling.map(function(s,i){
+      return '<div class="card"><div class="n">Asset ' + (i+1) + "</div><h4>" + esc(s.title)
+        + "</h4><p>" + esc(s.text) + "</p></div>"; }).join("");
+  }
+  if (has(D.habits)) {
+    show("s-habits");
+    $("habits").innerHTML = D.habits.map(function(h){
+      return '<div class="habit">' + chip(h.label, h.tone) + "<div>" + esc(h.text) + "</div></div>"; }).join("");
+  }
+
+  var thread = D.thread || {};
+  if (has(thread.events)) {
+    show("s-thread");
+    $("thread-intro").textContent = thread.intro || "";
+    $("thread-outro").textContent = thread.outro || "";
+    var vtone = { confirms:"good", fails:"bad", start:"plain" };
+    $("thread").innerHTML = thread.events.map(function(e){
+      return '<div class="tl-row"><div class="tl-year">' + esc(e.year) + '</div>'
+        + '<div class="tl-dot ' + esc(e.kind||"") + '"></div><div class="tl-body"><h4>' + esc(e.title)
+        + "</h4><p>" + esc(e.detail||"") + "</p>"
+        + (e.verdictText ? chip(e.verdictText, vtone[e.verdict]||"plain") : "") + "</div></div>"; }).join("");
+  }
+
+  if (has(D.gaps)) {
+    show("s-gaps");
+    var wtone = { decides:"bad", slows:"amb", "closes doors":"acc" };
+    $("gaps").innerHTML = "<thead><tr><th>Gap</th><th>Weight</th><th>Evidence</th><th>Fixable how</th><th>Cost</th></tr></thead><tbody>"
+      + D.gaps.map(function(g){
+        return "<tr><td><strong>" + esc(g.gap) + "</strong></td><td>" + chip(g.weight, wtone[g.weight]||"plain")
+          + "</td><td>" + esc(g.evidence) + "</td><td>" + esc(g.fix)
+          + '</td><td class="src">' + esc(g.cost) + "</td></tr>"; }).join("") + "</tbody>";
+  }
+
+  var C = D.constraints || {};
+  if (has(C.hard) || has(C.soft)) {
+    show("s-constraints");
+    var colOf = function(title, rows){
+      return !has(rows) ? "" : '<div class="col"><h4>' + title + "</h4><ul>"
+        + rows.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>"; };
+    $("constraints").innerHTML = colOf("Hard", C.hard) + colOf("Soft", C.soft);
+  }
+  if (has(D.decisions)) {
+    show("s-decisions");
+    $("decisions").innerHTML = D.decisions.map(function(d){
+      return '<span class="pill"><b>' + esc(d.label) + "</b>" + esc(d.text) + "</span>"; }).join("");
+  }
+  if (has(D.corrections)) {
+    show("s-corrections");
+    $("corrections").innerHTML = D.corrections.map(function(c){ return "<li>" + esc(c) + "</li>"; }).join("");
+  }
+
+  var M = D.market || {};
+  var demandTone = function(n){ return n>=5 ? "good" : n>=2 ? "amb" : "bad"; };
+  var agesTone = function(a){ return a==="well" ? "good" : a==="badly" ? "bad" : "amb"; };
+  if (has(M.lines)) {
+    show("s-market");
+    $("market-note").textContent = M.asOf
+      ? "What the research supports, as of " + M.asOf + ". Each line names the source it came from."
+      : "What the research supports. Each line names the source it came from.";
+    $("lines").innerHTML = M.lines.map(function(l){
+      return '<div class="linecard">' + esc(l.text) + '<span class="src">' + esc(l.src||"source not recorded")
+        + "</span></div>"; }).join("");
+  }
+
+  if (has(M.skills)) {
+    show("s-skills");
+    var topSkill = Math.max.apply(null, M.skills.map(function(s){ return s.countN||0; }).concat([1]));
+    $("skills").innerHTML = M.skills.slice().sort(function(a,b){ return (b.countN||0)-(a.countN||0); })
+      .map(function(s){
+        return '<div class="skillrow"><div><b>' + esc(s.name) + "</b>"
+          + (s.note ? "<i>" + esc(s.note) + "</i>" : "") + "</div>"
+          + '<div class="skillbar"><span style="width:' + Math.round(100*(s.countN||0)/topSkill)
+          + '%"></span></div><div class="n">' + (s.countN||0) + "</div></div>"; }).join("");
+  }
+
+  if (has(M.families)) {
+    show("s-families");
+    var groups = [];
+    M.families.forEach(function(f){
+      var g = groups.filter(function(x){ return x.buys===f.buys; })[0];
+      if (!g) { g = { buys:f.buys, rows:[] }; groups.push(g); }
+      g.rows.push(f);
+    });
+    var html = "<thead><tr><th>Buys</th><th>Family</th><th>Why it is on the list</th><th>Demand counted</th>"
+      + "<th>Trend, and what drives it</th><th>Ages</th><th>Verdict</th></tr></thead><tbody>";
+    groups.forEach(function(g){
+      g.rows.forEach(function(f,i){
+        html += "<tr>"
+          + (i===0 ? '<td class="grp" rowspan="' + g.rows.length + '">' + esc(g.buys) + "</td>" : "")
+          + "<td><strong>" + esc(f.name) + "</strong>"
+          + (f.pay ? '<span class="chip-note">' + esc(f.pay) + "</span>" : "")
+          + (f.entryBar ? '<span class="chip-note">Bar: ' + esc(f.entryBar) + "</span>" : "")
+          + "</td><td>" + esc(f.why) + "</td>"
+          + "<td>" + chip(f.demandN + " counted", demandTone(f.demandN))
+          + (f.sourcing ? " " + chip(f.sourcing, f.sourcing === "confirmed" ? "good" : "amb") : "")
+          + (f.demandNote ? '<span class="chip-note">' + esc(f.demandNote) + "</span>" : "") + "</td>"
+          + "<td>" + esc(f.trend||"") + "</td>"
+          + "<td>" + chip(f.ages, agesTone(f.ages)) + "</td>"
+          + "<td>" + chip(f.verdict, f.verdictTone||"plain")
+          + (f.note ? '<span class="chip-note">' + esc(f.note) + "</span>" : "") + "</td></tr>";
+      });
+    });
+    $("families").innerHTML = html + "</tbody>";
+    if (M.skipped) $("skipped").textContent = M.skipped;
+    drawQuadrant(M.families, M.asOf);
+  }
+
+  // Demand against ageing. Both axes come from the family rows, so the picture
+  // cannot disagree with the table above it.
+  function drawQuadrant(families, asOf){
+    show("s-quadrant"); show("quadrant-wrap");
+    var W = 940, H = 430, L = 116, R = 30, T = 28, B = 62;
+    var maxN = Math.max.apply(null, families.map(function(f){ return f.demandN||0; }).concat([5]));
+    var yOf = { well: T + (H-T-B)*0.18, mixed: T + (H-T-B)*0.5, badly: T + (H-T-B)*0.82 };
+    var xOf = function(n){ return L + (W-L-R) * ((n||0)/maxN); };
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" height="' + H
+      + '" role="img" aria-label="Role families plotted by counted demand against how the asset ages">';
+    // the good corner
+    s += '<rect x="' + (L+(W-L-R)*0.5) + '" y="' + T + '" width="' + ((W-L-R)*0.5) + '" height="'
+      + ((H-T-B)*0.34) + '" fill="var(--accent-soft)" opacity="0.5"/>';
+    s += '<text x="' + (W-R-6) + '" y="' + (T+18) + '" class="mono" font-size="10.5" text-anchor="end">'
+      + "hiring now, and it keeps paying</text>";
+    ["well","mixed","badly"].forEach(function(k){
+      s += '<line x1="' + L + '" y1="' + yOf[k] + '" x2="' + (W-R) + '" y2="' + yOf[k] + '" class="grid"/>'
+        + '<text x="' + (L-10) + '" y="' + (yOf[k]+4) + '" class="mono" font-size="11" text-anchor="end">ages '
+        + k + "</text>";
+    });
+    s += '<line x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (H-B) + '" class="axis"/>';
+    s += '<line x1="' + L + '" y1="' + (H-B) + '" x2="' + (W-R) + '" y2="' + (H-B) + '" class="axis"/>';
+    [0, 0.5, 1].forEach(function(f){
+      var n = Math.round(maxN*f);
+      s += '<text x="' + xOf(n) + '" y="' + (H-B+18) + '" class="mono" font-size="10.5" text-anchor="middle">'
+        + n + "</text>";
+    });
+    s += '<text x="' + ((L+W-R)/2) + '" y="' + (H-B+38) + '" class="mono" font-size="11" text-anchor="middle">'
+      + "open positions counted" + (asOf ? ", " + asOf : "") + "</text>";
+    // points, nudged apart when two land on the same row and close together
+    var placed = [];
+    families.forEach(function(f){
+      var x = xOf(f.demandN), y = yOf[f.ages] || yOf.mixed, up = false;
+      placed.forEach(function(p){ if (Math.abs(p.y-y)<15 && Math.abs(p.x-x)<230) up = !up; });
+      var ly = y + (up ? -16 : 24);
+      placed.push({ x:x, y:y });
+      var tone = f.ages==="well" ? "var(--good)" : f.ages==="badly" ? "var(--bad)" : "var(--amber)";
+      var anchor = x > (W-R-190) ? "end" : "start";
+      var lx = x + (anchor==="end" ? 10 : -10);
+      s += '<circle cx="' + x + '" cy="' + y + '" r="7" fill="' + tone + '" stroke="var(--paper)" stroke-width="2"/>';
+      s += '<text x="' + lx + '" y="' + ly + '" font-size="13" text-anchor="' + anchor + '">' + esc(f.name) + "</text>";
+      s += '<text x="' + lx + '" y="' + (ly+15) + '" class="mono" font-size="10.5" text-anchor="' + anchor + '">'
+        + esc(f.verdict||"") + "</text>";
+    });
+    s += "</svg>";
+    $("quadrant").innerHTML = s;
+    $("quadrant-cap").textContent = "Each point is a role family from the table above; both axes are its own row, "
+      + "so the picture cannot say something the table does not.";
+  }
+
+  if (has(M.positions)) {
+    show("s-positions"); show("positions-wrap");
+    var whenLabel = { now:"now", build:"after one build" };
+    var whenTone = { now:"good", build:"amb" };
+    var stTone = { open:"good", closes:"amb", recurs:"acc", closed:"plain" };
+    var evTone = { strong:"good", some:"amb", thin:"bad" };
+    var filters = [
+      { key:"all",    label:"All",                 test:function(){ return true; } },
+      { key:"now",    label:"Now",                 test:function(p){ return p.when==="now"; } },
+      { key:"build",  label:"After one build",     test:function(p){ return p.when==="build"; } },
+      { key:"later",  label:"Later",               test:function(p){ return p.when!=="now" && p.when!=="build"; } },
+      { key:"closed", label:"Recurring or closed", test:function(p){ return p.status==="recurs" || p.status==="closed"; } }
+    ];
+    var num = function(t){ var m = String(t||"").match(/\d+/g); return m ? Math.max.apply(null, m.map(Number)) : -1; };
+    var laneRank = function(p){ return p.when==="now" ? 0 : p.when==="build" ? 1 : 2; };
+    var evRank = function(p){ return ({ strong:3, some:2, thin:1 })[p.evidence] || 0; };
+    var tie = function(a,b){ return num(b.oddsAfter)-num(a.oddsAfter) || num(b.oddsNow)-num(a.oddsNow)
+      || evRank(b)-evRank(a) || String(a.employer).localeCompare(String(b.employer)); };
+    var sorts = [
+      { key:"lane",     label:"Lane, then odds", cmp:function(a,b){ return laneRank(a)-laneRank(b) || tie(a,b); } },
+      { key:"now",      label:"Odds now",        cmp:function(a,b){ return num(b.oddsNow)-num(a.oddsNow) || tie(a,b); } },
+      { key:"after",    label:"After gaps",      cmp:tie },
+      { key:"evidence", label:"Evidence",        cmp:function(a,b){ return evRank(b)-evRank(a) || tie(a,b); } }
+    ];
+    var active = "all", sortKey = "lane";
+    var render = function(){
+      var f = filters.filter(function(x){ return x.key===active; })[0];
+      var srt = sorts.filter(function(x){ return x.key===sortKey; })[0];
+      $("filters").innerHTML = '<span class="lab">show</span>' + filters.map(function(x){
+        return '<button type="button" class="fbtn ' + (x.key===active?"on":"") + '" data-k="' + x.key + '">'
+          + x.label + '<span class="count">' + M.positions.filter(x.test).length + "</span></button>"; }).join("");
+      $("sorts").innerHTML = '<span class="lab">sort</span>' + sorts.map(function(x){
+        return '<button type="button" class="fbtn ' + (x.key===sortKey?"on":"") + '" data-k="' + x.key + '">'
+          + x.label + "</button>"; }).join("");
+      Array.prototype.forEach.call($("filters").querySelectorAll("button"), function(b){
+        b.onclick = function(){ active = b.dataset.k; render(); }; });
+      Array.prototype.forEach.call($("sorts").querySelectorAll("button"), function(b){
+        b.onclick = function(){ sortKey = b.dataset.k; render(); }; });
+      $("positions").innerHTML = "<thead><tr><th>Position</th><th>Family</th><th>Status</th><th>Evidence</th>"
+        + "<th>Odds now</th><th>After gaps</th><th>When</th><th>Note</th></tr></thead><tbody>"
+        + M.positions.filter(f.test).slice().sort(srt.cmp).map(function(p){
+          return '<tr><td><span class="pos-emp">' + esc(p.employer) + '</span><span class="pos-title">'
+            + esc(p.title) + '</span><span class="pos-loc">' + esc(p.loc||"") + "</span></td>"
+            + "<td>" + esc(p.family||"") + "</td>"
+            + "<td>" + chip(p.status, stTone[p.status]||"plain")
+            + (p.statusDate ? '<span class="chip-note">' + esc(p.statusDate) + "</span>" : "") + "</td>"
+            + "<td>" + chip(p.evidence, evTone[p.evidence]||"plain") + "</td>"
+            + "<td>" + esc(p.oddsNow||"") + "</td><td>" + esc(p.oddsAfter||"") + "</td>"
+            + "<td>" + chip(whenLabel[p.when]||p.when, whenTone[p.when]||"acc") + "</td>"
+            + "<td>" + esc(p.note||"") + "</td></tr>"; }).join("") + "</tbody>";
+    };
+    render();
+  }
+
+  var Hz = D.horizon || {};
+  if (has(Hz.shifts)) {
+    show("s-horizon");
+    $("horizon-note").textContent = Hz.note || "";
+    $("shifts").innerHTML = Hz.shifts.map(function(s){
+      var row = function(k,v,cls){ return v ? "<dt>" + k + '</dt><dd class="' + (cls||"") + '">' + esc(v) + "</dd>" : ""; };
+      return '<div class="shift"><h4>' + esc(s.title) + "</h4><dl>"
+        + row("Mechanism", s.mechanism)
+        + row("Already visible", s.alreadyVisible)
+        + row("Source", s.src)
+        + row("Wrong if", s.falsifier, "falsi")
+        + row("Worth to them", s.worthTo)
+        + "</dl></div>"; }).join("");
+  }
+  if (has(Hz.agesWell) || has(Hz.agesBadly)) {
+    show("s-horizon"); show("ageing");
+    $("ages-well").innerHTML = (Hz.agesWell||[]).map(function(x){ return chip(x,"good"); }).join("");
+    $("ages-badly").innerHTML = (Hz.agesBadly||[]).map(function(x){ return chip(x,"bad"); }).join("");
+  }
+
+  var K = Hz.clocks || {};
+  if (has(K.lanes)) {
+    show("clocks-wrap");
+    $("clocks-title").textContent = K.title || "Two clocks";
+    $("lanes").innerHTML = K.lanes.map(function(lane){
+      var steps = (lane.steps||[]).slice().sort(function(a,b){ return (a.at||0)-(b.at||0); });
+      return '<div class="lane"><div class="lane-head"><h4>' + esc(lane.name) + "</h4><span>"
+        + esc(lane.sub||"") + '</span></div><div class="track">'
+        + steps.map(function(st,i){
+            var at = Math.max(0, Math.min(11, st.at||0));
+            var span = Math.max(1, Math.min(12-at, st.span||2));
+            var next = steps[i+1];
+            var linked = next && (next.at||0) <= at + span;   // no arrow across a gap
+            return '<div class="step ' + esc(st.tone||"") + (linked ? "" : " nolink")
+              + '" style="grid-column:' + (at+1) + " / span " + span + '"><b>' + esc(st.label)
+              + "</b>" + (st.detail ? "<i>" + esc(st.detail) + "</i>" : "") + "</div>"; }).join("")
+        + "</div></div>"; }).join("");
+    var axis = K.axis || [];
+    $("axislabels").innerHTML = axis.map(function(a,i){
+      var col = Math.round(i * 12 / Math.max(1, axis.length)) + 1;
+      return '<span style="grid-column:' + col + " / span " + Math.max(1, Math.round(12/Math.max(1,axis.length)))
+        + '">' + esc(a) + "</span>"; }).join("");
+  }
+  if (has(Hz.calendar)) {
+    show("calendar-wrap");
+    $("calendar").innerHTML = "<thead><tr><th>Date</th><th>What it gates</th></tr></thead><tbody>"
+      + Hz.calendar.map(function(c){
+        return '<tr><td class="src" style="white-space:nowrap;color:var(--ink)">' + esc(c.date)
+          + "</td><td>" + esc(c.what) + "</td></tr>"; }).join("") + "</tbody>";
+  }
+
+  if (has(D.glossary)) {
+    show("s-glossary");
+    $("glossary").innerHTML = D.glossary.map(function(g){
+      return "<dt>" + esc(g[0]) + "</dt><dd>" + esc(g[1]) + "</dd>"; }).join("");
+  }
+
+  var S = D.sources || {};
+  if (has(S.produced) || has(S.checked) || has(S.notConfirmed)) {
+    show("s-sources");
+    var fill = function(listId, wrapId, rows){
+      if (!has(rows)) return;
+      show(wrapId);
+      $(listId).innerHTML = rows.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("");
+    };
+    fill("src-produced", "src-produced-wrap", S.produced);
+    fill("src-checked", "src-checked-wrap", S.checked);
+    fill("src-not", "src-not-wrap", S.notConfirmed);
+  }
+
+  $("foot").textContent = [meta.footer, M.asOf ? "Market data as of " + M.asOf + "." : ""]
+    .filter(Boolean).join(" ");
+})();
+</script>
+</body>
+</html>
