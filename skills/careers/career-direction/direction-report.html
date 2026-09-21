@@ -352,7 +352,11 @@
      axis labels decide what a column means, and they do not have to be
      evenly spaced in time. market.families[].demandN is a count of open
      positions, and it is what the chart plots, so an estimate there is a
-     lie with a dot on it.
+     lie with a dot on it. market.families[].sourcing is "confirmed" when
+     two independent sources back the row and "unconfirmed" when one does;
+     entryBar is what the lowest rung is and what the paying grade demands,
+     because a family priced only at its ceiling reads as reachable when it
+     is not.
      ------------------------------------------------------------------ -->
 <script type="application/json" id="report-data">
 {
@@ -469,6 +473,8 @@
         "demandN": 9,
         "demandNote": "9 open, 3 career pages, 13 Sep",
         "pay": "Above the floor in 6 of 9 postings",
+        "entryBar": "Analyst at €45k; the architect grade asks 5 yrs plus a named standard",
+        "sourcing": "confirmed",
         "trend": "Compliance dates already fixed in law",
         "ages": "well",
         "verdict": "first lane",
@@ -482,6 +488,8 @@
         "demandN": 6,
         "demandNote": "6 open across 4 vendors, 13 Sep",
         "pay": "Base below the floor; variable pay unresolved",
+        "entryBar": "No formal gate; 3 yrs customer-facing is the stated norm",
+        "sourcing": "confirmed",
         "trend": "Grows while vendors sell to teams, not procurement",
         "ages": "mixed",
         "verdict": "bridge",
@@ -495,6 +503,8 @@
         "demandN": 21,
         "demandNote": "21 open, one job board, 13 Sep",
         "pay": "At the floor, and flat since 2025",
+        "entryBar": "Open at every grade — which is why it pays what it does",
+        "sourcing": "unconfirmed",
         "trend": "Volume high, prices falling as tooling absorbs the work",
         "ages": "badly",
         "verdict": "fallback only",
@@ -743,8 +753,10 @@
           + (i===0 ? '<td class="grp" rowspan="' + g.rows.length + '">' + esc(g.buys) + "</td>" : "")
           + "<td><strong>" + esc(f.name) + "</strong>"
           + (f.pay ? '<span class="chip-note">' + esc(f.pay) + "</span>" : "")
+          + (f.entryBar ? '<span class="chip-note">Bar: ' + esc(f.entryBar) + "</span>" : "")
           + "</td><td>" + esc(f.why) + "</td>"
           + "<td>" + chip(f.demandN + " counted", demandTone(f.demandN))
+          + (f.sourcing ? " " + chip(f.sourcing, f.sourcing === "confirmed" ? "good" : "amb") : "")
           + (f.demandNote ? '<span class="chip-note">' + esc(f.demandNote) + "</span>" : "") + "</td>"
           + "<td>" + esc(f.trend||"") + "</td>"
           + "<td>" + chip(f.ages, agesTone(f.ages)) + "</td>"

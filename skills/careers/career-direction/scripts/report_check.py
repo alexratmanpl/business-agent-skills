@@ -2,9 +2,15 @@
 """Check a filled direction report before it is handed over.
 
 Reads the report-data block out of direction-report.html and looks for the
-four things that make a direction report worthless: a claim with no source, a
+things that make a direction report worthless: a claim with no source, a
 forecast with nothing that could disprove it, demand asserted rather than
-counted, and somebody's contact details left in a file they may forward.
+counted, a role family missing its pay range, its entry bar or the mark saying
+whether one source backs it or two, and somebody's contact details left in a
+file they may forward.
+
+It cannot tell evidence that is all self-assessment from evidence that is
+sourced, because marking a source as their own is a legitimate answer. That
+one is read by hand.
 
 It also catches the failure the page cannot show you. Anything the renderer
 does not recognise is skipped in silence, so one mistyped key -- "habbits", or
@@ -35,6 +41,7 @@ ENUMS = {
     "gaps[].weight": {"decides", "slows", "closes doors"},
     "market.families[].ages": {"well", "mixed", "badly"},
     "market.families[].verdictTone": TONES,
+    "market.families[].sourcing": {"confirmed", "unconfirmed"},
     "market.positions[].status": {"open", "closes", "recurs", "closed"},
     "market.positions[].evidence": {"strong", "some", "thin"},
     "market.positions[].when": {"now", "build", "later"},
@@ -61,7 +68,8 @@ KNOWN_KEYS = {
     "market.lines[]": {"text", "src"},
     "market.skills[]": {"name", "countN", "note"},
     "market.families[]": {"name", "buys", "why", "demandN", "demandNote", "pay",
-                          "trend", "ages", "verdict", "verdictTone", "note"},
+                          "entryBar", "sourcing", "trend", "ages", "verdict",
+                          "verdictTone", "note"},
     "market.positions[]": {"employer", "title", "loc", "family", "status", "statusDate",
                            "evidence", "oddsNow", "oddsAfter", "when", "note"},
     "horizon": {"note", "shifts", "agesWell", "agesBadly", "clocks", "calendar"},
@@ -155,6 +163,16 @@ def check_demand(data):
         if not str(family.get("demandNote", "")).strip():
             problems.append(f"market.families[{i}] '{name}' does not say where the count "
                             "came from or when. Put the source and the date in demandNote")
+        if not str(family.get("pay", "")).strip():
+            problems.append(f"market.families[{i}] '{name}' has no pay range. A family "
+                            "with no ceiling cannot be priced against anybody's floor")
+        if not str(family.get("entryBar", "")).strip():
+            problems.append(f"market.families[{i}] '{name}' has no entry bar. A family "
+                            "priced only at its ceiling reads as reachable when it is not")
+        if not str(family.get("sourcing", "")).strip():
+            problems.append(f"market.families[{i}] '{name}' is not marked confirmed or "
+                            "unconfirmed. One source is a lead, not a finding, and the "
+                            "report has to say which this is")
     return problems
 
 
@@ -238,8 +256,12 @@ def check_length(data, limit, whole):
 
 
 def check_name(data):
+    """Initials are two tokens and name nobody; a full name is two tokens and names
+    somebody. Counting tokens alone rejected the more private of the two."""
     name = str(data.get("meta", {}).get("name", "")).strip()
-    if len(name.split()) > 1:
+    parts = name.split()
+    initials = bool(parts) and all(len(p.rstrip(".")) <= 1 for p in parts)
+    if len(parts) > 1 and not initials:
         return [f"meta.name is '{name}'. A first name or initials is enough, and the "
                 "report travels better without a full one"]
     return []
