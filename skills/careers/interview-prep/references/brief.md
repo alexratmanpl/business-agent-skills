@@ -21,3 +21,13 @@ Readable prose about an unfamiliar subject gets someone as far as asking the que
 ## What disqualifies a question
 
 The advert, press releases and launch posts are marketing too, so a question drawn from where one of them puts its emphasis only sounds researched. Write the fact beside each question while drafting. One with no fact to name is cut, or moved out of the section and labelled as their own interest. That is a fair thing to ask, and not the same as having done the reading.
+
+## Lines worth scripting
+
+Two lines are hard to produce in the moment. An assessor scores both well:
+
+> I don't know that.
+
+> This got too complex, let me start again.
+
+The first opens the discussion rather than closing it, because an assessor can guide someone who says it and cannot guide someone bluffing. The second is the one candidates resist, because dropping their own approach feels like losing. Both are ordinary good judgement, not a rescue move. Script them into the weak-spot answer, with the drill already there.
