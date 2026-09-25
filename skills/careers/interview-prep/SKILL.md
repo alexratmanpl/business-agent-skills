@@ -58,7 +58,7 @@ If they decline the fit check, say once that preparation built on an untested vi
 
 ## Build
 
-- **What to expect at this stage.** A recruiter checks basics, budget, motivation. A hiring manager checks whether you can do the job. A founder checks whether you understand the business. A technical assessment checks whether you can hold a position under scrutiny, not recite the material. Open with a stated decision, and treat each follow-up as a test of it rather than a request for more scope. Leave room for how it holds up as the system grows. Before the round, they should be able to say in one sentence what they'd decide and what they're giving up.
+- **What to expect at this stage.** A recruiter checks basics, budget, motivation. A hiring manager checks whether you can do the job. A founder checks whether you understand the business. A technical assessment checks whether you can hold a position under scrutiny, not recite the material. It also checks whether you can abandon that position when it stops working. Open with a stated decision, and treat each follow-up as a test of it rather than a request for more scope. Leave room for how it holds up as the system grows. Before the round, they should be able to say in one sentence what they'd decide and what they're giving up.
 - **The domain, where it is unfamiliar.** Explain the field before the brief rests on it.
 - **The two or three things to land.** Not everything good about them — the points that answer this employer's actual worry. Lead with the one that reframes the rest.
 - **The opening move.** Any elephant — title mismatch, career break, unrelated-looking background — gets scripted for the first few minutes. Early is control; late is an apology.
@@ -66,7 +66,7 @@ If they decline the fit check, say once that preparation built on an untested vi
 - **Questions to ask.** Three to five, each built on a research fact absent from the company's marketing — a strategic tension, an odd decision, a competitor doing the opposite. Two good ones beat eight generic.
 - **Practical now.** References, a tool worth a weekend, anything the advert says about applications, travel, timing.
 
-`references/brief.md` holds what counts as the domain explained, and what disqualifies a question.
+`references/brief.md` holds what counts as the domain explained, what disqualifies a question, and the two lines worth scripting in advance.
 
 ## After a round
 
