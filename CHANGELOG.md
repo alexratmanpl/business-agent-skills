@@ -4,13 +4,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 [semantic versioning](https://semver.org/).
 
 The version applies to the whole set. The skills release together, so one number identifies a
-known-good combination rather than four lineages to keep in step.
+known-good combination rather than five lineages to keep in step.
 
 No git tag is cut per version. The only published artifact is the `latest` prerelease, which
 CI rebuilds from `master` on every push, so it always holds the newest state rather than a
 named version.
 
 ## [Unreleased]
+
+### Added
+
+- `learning-path`, a fifth skill and the first in a new `learning` category: a learning path to a
+  defined goal in any field. It tests the goal before planning anything. When performance,
+  standard or conditions are missing it says so in a fixed sentence and digs, offering concrete
+  versions of the goal with their judges and sources, rather than planning around the gap. The
+  standard comes from the body that sets it, every source is dated against today's date taken
+  from the environment, and a plan that cannot rest on verified evidence comes back as NO PATH
+  instead of a list of things to try.
+- Before any plan is delivered, a reviewer with no part in the draft opens every source and
+  returns each claim as upheld, corrected or dropped; the plan records the counts.
+- `learning-path` ships `scripts/path_check.py`, a gate. It fails a plan on a fact with no source
+  or date, a source read more than 30 days ago, a standard nobody verified, a milestone resting on
+  nothing confirmed, an outcome that is an activity rather than a performance, hours that fall
+  short of the evidenced effort or the budget verdict, a NO PATH plan carrying a to-do list under
+  any heading, and review counts that do not match the evidence table. The skill is on the file
+  layout from the start: the intake questions, the research method, the plan format and the review
+  brief live in four files under `references/`.
 
 ### Changed
 
