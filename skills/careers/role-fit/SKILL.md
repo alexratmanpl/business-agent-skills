@@ -32,6 +32,7 @@ Use whatever interactive choice mechanism the environment offers — tappable op
 - **Find the real filters:** bold text, anything marked essential, anything appearing twice, and the "this probably isn't for you if" list. That last is the most honest part of any advert.
 - **Separate must-have from wish-list.** The person hired usually misses one or two. The question is which.
 - **Tools listed:** be honest about which take a weekend and which take years.
+- **Is the advert the job?** Responsibilities but no outcomes, a very small team hiring senior, a manager still doing the job full-time — signs nobody has scoped the work. Test it: what would this hire do in the first six months that the team can't do now? A vague answer means the role is underdefined.
 
 ## Compare
 
@@ -48,7 +49,7 @@ If the job involves scale of any kind, estimate what they've handled against wha
 
 ## Verdict
 
-**Strong fit**, **plausible**, or **stretch**. Give a probability if asked and explain what drives it. If it's a long shot, say so, then say whether to apply anyway and what else should be running alongside.
+**Strong fit**, **plausible**, or **stretch**. Give a probability if asked and explain what drives it. If it's a long shot, say so, then say whether to apply anyway and what else should be running alongside. If the advert looks underdefined, say the verdict is on the advert, not the job.
 
 ## Gap script
 
