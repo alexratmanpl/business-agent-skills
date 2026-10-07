@@ -746,7 +746,7 @@
   };
 
   // Characters that make what follows them read backwards are dropped from every string.
-  var BIDI = /[‪-‮⁦-⁩]/g;
+  var BIDI = /[\u202a-\u202e\u2066-\u2069]/g;
   var D;
   try {
     D = JSON.parse($("report-data").textContent, function(k, v){ return typeof v==="string" ? v.replace(BIDI, "") : v; });
