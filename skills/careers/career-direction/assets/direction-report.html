@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-pA3SvDe72NdLP7Go5oT+F74b3cCRYJRaznS0nQf2Hm4='; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Direction report</title>
+<!-- No web fonts, no analytics, no external request of any kind. This file gets
+     forwarded; it should not tell anybody that it was opened. The policy above lets one script
+     run, the one below, named by its digest, so text that gets out of the data runs nothing.
+     Change the script and the digest changes with it: scripts/report_check.py prints the one that fits. -->
+<style>
+  :root{
+    --paper:#f5f7fa; --ink:#1b2330; --muted:#5a6676; --line:#d6dde6; --surface:#eaeef3;
+    --accent:#1f5f8b; --accent-ink:#164a6d; --accent-soft:#dce9f3;
+    --amber:#8f5514; --amber-bg:#f7ecd9;
+    --good:#2c6e49; --good-bg:#dff0e4;
+    --bad:#9b3b2e; --bad-bg:#f5dfda;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --display:system-ui,-apple-system,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+    --body:Georgia,"Iowan Old Style","Times New Roman",serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#121821; --ink:#e4e9f0; --muted:#98a4b4; --line:#273140; --surface:#1a2230;
+      --accent:#6fb0dd; --accent-ink:#9fcbea; --accent-soft:#1c3448;
+      --amber:#e0a35a; --amber-bg:#2c2214;
+      --good:#7fc79a; --good-bg:#16291e;
+      --bad:#e08b7c; --bad-bg:#33201c;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#121821; --ink:#e4e9f0; --muted:#98a4b4; --line:#273140; --surface:#1a2230;
+    --accent:#6fb0dd; --accent-ink:#9fcbea; --accent-soft:#1c3448;
+    --amber:#e0a35a; --amber-bg:#2c2214;
+    --good:#7fc79a; --good-bg:#16291e;
+    --bad:#e08b7c; --bad-bg:#33201c;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+       padding:36px 16px 90px;-webkit-font-smoothing:antialiased;overflow-wrap:anywhere}
+  .wrap{max-width:74ch;margin:0 auto}
+  .wide{max-width:1080px;margin:18px auto}
+
+  header{border-bottom:1px solid var(--line);padding-bottom:12px;display:flex;
+         justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  h1{font-family:var(--display);font-size:clamp(32px,6vw,52px);font-weight:700;line-height:1.05;
+     letter-spacing:-.025em;margin:30px 0 8px;text-wrap:balance}
+  .lede{font-size:18px;line-height:1.5;color:var(--muted);margin:0 0 22px}
+  h2{font-family:var(--display);font-size:25px;font-weight:700;letter-spacing:-.015em;margin:50px 0 8px;text-wrap:balance}
+  h3{font-family:var(--display);font-size:17px;font-weight:700;margin:22px 0 6px}
+  h4{font-family:var(--display);font-size:16px;font-weight:600;margin:0 0 5px}
+  p{margin:0 0 12px}
+  .note{font-size:14.5px;color:var(--muted);margin:0 0 10px;line-height:1.5}
+  .src{font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.45}
+  a{color:var(--accent);text-underline-offset:3px}
+
+  .themer{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+          border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:999px;
+          padding:4px 11px;cursor:pointer}
+  .themer:hover{border-color:var(--accent);color:var(--accent)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  .shape{background:var(--surface);border-left:3px solid var(--accent);padding:16px 20px;
+         border-radius:0 10px 10px 0;margin:18px 0}
+  .shape p:last-child{margin:0}
+
+  .asset{border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:0 0 10px}
+  .asset p{margin:0 0 6px;font-size:15.5px}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0 16px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface)}
+  .card .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
+  .card h4{margin:4px 0 5px;font-size:17px}
+  .card p{margin:0;font-size:15px}
+
+  .habits{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+  .habit{border:1px solid var(--line);border-radius:10px;padding:10px 12px;flex:1 1 230px;font-size:14.5px}
+  .habit .chip{margin-bottom:7px}
+
+  /* A label that runs on wraps inside its own chip, so a long one cannot push the page sideways. */
+  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+        padding:4px 9px;min-height:22px;border-radius:11px;max-width:100%;display:inline-flex;
+        align-items:center;line-height:1.3;font-weight:500}
+  .chip.good{background:var(--good-bg);color:var(--good)}
+  .chip.amb{background:var(--amber-bg);color:var(--amber)}
+  .chip.bad{background:var(--bad-bg);color:var(--bad)}
+  .chip.acc{background:var(--accent-soft);color:var(--accent-ink)}
+  .chip.plain{background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+  td .chip{padding:3px 8px;line-height:1.35;border-radius:8px;display:inline-block}
+  .chip-note{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+
+  .tl-row{display:grid;grid-template-columns:78px 26px 1fr;gap:0 12px;align-items:start;position:relative;padding:0 0 16px}
+  .tl-row::before{content:"";position:absolute;left:102px;top:22px;bottom:-4px;width:2px;background:var(--line)}
+  .tl-row:last-child::before{display:none}
+  .tl-year{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:3px;text-align:right}
+  .tl-dot{width:18px;height:18px;border-radius:50%;margin:3px 0 0 4px;border:3px solid var(--paper);
+          box-shadow:0 0 0 1px var(--line);position:relative;z-index:1;background:var(--muted)}
+  .tl-dot.turn{background:var(--amber)} .tl-dot.build{background:var(--accent)} .tl-dot.test{background:var(--bad)}
+  .tl-body h4{margin:0 0 2px}
+  .tl-body p{margin:0 0 6px;font-size:14.5px;color:var(--muted)}
+
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0 6px}
+  th,td{text-align:left;vertical-align:top;padding:8px 9px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+  /* A table scrolls inside its wrapper, so its columns keep the width their words need. */
+  .tablewrap{overflow-x:auto}
+  table{overflow-wrap:break-word}
+  td.grp{font-family:var(--display);font-weight:700;font-size:13px;border-right:1px solid var(--line);width:112px}
+  #families{min-width:900px} #positions{min-width:940px}
+
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px;margin:12px 0}
+  .col{border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+  .col h4{font-size:15px}
+  .col ul{margin:0;padding-left:18px;font-size:15px}
+  .col li{margin-bottom:6px}
+  ul.plainlist{font-size:15px;line-height:1.5;padding-left:18px;margin:6px 0 12px}
+  ul.plainlist li{margin-bottom:5px}
+
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  .pill{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;background:var(--surface);
+        display:inline-flex;align-items:center;gap:8px;line-height:1.3}
+  .pill b{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--amber);font-weight:500;
+          flex-shrink:0;max-width:100%}   /* a label keeps its width; only one wider than the pill gives way */
+
+  .skillrow{display:grid;grid-template-columns:minmax(130px,1.1fr) 2fr max-content;gap:12px;
+            align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+  .skillrow b{font-weight:600;display:block}
+  .skillrow i{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--muted);display:block;margin-top:2px}
+  .skillbar{height:10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);overflow:hidden}
+  .skillbar span{display:block;height:100%;background:var(--accent)}
+  .skillrow .n{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+  @media (max-width:560px){.skillrow{grid-template-columns:1fr max-content}.skillbar{grid-column:1 / -1}}
+  .linecards{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;margin:12px 0}
+  .linecard{border:1px solid var(--line);border-radius:12px;padding:13px 16px;font-size:15px}
+  .linecard .src{display:block;margin-top:6px}
+
+  .fbtn{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);
+        background:var(--paper);color:var(--muted);border-radius:999px;padding:0 12px;height:28px;
+        display:inline-flex;align-items:center;cursor:pointer}
+  .fbtn.on{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
+  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+  .bar .lab{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .count{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-left:6px}
+  .pos-emp{font-weight:600} .pos-title{display:block;font-size:13.5px}
+  .pos-loc{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  figure{margin:0}
+  figcaption{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .frame{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:14px;overflow-x:auto}
+  svg{display:block;max-width:100%;height:auto}
+  #quadrant svg{min-width:720px}   /* on a phone the frame scrolls; shrunk to fit, the labels are unreadable */
+  svg text{font-family:var(--body);fill:var(--ink)}
+  svg .mono{font-family:var(--mono);fill:var(--muted)}
+  svg .grid{stroke:var(--line);stroke-width:1}
+  svg .axis{stroke:var(--muted);stroke-width:1.2}
+
+  .shift{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;
+         padding:14px 18px;margin:0 0 12px}
+  .shift h4{font-size:16.5px;margin-bottom:6px}
+  .shift dl{display:grid;grid-template-columns:max-content 1fr;gap:5px 14px;margin:0;font-size:15px}
+  .shift dt{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:4px}
+  .shift dd{margin:0}
+  .shift .falsi{color:var(--amber)}
+
+  .lanes{display:grid;gap:10px;margin:10px 0}
+  .lane{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface)}
+  .lane-head{display:flex;gap:10px;align-items:baseline;margin-bottom:8px}
+  .lane-head h4{font-size:15px;margin:0;flex-shrink:0;max-width:100%}
+  .lane-head span{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .track{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;align-items:stretch}
+  .step{border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:8px 10px;font-size:13.5px;position:relative}
+  .step.acc{border-color:var(--accent);background:var(--accent-soft)}
+  .step.amb{border-color:var(--amber);background:var(--amber-bg)}
+  .step.good{border-color:var(--good);background:var(--good-bg)}
+  .step.bad{border-color:var(--bad);background:var(--bad-bg)}
+  .step b{display:block;font-family:var(--display);font-size:13.5px}
+  .step i{font-style:normal;color:var(--muted);font-size:12.5px;display:block;margin-top:2px}
+  .step::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);
+               color:var(--accent);font-size:13px;z-index:2}
+  .step:last-child::after,.step.nolink::after{content:""}
+  .axislabels{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;margin:4px 0 0;
+              font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+  .step .when{display:none}
+  /* Stacked, the steps no longer sit over the columns the axis names, so each carries its own dates. */
+  @media (max-width:760px){
+    .track{display:flex;flex-direction:column}
+    .axislabels{display:none}
+    .step .when{display:block;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:2px}
+    .step::after{content:"↓";right:auto;left:14px;top:auto;bottom:-13px;transform:none}
+  }
+
+  .gloss{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;font-size:14.5px;margin:10px 0}
+  .gloss dt{font-family:var(--mono);font-size:12.5px;color:var(--accent-ink);padding-top:2px}
+  .gloss dd{margin:0}
+  .foot{border-top:1px solid var(--line);margin-top:44px;padding-top:12px;font-family:var(--mono);
+        font-size:12px;color:var(--muted);line-height:1.6}
+  .err{border:1px solid var(--bad);background:var(--bad-bg);color:var(--bad);border-radius:12px;
+       padding:16px 20px;font-family:var(--mono);font-size:13px;line-height:1.6;white-space:pre-wrap}
+  @media (max-width:520px){.gloss,.shift dl{grid-template-columns:1fr}.tl-row{grid-template-columns:58px 26px 1fr}.tl-row::before{left:82px}}
+  /* Paper does not scroll, so what a screen scrolls to would be cut off at the edge of the sheet. */
+  @media print{
+    body{padding:0}
+    .themer,.bar{display:none}
+    .frame{break-inside:avoid}
+    .tablewrap,.frame{overflow:visible}
+    #families,#positions,#quadrant svg{min-width:0}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow"></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span class="eyebrow" id="date"></span>
+      <button class="themer" id="themer" type="button">theme</button>
+    </div>
+  </header>
+  <h1 id="title"></h1>
+  <p class="lede" id="lede"></p>
+  <div class="shape" id="shape" hidden></div>
+  <div id="error"></div>
+
+  <section id="s-evidence" hidden>
+    <h2>What the evidence supports</h2>
+    <p class="note">Every claim names where it came from. <strong>Self</strong> means their own account; anything else is someone else&rsquo;s words or a record.</p>
+    <div id="evidence"></div>
+  </section>
+
+  <section id="s-selling" hidden>
+    <h2>What they are actually selling</h2>
+    <p class="note">Not the job title. The assets a buyer pays for, in the order they would pay for them.</p>
+    <div class="cards" id="selling"></div>
+  </section>
+
+  <section id="s-habits" hidden>
+    <h2>What a buyer will also notice</h2>
+    <p class="note">Red costs interviews, amber costs some, green is why people trust them.</p>
+    <div class="habits" id="habits"></div>
+  </section>
+
+  <section id="s-thread" hidden>
+    <h2>One thread, not a zig-zag</h2>
+    <p class="note" id="thread-intro"></p>
+    <div id="thread"></div>
+    <p class="note" id="thread-outro"></p>
+  </section>
+
+  <section id="s-gaps" hidden>
+    <h2>The gaps, with the same honesty</h2>
+    <p class="note"><strong>Decides</strong> gates the seat outright · <strong>slows</strong> costs applications · <strong>closes doors</strong> removes whole employers.</p>
+  </section>
+</div>
+<div class="wide"><div class="tablewrap"><table id="gaps"></table></div></div>
+<div class="wrap">
+
+  <section id="s-constraints" hidden>
+    <h2>Constraints the research applies</h2>
+    <div class="grid2" id="constraints"></div>
+  </section>
+
+  <section id="s-decisions" hidden>
+    <h2>Decisions only they can make</h2>
+    <p class="note">Open questions the research cannot close. Each one changes which families stay on the list.</p>
+    <div class="pills" id="decisions"></div>
+  </section>
+
+  <section id="s-corrections" hidden>
+    <h2>Corrections applied during the research</h2>
+    <p class="note">Things they put right when a contradiction was put back to them, in their words.</p>
+    <ul class="plainlist" id="corrections"></ul>
+  </section>
+
+  <section id="s-market" hidden>
+    <h2>What the market is buying</h2>
+    <p class="note" id="market-note"></p>
+    <div class="linecards" id="lines"></div>
+  </section>
+
+  <section id="s-skills" hidden>
+    <h2>Skills the postings ask for</h2>
+    <p class="note">Counted across the postings read, not inferred from the field.</p>
+    <div id="skills"></div>
+  </section>
+
+  <section id="s-families" hidden>
+    <h2>Role families</h2>
+    <p class="note">Grouped by the asset they buy, because the same work carries a different title at every employer. <strong>Demand</strong> is what was counted in a named source on a named date, not an impression.</p>
+  </section>
+</div>
+<div class="wide" id="families-wrap" hidden><div class="tablewrap"><table id="families"></table></div></div>
+<div class="wrap"><p class="note" id="skipped" hidden></p></div>
+
+<div class="wrap">
+  <section id="s-quadrant" hidden>
+    <h2>Demand now against how it ages</h2>
+    <p class="note">The trade-off in one picture. Right is hiring today; up keeps paying as seniority grows. The top-right corner is where both hold.</p>
+  </section>
+</div>
+<div class="wide" id="quadrant-wrap" hidden>
+  <figure><div class="frame" id="quadrant"></div><figcaption id="quadrant-cap"></figcaption></figure>
+</div>
+
+<div class="wrap">
+  <section id="s-positions" hidden>
+    <h2>Concrete positions</h2>
+    <p class="note">One row per posting. <strong>Evidence</strong> is how much confirms the seat: <span class="chip good">strong</span> employer page plus a family with five or more open seats · <span class="chip amb">some</span> employer page in a thin family, or a board posting alone · <span class="chip bad">thin</span> closed, recurring or pattern only.<span id="odds-note" hidden> Odds are estimates; &ldquo;after&rdquo; assumes the gap named in the row is closed.</span></p>
+  </section>
+</div>
+<div class="wide" id="positions-wrap" hidden>
+  <div class="bar" id="filters"></div>
+  <div class="bar" id="sorts"></div>
+  <div class="tablewrap"><table id="positions"></table></div>
+</div>
+
+<div class="wrap">
+  <section id="s-horizon" hidden>
+    <h2>The next three to five years</h2>
+    <p class="note" id="horizon-note"></p>
+    <div id="shifts"></div>
+    <div class="grid2" id="ageing" hidden>
+      <div class="col" id="ages-well-wrap" hidden><h4>Ages well &mdash; seniority is the asset</h4><div class="chips" id="ages-well"></div></div>
+      <div class="col" id="ages-badly-wrap" hidden><h4>Ages badly &mdash; energy or novelty is the asset</h4><div class="chips" id="ages-badly"></div></div>
+    </div>
+  </section>
+</div>
+<div class="wide" id="clocks-wrap" hidden>
+  <h3 class="wrap" id="clocks-title"></h3>
+  <p class="note wrap">Two clocks run at once. The fast one pays; the slow one builds the seat the fast one cannot reach.</p>
+  <div class="lanes" id="lanes"></div>
+  <div class="axislabels" id="axislabels"></div>
+</div>
+<div class="wide" id="calendar-wrap" hidden>
+  <div class="tablewrap"><table id="calendar"></table></div>
+</div>
+
+<div class="wrap">
+  <section id="s-glossary" hidden>
+    <h2>Abbreviations used above</h2>
+    <dl class="gloss" id="glossary"></dl>
+  </section>
+
+  <section id="s-sources" hidden>
+    <h2>Sources</h2>
+    <div id="src-produced-wrap" hidden><h3>Produced in this research</h3><ul class="plainlist" id="src-produced"></ul></div>
+    <div id="src-checked-wrap" hidden><h3>Checked directly</h3><ul class="plainlist" id="src-checked"></ul></div>
+    <div id="src-not-wrap" hidden><h3>Not confirmed &mdash; treat as unknown, not as absent</h3><ul class="plainlist" id="src-not"></ul></div>
+  </section>
+  <div class="foot" id="foot"></div>
+</div>
+
+<!-- THE REPORT. Replace the data between the script tags below, in a copy of this file.
+     Strict JSON: double quotes, no trailing commas, no comments. The keys the page reads are
+     listed in scripts/report_check.py and explained in references/report.md. The example is
+     invented and is a shape to copy, not content to keep. -->
+<script type="application/json" id="report-data">
+{
+  "meta": {
+    "name": "Ira",
+    "date": "6 October 2026",
+    "eyebrow": "Direction review · profile, market, horizon · invented example",
+    "lede": "From one intake, a plant manager's reference, a sales manager's note, two customer emails, two rejection letters, three years of waste reports, a 2025 margin audit and a sweep of 22 employers. The CV counts as their own account.",
+    "footer": "Odds are estimates. Nothing about the person was searched for or sent to a third party. All people, employers and figures here are invented."
+  },
+  "shape": [
+    "Not a press operator, whatever the title says. Someone who kept six presses busy for five years from a spreadsheet nobody else can run.",
+    "The nearest family hires the same sequencing on a different floor. One named scheduling system stands in the way."
+  ],
+  "evidence": [
+    {
+      "title": "Cut make-ready waste",
+      "text": "Resequenced the main press. Waste fell from about 9% of sheets to under 5% and held for two years.",
+      "src": "Plant manager's reference; waste reports 2022-2024; self (the starting figure)"
+    },
+    {
+      "title": "Asked for by name",
+      "text": "Two publishers' print buyers asked for Ira to approve colour proofs, over three years.",
+      "src": "Two customer emails, 2023 and 2025"
+    },
+    {
+      "title": "Sales quote from the costing sheet",
+      "text": "Sales have quoted from Ira's costing sheet since 2021. The 2025 margin audit found it within 5%.",
+      "src": "Sales manager's note; 2025 margin audit"
+    }
+  ],
+  "selling": [
+    {
+      "title": "Keeping a line running",
+      "text": "Sequences jobs so presses stay busy and waste stays low. Pays wherever a machine is the bottleneck."
+    },
+    {
+      "title": "Sign-off a customer trusts",
+      "text": "The proof means something when Ira signs it. Pays wherever the customer inspects the result."
+    },
+    {
+      "title": "Costing a job before it runs",
+      "text": "Prices from press time and material, and lands close to actuals. Pays wherever quotes drive margin."
+    }
+  ],
+  "habits": [
+    {
+      "label": "Signs nothing unchecked",
+      "tone": "good",
+      "text": "The plant manager and a customer both say it: no job runs before the first sheet is signed."
+    },
+    {
+      "label": "Fixes first, tells later",
+      "tone": "amb",
+      "text": "Solves line problems quietly; managers hear afterwards. Good for the shift, thin for the record."
+    },
+    {
+      "label": "Waits to be asked",
+      "tone": "bad",
+      "text": "The 2011 and 2016 moves both began as offers, not applications. The plant manager's reference says so."
+    }
+  ],
+  "thread": {
+    "intro": "Amber marks a turn that cost something, blue a thing built that others then used, red a test.",
+    "events": [
+      {
+        "year": "2011",
+        "kind": "build",
+        "title": "Joins a commercial printer",
+        "detail": "Nights on the small press, then the main hall.",
+        "verdict": "start",
+        "verdictText": "learns waste first-hand"
+      },
+      {
+        "year": "2016",
+        "kind": "turn",
+        "title": "Becomes shift supervisor",
+        "detail": "Six operators, and a commute that doubled.",
+        "verdict": "confirms",
+        "verdictText": "accepts the cost"
+      },
+      {
+        "year": "2020",
+        "kind": "build",
+        "title": "Takes over sequencing for six presses",
+        "detail": "One spreadsheet, rebuilt every week.",
+        "verdict": "confirms",
+        "verdictText": "waste roughly halves"
+      },
+      {
+        "year": "2023",
+        "kind": "test",
+        "title": "Interviews as a planner at a converter",
+        "detail": "Final round. The offer went to someone who knew the firm's software.",
+        "verdict": "fails",
+        "verdictText": "no offer"
+      },
+      {
+        "year": "2026",
+        "kind": "test",
+        "title": "Applies to a second converter",
+        "detail": "Passed the case task. The letter names the same system.",
+        "verdict": "fails",
+        "verdictText": "same answer"
+      }
+    ],
+    "outro": "Both letters name the same system."
+  },
+  "gaps": [
+    {
+      "gap": "No time on a scheduling system",
+      "weight": "decides",
+      "evidence": "Two rejection letters; six of nine planner postings name one",
+      "fix": "The vendor's free sandbox, then the evening course.",
+      "cost": "40 hours, over two months"
+    },
+    {
+      "gap": "The method lives in one spreadsheet",
+      "weight": "slows",
+      "evidence": "The reference says nobody else can run it",
+      "fix": "Write the sequencing rules as a one-page method.",
+      "cost": "a weekend"
+    },
+    {
+      "gap": "Colour certificate lapsed in 2022",
+      "weight": "closes doors",
+      "evidence": "The colour-specialist postings ask for it; the 2022 lapse is self (their correction)",
+      "fix": "Retake it, if that family stays on the list.",
+      "cost": "three days, about €900"
+    }
+  ],
+  "constraints": {
+    "hard": [
+      "Income floor €38k a year, gross. It rules out one family.",
+      "Within 45 minutes of home; no relocation.",
+      "No more than two weekends a month."
+    ],
+    "soft": [
+      "Study fits six hours a week.",
+      "A family-owned firm is preferred, not required.",
+      "Runway of eight months, so one pay dip is affordable.",
+      "In ten years, leading planning at a plant. Will not go back to night shifts."
+    ]
+  },
+  "decisions": [
+    { "label": "Course", "text": "book the vendor's evening course now? It starts 12 November and places are limited." },
+    { "label": "Shifts", "text": "does a four-day, ten-hour week count as full time against the floor?" }
+  ],
+  "corrections": [
+    "“I set the schedule.” The plant manager sets it; Ira sequences within it. Asset reworded.",
+    "“I hold the colour certificate.” It lapsed in 2022. Moved from held to the slow lane."
+  ],
+  "market": {
+    "asOf": "1 October 2026",
+    "lines": [
+      {
+        "text": "Packaging converters hire planners from print floors. None of the nine postings read excludes a print background.",
+        "src": "Nine postings, read in full, 1 Oct"
+      },
+      {
+        "text": "Six of the nine planner requirement lists name a scheduling system. Four of those accept an equivalent.",
+        "src": "The same nine postings"
+      }
+    ],
+    "skills": [
+      { "name": "Production sequencing", "countN": 9, "note": "Held, in a spreadsheet only" },
+      { "name": "Scheduling system, any vendor", "countN": 6, "note": "Gap, and it decides" },
+      { "name": "Costing and quoting", "countN": 4, "note": "Held. The margin audit confirms it" }
+    ],
+    "families": [
+      {
+        "name": "Production planner at a packaging converter",
+        "buys": "Keeping a line running",
+        "why": "The same sequencing on a different floor",
+        "demandN": 9,
+        "demandNote": "9 on a trade board, 8 on employers' own pages; not added, 1 Oct",
+        "pay": "€44-52k a year, gross, stated in 6 of 9 postings",
+        "entryBar": "Planner at €39k; the senior grade asks 5 yrs and a named scheduling system",
+        "sourcing": "confirmed",
+        "trend": "Up from 7 open in July, by the board's own archive",
+        "ages": "well",
+        "verdict": "lead with this",
+        "verdictTone": "good",
+        "note": "Four postings accept an equivalent system"
+      },
+      {
+        "name": "Colour quality specialist at a packaging group",
+        "buys": "Sign-off a customer trusts",
+        "why": "Customer sign-off, sold inside a firm",
+        "demandN": 5,
+        "demandNote": "5 open, one trade board, 1 Oct",
+        "pay": "€40-48k a year, gross, stated in 3 of 5 postings",
+        "entryBar": "Starts at €38k; asks a colour-standard certificate, €900 and three days",
+        "sourcing": "unconfirmed",
+        "trend": "Steady at 4 to 6 open since June",
+        "ages": "mixed",
+        "verdict": "after the certificate",
+        "verdictTone": "amb"
+      },
+      {
+        "name": "Planner at a trade printer",
+        "buys": "Keeping a line running",
+        "why": "The current industry, so the least to learn",
+        "demandN": 12,
+        "demandNote": "12 on a general board, 9 on employers' own pages; not added, 1 Oct",
+        "pay": "€34-39k a year, gross, stated in 10 of 12 postings",
+        "entryBar": "Starts at €31k; no system or certificate asked at any grade",
+        "sourcing": "confirmed",
+        "trend": "Down from 17 on the board in March",
+        "ages": "badly",
+        "verdict": "fallback",
+        "verdictTone": "bad"
+      }
+    ],
+    "skipped": "One family dropped: estimating at a trade printer, whose best grade pays €36k a year, gross, against a €38k floor.",
+    "positions": [
+      {
+        "employer": "Packaging converter, named in the sources",
+        "title": "Production planner",
+        "loc": "Within 45 minutes",
+        "family": "Production planner at a packaging converter",
+        "status": "closes",
+        "statusDate": "23 Oct",
+        "evidence": "strong",
+        "oddsNow": "15-20%",
+        "oddsAfter": "45%",
+        "when": "now",
+        "note": "Takes an equivalent system"
+      },
+      {
+        "employer": "Packaging group",
+        "title": "Colour quality specialist",
+        "loc": "Hybrid, one hour away",
+        "family": "Colour quality specialist at a packaging group",
+        "status": "open",
+        "statusDate": "1 Oct",
+        "evidence": "some",
+        "oddsNow": "10%",
+        "oddsAfter": "40%",
+        "when": "later",
+        "note": "Needs the certificate first"
+      },
+      {
+        "employer": "Second converter",
+        "title": "Planner",
+        "loc": "Within 45 minutes",
+        "family": "Production planner at a packaging converter",
+        "status": "closed",
+        "statusDate": "12 Sep",
+        "evidence": "thin",
+        "oddsNow": "15%",
+        "oddsAfter": "40%",
+        "when": "build",
+        "note": "The seat exists; no live opening"
+      }
+    ]
+  },
+  "horizon": {
+    "note": "Each shift is visible in something dated today, and says what would prove it wrong. The ageing marks are judgements.",
+    "shifts": [
+      {
+        "title": "Packaging rules start to ask for proof per job",
+        "mechanism": "A recycled-content rule applies from 1 January 2028 and must be evidenced job by job. Somebody has to plan around it.",
+        "alreadyVisible": "Five of the nine planner postings read add traceability to the requirements; two cite the rule.",
+        "src": "Postings, 1 Oct; the rule's published text, Jul 2026",
+        "falsifier": "The date moves past April 2028, or by then the postings drop the term (my threshold).",
+        "worthTo": "Direct. Sequencing with a record is the job."
+      },
+      {
+        "title": "Short runs outgrow the spreadsheet",
+        "mechanism": "More, smaller jobs multiply the sequencing decisions, and a spreadsheet stops being enough.",
+        "alreadyVisible": "Three annual reports announce a scheduling roll-out, each dated 2026.",
+        "src": "Annual reports, Jun-Aug 2026",
+        "falsifier": "The roll-outs are cancelled, or by April 2027 the postings stop naming a system (my threshold).",
+        "worthTo": "High. It is the gap and the demand."
+      },
+      {
+        "title": "Offset volume keeps falling at trade printers",
+        "mechanism": "Fewer sheets a year means fewer presses to run and to plan.",
+        "alreadyVisible": "The printers' association reports sheet volume down 6% on the year.",
+        "src": "Association survey, Sep 2026; one source",
+        "falsifier": "Volume turns up for two quarters running before April 2027 (my threshold).",
+        "worthTo": "Negative for the current industry. It pays now and shrinks."
+      }
+    ],
+    "agesWell": ["Sequencing under constraints", "Judgement about quality", "Costing from real figures"],
+    "agesBadly": ["Night-shift stamina", "One firm's job-ticket format", "Offset-only knowledge"],
+    "clocks": {
+      "title": "Two clocks",
+      "axis": ["now", "2 months", "6 months", "1 year", "18 months", "3 years"],
+      "lanes": [
+        {
+          "name": "Fast",
+          "sub": "pays, and builds the record the slow lane needs",
+          "steps": [
+            {
+              "at": 0,
+              "span": 3,
+              "label": "Write the method, then apply",
+              "detail": "The roles that take an equivalent",
+              "tone": "acc"
+            },
+            {
+              "at": 3,
+              "span": 5,
+              "label": "Planner seat",
+              "detail": "At a converter, on the first-year band",
+              "tone": "good"
+            }
+          ]
+        },
+        {
+          "name": "Slow",
+          "sub": "cannot be bought later",
+          "steps": [
+            { "at": 0, "span": 2, "label": "Sandbox hours", "detail": "The vendor's free tier", "tone": "amb" },
+            { "at": 2, "span": 5, "label": "The evening course", "detail": "Six hours a week", "tone": "amb" },
+            { "at": 8, "span": 4, "label": "Colour certificate", "detail": "Three days, about €900", "tone": "acc" }
+          ]
+        }
+      ]
+    },
+    "calendar": [
+      { "date": "23 Oct 2026", "what": "The one planner posting that closes. Write the method before applying." },
+      { "date": "12 Nov 2026", "what": "The course starts. The next intake is March." }
+    ]
+  },
+  "glossary": [
+    ["asset", "What a buyer pays for, not the job title"],
+    ["family", "Roles that buy the same asset under different titles"],
+    ["demand counted", "Positions counted in a named source on a named date"]
+  ],
+  "sources": {
+    "produced": ["Intake, 6 Oct 2026", "Employer sweep, 22 organisations, 1 Oct 2026"],
+    "checked": [
+      "A written reference, a sales manager's note, two customer emails and two rejection letters",
+      "Waste reports 2022-2024 and the 2025 margin audit",
+      "Nine postings read in full"
+    ],
+    "notConfirmed": [
+      "Pay for the colour-specialist grade, from one source",
+      "Whether the vendor's course is open to people outside its customers"
+    ]
+  }
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  // Quotes are escaped too, so a value that is ever put inside an attribute cannot end it.
+  var esc = function(s){ return (s==null?"":String(s))
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;"); };
+  var has = function(x){ return Array.isArray(x) ? x.length>0 : (x!=null && x!==""); };
+  var show = function(id){ $(id).hidden = false; };
+  // A value from the data is escaped, or read as a number, or only chooses from a list or table
+  // written here. Nothing in it can become markup.
+  var own = function(table, key, fallback){
+    return typeof key==="string" && Object.prototype.hasOwnProperty.call(table, key) ? table[key] : fallback; };
+  var pick = function(list, value, fallback){ return list.indexOf(value) >= 0 ? value : fallback; };
+  var TONES = ["good","amb","bad","acc","plain"];
+  var chip = function(t,tone){ return '<span class="chip '+pick(TONES,tone,"plain")+'">'+esc(t)+"</span>"; };
+  // How a family ages. Its row on the chart, its chip and its dot all come from here.
+  var AGES = {
+    well:  { row:0.18, tone:"good", dot:"var(--good)" },
+    mixed: { row:0.5,  tone:"amb",  dot:"var(--amber)" },
+    badly: { row:0.82, tone:"bad",  dot:"var(--bad)" }
+  };
+  var ages = function(a){ return own(AGES, a, AGES.mixed); };
+
+  // Each section draws on its own. One that cannot be drawn is named on screen, and the others
+  // are unaffected.
+  var failed = [];
+  var section = function(name, draw){
+    try { draw(); } catch (e) { failed.push(name); console.error(name, e); }
+  };
+
+  // theme toggle: follows the system until someone presses it
+  $("themer").onclick = function(){
+    var now = document.documentElement.getAttribute("data-theme");
+    var dark = now ? now==="dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
+  };
+
+  // Characters that make what follows them read backwards are dropped from every string.
+  var BIDI = /[‪-‮⁦-⁩]/g;
+  var D;
+  try {
+    D = JSON.parse($("report-data").textContent, function(k, v){ return typeof v==="string" ? v.replace(BIDI, "") : v; });
+    if (D===null || typeof D!=="object" || Array.isArray(D)) throw new Error("the report data has to be an object");
+  } catch (e) {
+    $("error").innerHTML = '<div class="err">The report data is not valid JSON, so nothing below could '
+      + "be built.\n\n" + esc(e.message)
+      + "\n\nJSON is strict: double quotes on every key and string, no trailing commas, no comments.</div>";
+    $("title").textContent = "Report data could not be read";
+    return;
+  }
+
+  var meta = D.meta || {};
+  section("header", function(){
+    $("eyebrow").textContent = meta.eyebrow || "Direction review";
+    $("date").textContent = meta.date || "";
+    $("title").textContent = meta.name ? meta.name + ", where next" : "Where next";
+    $("lede").textContent = meta.lede || "";
+  });
+  section("shape", function(){
+    if (!has(D.shape)) return;
+    $("shape").innerHTML = D.shape.map(function(s,i){
+      return "<p>" + (i===0 ? "<strong>The shape.</strong> " : "") + esc(s) + "</p>"; }).join("");
+    show("shape");
+  });
+
+  section("evidence", function(){
+    if (!has(D.evidence)) return;
+    $("evidence").innerHTML = D.evidence.map(function(a){
+      return '<div class="asset"><h4>' + esc(a.title) + "</h4><p>" + esc(a.text)
+        + '</p><p class="src">' + esc(a.src || "source not recorded") + "</p></div>"; }).join("");
+    show("s-evidence");
+  });
+
+  section("selling", function(){
+    if (!has(D.selling)) return;
+    $("selling").innerHTML = D.selling.map(function(s,i){
+      return '<div class="card"><div class="n">Asset ' + (i+1) + "</div><h4>" + esc(s.title)
+        + "</h4><p>" + esc(s.text) + "</p></div>"; }).join("");
+    show("s-selling");
+  });
+  section("habits", function(){
+    if (!has(D.habits)) return;
+    $("habits").innerHTML = D.habits.map(function(h){
+      return '<div class="habit">' + chip(h.label, h.tone) + "<div>" + esc(h.text) + "</div></div>"; }).join("");
+    show("s-habits");
+  });
+
+  section("thread", function(){
+    var thread = D.thread || {};
+    if (!has(thread.events)) return;
+    var vtone = { confirms:"good", fails:"bad", start:"plain" };
+    $("thread").innerHTML = thread.events.map(function(e){
+      return '<div class="tl-row"><div class="tl-year">' + esc(e.year) + '</div>'
+        + '<div class="tl-dot ' + pick(["turn","build","test"], e.kind, "") + '"></div><div class="tl-body"><h4>'
+        + esc(e.title) + "</h4><p>" + esc(e.detail||"") + "</p>"
+        + (e.verdictText ? chip(e.verdictText, own(vtone, e.verdict, "plain")) : "") + "</div></div>"; }).join("");
+    $("thread-intro").textContent = thread.intro || "";
+    $("thread-outro").textContent = thread.outro || "";
+    show("s-thread");
+  });
+
+  section("gaps", function(){
+    if (!has(D.gaps)) return;
+    var wtone = { decides:"bad", slows:"amb", "closes doors":"acc" };
+    $("gaps").innerHTML = "<thead><tr><th>Gap</th><th>Weight</th><th>Evidence</th><th>Fixable how</th><th>Cost</th></tr></thead><tbody>"
+      + D.gaps.map(function(g){
+        return "<tr><td><strong>" + esc(g.gap) + "</strong></td><td>" + chip(g.weight, own(wtone, g.weight, "plain"))
+          + "</td><td>" + esc(g.evidence) + "</td><td>" + esc(g.fix)
+          + '</td><td class="src">' + esc(g.cost) + "</td></tr>"; }).join("") + "</tbody>";
+    show("s-gaps");
+  });
+
+  section("constraints", function(){
+    var C = D.constraints || {};
+    if (!has(C.hard) && !has(C.soft)) return;
+    var colOf = function(title, rows){
+      return !has(rows) ? "" : '<div class="col"><h4>' + title + "</h4><ul>"
+        + rows.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>"; };
+    $("constraints").innerHTML = colOf("Hard", C.hard) + colOf("Soft", C.soft);
+    show("s-constraints");
+  });
+  section("decisions", function(){
+    if (!has(D.decisions)) return;
+    $("decisions").innerHTML = D.decisions.map(function(d){
+      return '<span class="pill"><b>' + esc(d.label) + "</b>" + esc(d.text) + "</span>"; }).join("");
+    show("s-decisions");
+  });
+  section("corrections", function(){
+    if (!has(D.corrections)) return;
+    $("corrections").innerHTML = D.corrections.map(function(c){ return "<li>" + esc(c) + "</li>"; }).join("");
+    show("s-corrections");
+  });
+
+  var M = D.market || {};
+  section("market", function(){
+    if (!has(M.lines)) return;
+    $("lines").innerHTML = M.lines.map(function(l){
+      return '<div class="linecard">' + esc(l.text) + '<span class="src">' + esc(l.src||"source not recorded")
+        + "</span></div>"; }).join("");
+    $("market-note").textContent = M.asOf
+      ? "What the research supports, as of " + M.asOf + ". Each line names the source it came from."
+      : "What the research supports. Each line names the source it came from.";
+    show("s-market");
+  });
+
+  section("skills", function(){
+    if (!has(M.skills)) return;
+    var count = function(s){ return Number(s.countN) || 0; };   // a number, whatever the data holds
+    var topSkill = Math.max.apply(null, M.skills.map(count).concat([1]));
+    $("skills").innerHTML = M.skills.slice().sort(function(a,b){ return count(b)-count(a); })
+      .map(function(s){
+        return '<div class="skillrow"><div><b>' + esc(s.name) + "</b>"
+          + (s.note ? "<i>" + esc(s.note) + "</i>" : "") + "</div>"
+          + '<div class="skillbar"><span style="width:' + Math.round(100*count(s)/topSkill)
+          + '%"></span></div><div class="n">' + count(s) + "</div></div>"; }).join("");
+    show("s-skills");
+  });
+
+  section("families", function(){
+    if (!has(M.families)) return;
+    var demandTone = function(n){ return n>=5 ? "good" : n>=2 ? "amb" : "bad"; };
+    var groups = [];
+    M.families.forEach(function(f){
+      var g = groups.filter(function(x){ return x.buys===f.buys; })[0];
+      if (!g) { g = { buys:f.buys, rows:[] }; groups.push(g); }
+      g.rows.push(f);
+    });
+    // A verdict is a judgement about a person. A report that is the market only has none, and a note
+    // it keeps on a family is headed as a note.
+    var verdicts = M.families.some(function(f){ return f.verdict; });
+    var judged = verdicts || M.families.some(function(f){ return f.note; });
+    var html = "<thead><tr><th>Buys</th><th>Family</th><th>Why it is on the list</th><th>Demand counted</th>"
+      + "<th>Trend, and what drives it</th><th>Ages</th>" + (judged ? "<th>" + (verdicts ? "Verdict" : "Note") + "</th>" : "")
+      + "</tr></thead><tbody>";
+    groups.forEach(function(g){
+      g.rows.forEach(function(f,i){
+        html += "<tr>"
+          + (i===0 ? '<td class="grp" rowspan="' + g.rows.length + '">' + esc(g.buys) + "</td>" : "")
+          + "<td><strong>" + esc(f.name) + "</strong>"
+          + (f.pay ? '<span class="chip-note">' + esc(f.pay) + "</span>" : "")
+          + (f.entryBar ? '<span class="chip-note">Bar: ' + esc(f.entryBar) + "</span>" : "")
+          + "</td><td>" + esc(f.why) + "</td>"
+          + "<td>" + chip(f.demandN + " counted", demandTone(f.demandN))
+          + (f.sourcing ? " " + chip(f.sourcing, f.sourcing === "confirmed" ? "good" : "amb") : "")
+          + (f.demandNote ? '<span class="chip-note">' + esc(f.demandNote) + "</span>" : "") + "</td>"
+          + "<td>" + esc(f.trend||"") + "</td>"
+          + "<td>" + chip(f.ages, ages(f.ages).tone) + "</td>"
+          + (judged ? "<td>" + (f.verdict ? chip(f.verdict, f.verdictTone) : "")
+            + (f.note ? '<span class="chip-note">' + esc(f.note) + "</span>" : "") + "</td>" : "")
+          + "</tr>";
+      });
+    });
+    $("families").innerHTML = html + "</tbody>";
+    show("s-families"); show("families-wrap");
+  });
+  // What was cut, and why, is a result too: it shows even when no family is left to chart.
+  section("skipped", function(){
+    if (!has(M.skipped)) return;
+    $("skipped").textContent = M.skipped;
+    show("skipped"); show("s-families");
+  });
+
+  // Demand against ageing. Both axes come from the family rows, so the picture
+  // cannot disagree with the table above it.
+  section("quadrant", function(){
+    if (!has(M.families)) return;
+    var W = 940, H = 430, L = 116, R = 30, T = 28, B = 62;
+    var maxN = Math.max.apply(null, M.families.map(function(f){ return f.demandN||0; }).concat([5]));
+    var yOf = function(a){ return T + (H-T-B) * ages(a).row; };
+    var xOf = function(n){ return L + (W-L-R) * ((n||0)/maxN); };
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" height="' + H
+      + '" role="img" aria-label="Role families plotted by counted demand against how the asset ages">';
+    // the good corner
+    s += '<rect x="' + (L+(W-L-R)*0.5) + '" y="' + T + '" width="' + ((W-L-R)*0.5) + '" height="'
+      + ((H-T-B)*0.34) + '" fill="var(--accent-soft)" opacity="0.5"/>';
+    // Named above the frame, so the first families a reader looks for never have their names pushed off it.
+    s += '<text x="' + (W-R) + '" y="' + (T-8) + '" class="mono" font-size="10.5" text-anchor="end">'
+      + "hiring now, and it keeps paying</text>";
+    Object.keys(AGES).forEach(function(k){
+      s += '<line x1="' + L + '" y1="' + yOf(k) + '" x2="' + (W-R) + '" y2="' + yOf(k) + '" class="grid"/>'
+        + '<text x="' + (L-10) + '" y="' + (yOf(k)+4) + '" class="mono" font-size="11" text-anchor="end">ages '
+        + k + "</text>";
+    });
+    s += '<line x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (H-B) + '" class="axis"/>';
+    s += '<line x1="' + L + '" y1="' + (H-B) + '" x2="' + (W-R) + '" y2="' + (H-B) + '" class="axis"/>';
+    [0, 0.5, 1].forEach(function(f){
+      var n = Math.round(maxN*f);
+      s += '<text x="' + xOf(n) + '" y="' + (H-B+18) + '" class="mono" font-size="10.5" text-anchor="middle">'
+        + n + "</text>";
+    });
+    s += '<text x="' + ((L+W-R)/2) + '" y="' + (H-B+38) + '" class="mono" font-size="11" text-anchor="middle">'
+      + "open positions counted" + (M.asOf ? ", " + esc(M.asOf) : "") + "</text>";
+    // Points first. Two that would sit on one another are set apart: the count is the horizontal place
+    // and stays exact, a row is only a band, so the later point is moved up or down inside it.
+    var dots = [];
+    M.families.forEach(function(f){
+      var x = xOf(f.demandN), y = yOf(f.ages), lift = 0;
+      [0, -18, 18, -36, 36, -54, 54].some(function(by){
+        lift = by;
+        return !dots.some(function(p){ return Math.abs(p.x-x) < 14 && Math.abs(p.y-(y+by)) < 14; });
+      });
+      dots.push({ f:f, x:x, y:y+lift, lifted:lift !== 0 });
+      // One source is drawn hollow, so a count that rests on it does not look like one that is confirmed.
+      var hollow = f.sourcing === "unconfirmed", dot = ages(f.ages).dot;
+      s += '<circle cx="' + x + '" cy="' + (y+lift) + '" r="7" fill="' + (hollow ? "var(--paper)" : dot) + '" stroke="'
+        + (hollow ? dot : "var(--paper)") + '" stroke-width="' + (hollow ? 3 : 2) + '"/>';
+    });
+    $("quadrant").innerHTML = s + "</svg>";
+    $("quadrant-cap").textContent = "Each point is a role family from the table above; both axes are its own row, "
+      + "so the picture cannot say something the table does not."
+      + (M.families.some(function(f){ return f.sourcing === "unconfirmed"; }) ? " A hollow point is a count from one source." : "");
+    show("s-quadrant"); show("quadrant-wrap");
+    // Names go in last, because where one fits depends on how wide it is, which only a drawn page knows.
+    // Each point has a few places beside it, and the names are set where the fewest things collide: a
+    // name over a point, over an axis label, over another name or off the picture. A name beside its point
+    // has no room for the verdict under it, and loses it before it is allowed to collide with anything.
+    var svg = $("quadrant").firstChild;
+    var area = function(r, pad){ return { l:r.x-pad, t:r.y-pad, r:r.x+r.width+pad, b:r.y+r.height+pad }; };
+    var hit = function(a, b){ return a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b; };
+    var fixed = [].map.call(svg.querySelectorAll("text"), function(t){ return area(t.getBBox(), 2); });
+    var write = function(text, mono, x, y){
+      var t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t.setAttribute("font-size", mono ? "10.5" : "13");
+      if (mono) t.setAttribute("class", "mono");
+      t.setAttribute("x", x); t.setAttribute("y", y);
+      t.textContent = text;
+      svg.appendChild(t);
+      return t;
+    };
+    dots.forEach(function(d){
+      d.name = write(d.f.name, false, d.x-10, d.y+24);
+      d.line = d.f.verdict && !d.lifted ? write(d.f.verdict, true, d.x-10, d.y+39) : null;
+    });
+    try {
+      var options = dots.map(function(d){
+        var nb = d.name.getBBox(), lb = d.line && d.line.getBBox();
+        // How far a name reaches above and below its baseline, which the drawn box gives in page units.
+        var above = d.y + 24 - nb.y, below = nb.y + nb.height - (d.y + 24);
+        var under = lb ? 15 + lb.y + lb.height - (d.y + 39) : below;
+        var places = [];
+        (d.lifted ? [[14, "start"], [-14, "end"]] : [[-10, "start"], [10, "end"]]).forEach(function(side){
+          (d.lifted ? [4] : [24, d.line ? -31 : -16]).forEach(function(dy){
+            places.push({ dx:side[0], dy:dy, anchor:side[1], verdict:!d.lifted });
+          });
+        });
+        if (!d.lifted) places.push({ dx:14, dy:4, anchor:"start", verdict:false }, { dx:-14, dy:4, anchor:"end", verdict:false });
+        return places.map(function(pl, rank){
+          var shown = pl.verdict && d.line, w = Math.max(nb.width, shown ? lb.width : 0);
+          var left = d.x + pl.dx - (pl.anchor === "end" ? w : 0);
+          var box = { l:left-1, t:d.y+pl.dy-above-1, r:left+w+1, b:d.y+pl.dy+(shown ? under : below)+1 };
+          var base = rank / 1000 + (d.line && !shown ? 0.4 : 0)
+            + (box.l < 4 || box.r > W-4 || box.t < 4 || box.b > H-4 ? 9 : 0);
+          fixed.forEach(function(o){ if (hit(box, o)) base += 1; });
+          dots.forEach(function(o){ if (o !== d && hit(box, { l:o.x-9, t:o.y-9, r:o.x+9, b:o.y+9 })) base += 1; });
+          return { place:pl, box:box, base:base, shown:shown };
+        });
+      });
+      // Searched to its end this takes seconds at fifteen names that sit close together, and nothing is drawn
+      // until it ends. The first placement it reaches is a valid one, so it stops at twenty thousand steps
+      // and keeps the best it has.
+      var chosen = [], best = [], low = Infinity, steps = 0;
+      var search = function(i, cost){
+        if (cost >= low || ++steps > 20000) return;
+        if (i === dots.length) { low = cost; best = chosen.slice(); return; }
+        options[i].forEach(function(o){
+          var c = cost + o.base;
+          for (var j = 0; j < i; j++) if (hit(o.box, chosen[j].box)) c += 1;
+          chosen[i] = o;
+          search(i + 1, c);
+        });
+      };
+      search(0, 0);
+      best.forEach(function(o, i){
+        var d = dots[i];
+        [[d.name, 0], [d.line, 15]].forEach(function(pair){
+          if (!pair[0]) return;
+          if (pair[0] === d.line && !o.shown) { pair[0].remove(); return; }
+          pair[0].setAttribute("x", d.x + o.place.dx); pair[0].setAttribute("y", d.y + o.place.dy + pair[1]);
+          pair[0].setAttribute("text-anchor", o.place.anchor);
+        });
+      });
+    } catch (e) { /* a browser that cannot measure leaves each name below its point */ }
+  });
+
+  section("positions", function(){
+    if (!has(M.positions)) return;
+    // Odds and "when" are judgements about a person. A report that is the market only has
+    // neither, and then the columns and the controls that work on them are not drawn.
+    var hasWhen = M.positions.some(function(p){ return p.when; });
+    var hasOdds = M.positions.some(function(p){ return p.oddsNow || p.oddsAfter; });
+    // How soon a position is worth applying for. Its chip, its filter and its place in the sort.
+    var WHEN = {
+      now:   { label:"now",             filter:"Now",             tone:"good", rank:0 },
+      build: { label:"after one build", filter:"After one build", tone:"amb",  rank:1 },
+      later: { label:"later",           filter:"Later",           tone:"acc",  rank:2 }
+    };
+    var lane = function(p){ return own(WHEN, p.when, null); };
+    var laneRank = function(p){ return lane(p) ? lane(p).rank : WHEN.later.rank + 1; };
+    var stTone = { open:"good", closes:"amb", recurs:"acc", closed:"plain" };
+    var evTone = { strong:"good", some:"amb", thin:"bad" };
+    var evRank = function(p){ return own({ strong:3, some:2, thin:1 }, p.evidence, 0); };
+    var num = function(t){ var m = String(t||"").match(/\d+/g); return m ? Math.max.apply(null, m.map(Number)) : -1; };
+    var tie = function(a,b){ return num(b.oddsAfter)-num(a.oddsAfter) || num(b.oddsNow)-num(a.oddsNow)
+      || evRank(b)-evRank(a) || String(a.employer).localeCompare(String(b.employer)); };
+    var filters = [{ key:"all", label:"All", test:function(){ return true; } }]
+      .concat(!hasWhen ? [] : Object.keys(WHEN).map(function(k){
+        return { key:k, label:WHEN[k].filter, test:function(p){ return p.when===k; } }; }))
+      .concat([{ key:"closed", label:"Recurring or closed",
+                 test:function(p){ return p.status==="recurs" || p.status==="closed"; } }]);
+    var sorts = [].concat(
+      !hasWhen ? [] : [{ key:"lane", label: hasOdds ? "Lane, then odds" : "Lane, then evidence",
+                         cmp:function(a,b){ return laneRank(a)-laneRank(b) || tie(a,b); } }],
+      !hasOdds ? [] : [{ key:"now",   label:"Odds now",   cmp:function(a,b){ return num(b.oddsNow)-num(a.oddsNow) || tie(a,b); } },
+                       { key:"after", label:"After gaps", cmp:tie }],
+      [{ key:"evidence", label:"Evidence", cmp:function(a,b){ return evRank(b)-evRank(a) || tie(a,b); } }]);
+    var active = "all", sortKey = sorts[0].key;
+    var render = function(){
+      var f = filters.filter(function(x){ return x.key===active; })[0];
+      var srt = sorts.filter(function(x){ return x.key===sortKey; })[0];
+      $("filters").innerHTML = '<span class="lab">show</span>' + filters.map(function(x){
+        return '<button type="button" class="fbtn ' + (x.key===active?"on":"") + '" data-k="' + x.key + '">'
+          + x.label + '<span class="count">' + M.positions.filter(x.test).length + "</span></button>"; }).join("");
+      $("sorts").innerHTML = sorts.length < 2 ? "" : '<span class="lab">sort</span>' + sorts.map(function(x){
+        return '<button type="button" class="fbtn ' + (x.key===sortKey?"on":"") + '" data-k="' + x.key + '">'
+          + x.label + "</button>"; }).join("");
+      Array.prototype.forEach.call($("filters").querySelectorAll("button"), function(b){
+        b.onclick = function(){ active = b.dataset.k; render(); }; });
+      Array.prototype.forEach.call($("sorts").querySelectorAll("button"), function(b){
+        b.onclick = function(){ sortKey = b.dataset.k; render(); }; });
+      $("positions").innerHTML = "<thead><tr><th>Position</th><th>Family</th><th>Status</th><th>Evidence</th>"
+        + (hasOdds ? "<th>Odds now</th><th>After gaps</th>" : "") + (hasWhen ? "<th>When</th>" : "")
+        + "<th>Note</th></tr></thead><tbody>"
+        + M.positions.filter(f.test).slice().sort(srt.cmp).map(function(p){
+          return '<tr><td><span class="pos-emp">' + esc(p.employer) + '</span><span class="pos-title">'
+            + esc(p.title) + '</span><span class="pos-loc">' + esc(p.loc||"") + "</span></td>"
+            + "<td>" + esc(p.family||"") + "</td>"
+            + "<td>" + chip(p.status, own(stTone, p.status, "plain"))
+            + (p.statusDate ? '<span class="chip-note">' + esc(p.statusDate) + "</span>" : "") + "</td>"
+            + "<td>" + chip(p.evidence, own(evTone, p.evidence, "plain")) + "</td>"
+            + (hasOdds ? "<td>" + esc(p.oddsNow||"") + "</td><td>" + esc(p.oddsAfter||"") + "</td>" : "")
+            + (hasWhen ? "<td>" + (p.when ? chip(lane(p) ? lane(p).label : p.when, lane(p) ? lane(p).tone : "acc") : "")
+              + "</td>" : "")
+            + "<td>" + esc(p.note||"") + "</td></tr>"; }).join("") + "</tbody>";
+    };
+    render();
+    show("s-positions"); show("positions-wrap");
+    if (hasOdds) show("odds-note");
+  });
+
+  var Hz = D.horizon || {};
+  section("shifts", function(){
+    if (!has(Hz.shifts)) return;
+    var row = function(k,v,cls){ return v ? "<dt>" + k + '</dt><dd class="' + (cls||"") + '">' + esc(v) + "</dd>" : ""; };
+    $("shifts").innerHTML = Hz.shifts.map(function(s){
+      return '<div class="shift"><h4>' + esc(s.title) + "</h4><dl>"
+        + row("Mechanism", s.mechanism)
+        + row("Already visible", s.alreadyVisible)
+        + row("Source", s.src)
+        + row("Wrong if", s.falsifier, "falsi")
+        + row("Worth to them", s.worthTo)
+        + "</dl></div>"; }).join("");
+    $("horizon-note").textContent = Hz.note || "";
+    show("s-horizon");
+  });
+  // Each column has its own heading, so one with nothing in it does not draw.
+  section("ageing", function(){
+    var side = function(rows, listId, wrapId, tone){
+      if (!has(rows)) return;
+      $(listId).innerHTML = rows.map(function(x){ return chip(x, tone); }).join("");
+      show(wrapId); show("ageing"); show("s-horizon");
+    };
+    side(Hz.agesWell, "ages-well", "ages-well-wrap", "good");
+    side(Hz.agesBadly, "ages-badly", "ages-badly-wrap", "bad");
+  });
+
+  section("clocks", function(){
+    var K = Hz.clocks || {};
+    if (!has(K.lanes)) return;
+    var axis = K.axis || [];
+    // The label under a column is the last one that starts on or before it.
+    var starts = axis.map(function(a,i){ return Math.round(i * 12 / axis.length); });
+    var under = function(col){ var k = 0; starts.forEach(function(s,i){ if (s <= col) k = i; }); return axis[k]; };
+    $("lanes").innerHTML = K.lanes.map(function(lane){
+      var steps = (lane.steps||[]).slice().sort(function(a,b){ return (a.at||0)-(b.at||0); });
+      return '<div class="lane"><div class="lane-head"><h4>' + esc(lane.name) + "</h4><span>"
+        + esc(lane.sub||"") + '</span></div><div class="track">'
+        + steps.map(function(st,i){
+            var at = Math.max(0, Math.min(11, st.at||0));
+            var span = Math.max(1, Math.min(12-at, st.span||2));
+            var next = steps[i+1];
+            var linked = next && (next.at||0) <= at + span;   // no arrow across a gap
+            var from = under(at), to = under(at + span - 1);
+            return '<div class="step ' + pick(TONES, st.tone, "") + (linked ? "" : " nolink")
+              + '" style="grid-column:' + (at+1) + " / span " + span + '">'
+              + (axis.length ? '<small class="when">' + esc(from) + (to !== from ? " → " + esc(to) : "") + "</small>" : "")
+              + "<b>" + esc(st.label)
+              + "</b>" + (st.detail ? "<i>" + esc(st.detail) + "</i>" : "") + "</div>"; }).join("")
+        + "</div></div>"; }).join("");
+    $("axislabels").innerHTML = axis.map(function(a,i){
+      var col = Math.round(i * 12 / Math.max(1, axis.length)) + 1;
+      return '<span style="grid-column:' + col + " / span " + Math.max(1, Math.round(12/Math.max(1,axis.length)))
+        + '">' + esc(a) + "</span>"; }).join("");
+    $("clocks-title").textContent = K.title || "Two clocks";
+    show("clocks-wrap");
+  });
+  section("calendar", function(){
+    if (!has(Hz.calendar)) return;
+    $("calendar").innerHTML = "<thead><tr><th>Date</th><th>What it gates</th></tr></thead><tbody>"
+      + Hz.calendar.map(function(c){
+        return '<tr><td class="src" style="white-space:nowrap;color:var(--ink)">' + esc(c.date)
+          + "</td><td>" + esc(c.what) + "</td></tr>"; }).join("") + "</tbody>";
+    show("calendar-wrap");
+  });
+
+  section("glossary", function(){
+    if (!has(D.glossary)) return;
+    $("glossary").innerHTML = D.glossary.map(function(g){
+      return "<dt>" + esc(g[0]) + "</dt><dd>" + esc(g[1]) + "</dd>"; }).join("");
+    show("s-glossary");
+  });
+
+  section("sources", function(){
+    var S = D.sources || {};
+    var fill = function(listId, wrapId, rows){
+      if (!has(rows)) return;
+      $(listId).innerHTML = rows.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("");
+      show(wrapId); show("s-sources");
+    };
+    fill("src-produced", "src-produced-wrap", S.produced);
+    fill("src-checked", "src-checked-wrap", S.checked);
+    fill("src-not", "src-not-wrap", S.notConfirmed);
+  });
+
+  $("foot").textContent = [meta.footer, M.asOf ? "Market data as of " + M.asOf + "." : ""]
+    .filter(Boolean).join(" ");
+
+  if (failed.length) {
+    $("error").innerHTML = '<div class="err">These sections could not be drawn, because their data is not in the '
+      + "shape the page reads: " + esc(failed.join(", ")) + ". Everything else is intact.</div>";
+  }
+})();
+</script>
+</body>
+</html>
