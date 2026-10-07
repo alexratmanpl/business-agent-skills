@@ -227,6 +227,9 @@ CASES = [
      ["meta.footer"]),
     ("a phone number after a run of years", [("meta.lede", "Reports 2024 2025 2026. Call 600 123 456.")], 1,
      ["meta.lede"]),
+    # A run of years is joined by what joins the digits of a number: a space, a dot or a hyphen. Years
+    # joined by a slash are not taken out, so the first of them still counts with the number before it.
+    ("a number beside years joined by a slash", [("meta.lede", "Call 420.7890 2024/2025.")], 1, ["meta.lede"]),
     ("a product and a phase with a number", [("selling[0].text",
      "Led the Windows 11 rollout and Phase 2 of the audit.")], 0, []),
     ("a citation, and a number after Via", [("selling[0].text",
@@ -317,6 +320,11 @@ CASES = [
     ("a phone number with a bracketed group in the middle", [("meta.footer", "Call +1 800 (555) 1234.")], 1,
      ["meta.footer"]),
     ("digits that run into a letter are a reference", [("meta.footer", "Ref 600 123 456B.")], 0, []),
+    # A range of grouped thousands is a sum where it starts a number. The end of a longer number is digits.
+    ("a phone number that ends like a range of grouped thousands", [("meta.footer",
+     "Call +420-603 123-456 789.")], 1, ["meta.footer"]),
+    ("a number whose last groups look like a range of grouped thousands", [("meta.footer",
+     "Ref 1234 000-75 000.")], 1, ["meta.footer"]),
 
     # The data sits in a script element. A browser ends that element at an end tag in any case,
     # with a space or a slash after it, and reads on from there as markup, so a field that holds
