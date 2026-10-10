@@ -4,7 +4,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 [semantic versioning](https://semver.org/).
 
 The version applies to the whole set. The skills release together, so one number identifies a
-known-good combination rather than five lineages to keep in step.
+known-good combination rather than six lineages to keep in step.
 
 No git tag is cut per version. The only published artifact is the `latest` prerelease, which
 CI rebuilds from `master` on every push, so it always holds the newest state rather than a
@@ -29,6 +29,18 @@ named version.
   searching the person, and the report carries a first name or initials rather than contact
   details. The checker enforces the last of the three, for the common shapes of an email address,
   a phone number, a profile link, a street address and a surname.
+- `learning-path`, a sixth skill and the first in a new `learning` category: a learning path to a
+  defined goal in any field. It tests the goal before planning anything. When performance,
+  standard or conditions are missing, it says so in a fixed sentence and digs. It offers concrete
+  versions of the goal with their judges and sources, rather than planning around the gap. The
+  standard comes from the body that sets it. Every source is dated against today's date, taken
+  from the environment. A plan that cannot rest on verified evidence comes back as NO PATH, not as
+  a list of things to try.
+- Before any plan is delivered, a fresh reviewer, or a separate pass, opens every source and
+  returns each claim as upheld, corrected or dropped. The plan records the counts.
+- `learning-path` ships `scripts/path_check.py`, a gate that reads a drafted plan and names each
+  problem it finds. The skill is on the file layout from the start. The intake questions, the
+  research method, the plan format and the review brief live in four files under `references/`.
 
 ### Changed
 

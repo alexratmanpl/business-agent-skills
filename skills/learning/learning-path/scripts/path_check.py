@@ -15,7 +15,9 @@ path worse than none, and each is invisible in a plan that looks finished:
 
 What it cannot check: whether a quote is really on the page, whether two
 sources are really independent, and whether a claim says no more than its
-quote. That is the fact review in references/review.md.
+quote. That is the fact review in references/review.md. It also reads wording
+by its shape, not its meaning, and reads only some sections for it. A vague
+outcome, condition or to-do list can pass.
 
 A gate, not a checklist. Problems exit 1. Wording that is usually vague but has
 real exceptions, and things worth a second look, are printed and exit 0. An

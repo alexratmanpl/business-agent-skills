@@ -1,6 +1,6 @@
 # The plan: format and reasons
 
-Read this before writing any plan, with a path or without one. Headings and field names are exact, because `scripts/path_check.py` reads them. It checks the format, the dates, the links and the arithmetic set out below; where code cannot run, apply them by hand. Whether a claim is true, and a milestone well chosen, is judgement: the fact review covers it.
+Read this before writing any plan, with a path or without one. Headings and field names are exact, because `scripts/path_check.py` reads them. Where code cannot run, apply every rule below by hand. Whether a claim is true, and a milestone well chosen, is judgement: the fact review covers it.
 
 ## A plan with a path
 
@@ -49,7 +49,7 @@ Budget: fits
 - <what could not be established, and what would settle it>
 
 ## Verification
-Checked 14 claims on 2026-09-25: 11 upheld, 2 corrected, 1 dropped.
+Checked 14 claims on 2026-09-25: 12 upheld, 1 corrected, 1 dropped.
 - E4 corrected: …
 - Dropped: …
 ```
@@ -117,7 +117,7 @@ As of: 2026-09-25
 Verdict: NO PATH
 
 ## Goal
-<the seven lines, with MISSING where it applies>
+<the seven "- Field: value" lines, with MISSING where it applies>
 
 ## Verdict
 This goal is not defined enough to build a learning path. <why>
@@ -129,8 +129,13 @@ This goal is not defined enough to build a learning path. <why>
 - <the missing line or fact>: <the decision or fact that would supply it>
 
 ## Evidence
+<the Evidence table as in a plan with a path, with no rows when the research found nothing>
+
 ## Not verified
+<as in a plan with a path>
+
 ## Verification
+<as in a plan with a path>
 ```
 
 These sections and no others. No Budget or Effort line, and no milestones, steps, weeks or stages under any heading or bold label. Versions of the goal may say what each version takes, but never how to practise. The Verdict opens with one of these sentences:
@@ -140,7 +145,7 @@ These sections and no others. No Budget or Effort line, and no milestones, steps
 - "Learning is not what stands between you and this goal."
 - "These hours cannot reach this standard." Use it when they have turned down the smaller goal the hours do buy.
 
-No item in the Verdict, the Versions of the goal or What would change the verdict is an activity. What would change the verdict lists decisions and facts they can supply. The Evidence table holds what the research did find.
+No item in the Verdict, the Versions of the goal or What would change the verdict is an activity. What would change the verdict lists decisions and facts they can supply.
 
 ## Building the milestones
 
