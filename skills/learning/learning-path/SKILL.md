@@ -1,6 +1,6 @@
 ---
 name: learning-path
-description: Build a learning path to a defined goal in any field — a language, an instrument, a sport, a craft, an exam, a licence, a job skill. Every fact comes from dated, verified research, not memory. Use when someone asks how to learn something, wants a study plan or roadmap, or asks what reaching a level takes and how long. Says plainly when a goal is too vague to plan for, and returns no path rather than a guessed one. Learning only — see role-fit for fit against a named job.
+description: Build a learning path to a defined goal in any field — a language, an instrument, a sport, a craft, an exam or licence, a job skill. Use when someone asks how to learn something, or what reaching a level takes and how long. Also use to score practice work they bring back. Learning only — see career-direction, role-fit, interview-prep.
 compatibility: The bundled checker needs code execution; without it, the rules in references/plan.md are applied by hand. The fact review is stronger with a subagent and works without one.
 ---
 
@@ -25,6 +25,8 @@ Take it from the environment — the system clock, the conversation, the platfor
 Use whatever interactive choice mechanism the environment offers — tappable options where they exist, plain questions otherwise. Run the intake in passes and skip what is answered. `references/intake.md` holds the passes, the questions and what each digs for.
 
 Ask for evidence of the starting point rather than a self-rating. Once the standard is known, offer a diagnostic built from its real assessment.
+
+**If nobody is watching** — a background job, a scheduled run, a delegated task in an agentic workspace — do not stall. Do not invent the person. If the request defines the goal, research the standard and the route, and mark the starting point and hours as missing at the top. If it does not, deliver NO PATH with what would define it.
 
 ## The goal test
 
@@ -70,11 +72,9 @@ Then run `scripts/path_check.py` on the plan — `${CLAUDE_SKILL_DIR}/scripts/pa
 
 Write it as markdown, `learning-path-TOPIC.md`, and make sure they have it: attach it, save it to a connected folder, or put it in the reply. Say the date it was checked; after 30 days it wants checking again.
 
-When they bring work back, review it with the second half of `references/review.md`.
+## When they bring work back
 
-## If nobody is watching
-
-Do not stall, and do not invent the person. If the request defines the goal, research the standard and the route, and mark the starting point and hours as missing at the top. If it does not, deliver NO PATH with what would define it.
+Score it with the second half of `references/review.md`.
 
 ## Rules
 

@@ -17,7 +17,7 @@ Each skill is a `SKILL.md` with frontmatter plus the files it needs, following t
 | [`role-fit`](skills/careers/role-fit/) | Compares a background against a specific job: a verdict, a rough probability, the gaps, and the unusual strength other applicants lack. | — |
 | [`pay-check`](skills/careers/pay-check/) | Local market rate for role, level and contract type; employment-versus-contracting conversion; how to reopen a number already given. | `scripts/rate_calc.py`, `rates-example.json` |
 | [`interview-prep`](skills/careers/interview-prep/) | Preparation at any stage, a one-to-two page brief to read beforehand, and a page for notes during the call. Calls `company-research`, `role-fit` and `pay-check` by name when they are installed, and works alone when they are not. | `scripts/plain_check.py`, `interview-record.html` |
-| [`learning-path`](skills/learning/learning-path/) | A learning path to a defined goal in any field — a language, an instrument, a sport, an exam, a job skill — built from dated research that every milestone cites. Tests the goal first, sets the hours against the evidence, and returns no path rather than a guessed one. | `scripts/path_check.py` |
+| [`learning-path`](skills/learning/learning-path/) | A learning path to a defined goal in any field, built from dated research that every milestone cites. Tests the goal first, sets the hours against the evidence, and returns no path rather than a guessed one. | `scripts/path_check.py` |
 
 Invoke one by name, or describe the task and let the agent choose.
 
