@@ -70,7 +70,8 @@ rewording it clears the flag. Its cases, and the page's, run with
 page need Playwright and a Chromium, and are skipped without them.
 
 `skills/learning/learning-path/scripts/path_check.py` reads a drafted learning plan and fails on
-the defects `--help` lists. `--help` also says what the script cannot check.
+the defects `--help` lists. `--help` also says what the script cannot check. Its cases run with
+`python3 -I skills/learning/learning-path/evals/test_path_check.py`.
 
 Conventions are in [AGENTS.md](AGENTS.md); how to contribute is in
 [CONTRIBUTING.md](CONTRIBUTING.md).

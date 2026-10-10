@@ -12,6 +12,8 @@ path worse than none, and each is invisible in a plan that looks finished:
   - a budget verdict the evidence or the milestones do not add up to
   - a NO PATH plan that hands out a to-do list anyway
   - a fact review whose counts do not match the table it reviewed
+  - template text left where the plan's own words go ('<why>', 'https://...', '...' after a
+    label); the first four different ones are named
 
 What it cannot check: whether a quote is really on the page, whether two
 sources are really independent, and whether a claim says no more than its
@@ -23,6 +25,31 @@ A gate, not a checklist. Problems exit 1. Wording that is usually vague but has
 real exceptions, and things worth a second look, are printed and exit 0. An
 unreadable file or a bad argument exits 2. A date one day ahead is accepted,
 since the plan and the machine checking it may sit in different time zones.
+
+Hours may be written 1.5 or 1,5. In a total, a comma before three digits is
+thousands, so 2,200 is two thousand two hundred. Hours a week takes no thousands.
+
+In Hours a week the first figure counts and what follows it is commentary. A figure is one
+number, or two joined by a hyphen, an en or em dash, '--' or 'to' ('5-6'). The budget uses the
+low end of a range. Commentary may name a day after a bare number, or after hours and a week
+(the hour unit comes straight after the figure). A number is bare when a clause ends straight
+after it: a comma, semicolon, round bracket, en or em dash, a hyphen or '--' with a space on
+each side, or a full stop or colon and a space. A time unit that opens the next clause belongs
+to the number, which is then not bare. A day anywhere else is hours per day, and the field is
+refused. The figure is read as hours whatever unit follows it, so write 1.5 hours, not 90
+minutes. For example, these pass:
+    5 (about an hour a day)
+    5 hours a week -- about an hour a day
+and these are refused:
+    1 hour a day
+    5 - 1 hour a day
+    30 (minutes a day)
+    90 minutes a week (15 minutes a day)
+    5 hours (about an hour a day)
+    5 solid hours a week (about an hour a day)
+    5 days a week, 30 minutes a day
+    5 [about an hour a day]
+    5-about an hour a day
 
 Usage: path_check.py learning-path-TOPIC.md [--today YYYY-MM-DD] [--max-age-days 30]
 """
@@ -87,8 +114,8 @@ VAGUE = re.compile(
 VAGUE_NOTE = re.compile(r"^(?:understand|know|improve|research|review|cover)\b",
                         re.IGNORECASE)
 MEASURABLE = re.compile(
-    r"\d+(?:\.\d+)?\s*(?:%|percent|s|secs?|seconds?|mins?|minutes?|h|hrs?|hours?|bpm|wpm|"
-    r"km|m|metres?|meters?|kg|reps?|laps?|lengths?|words?|points?|marks?|/\s*\d+)\b|"
+    r"\d+(?:\.\d+)?\s*(?:%|(?:percent|s|secs?|seconds?|mins?|minutes?|h|hrs?|hours?|bpm|wpm|"
+    r"km|m|metres?|meters?|kg|reps?|laps?|lengths?|words?|points?|marks?|/\s*\d+)\b)|"
     r"\b(?:in\s+under|within|without|unaided|unprepared|from\s+memory|scoring|"
     r"at\s+least|no\s+more\s+than|by\s+ear|at\s+sight|timed|live)\b|"
     r"\band\s+(?:name|identify|explain|write|answer|summari[sz]e|list|play|sing|perform|"
@@ -133,11 +160,44 @@ MONTH_WORDS = re.compile(r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov
 LINK = re.compile(r"https?://[^\s)>\]|]+|\bdoi:\s*10\.[^\s)>\]|]+", re.IGNORECASE)
 EVIDENCE_ID = re.compile(r"\bE\d+\b")
 DAY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-AMOUNT = re.compile(r"(\d+(?:\.\d+)?)\s*(h|hrs?|hours?|min|mins|minutes?)\b", re.I)
+CHECKED = re.compile(r"checked\s+(\d+)\s+claims?\s+on\s+(\d{4}-\d{2}-\d{2})", re.I)
+# A figure with a comma or a point in it that is neither thousands nor a decimal, such as 1,5000 or
+# 0,750, matches nothing and is a problem, not a guess. NUMBER_START keeps a match from starting
+# inside a number: the 5000 in 1,5000, the 5 in 1.5.
+THOUSANDS = r"[1-9]\d{0,2}(?:,\d{3})+"
+DECIMAL = r"\d+(?:\.\d+|,\d{1,2})?"
+NUMBER = THOUSANDS + "|" + DECIMAL
+NUMBER_START = r"(?<!\d)(?<!\d[.,])"
+HOUR_UNIT = r"h|hrs?|hours?"
+TIME_UNIT = HOUR_UNIT + r"|min|mins|minutes?"
+AMOUNT = re.compile(NUMBER_START + "(" + NUMBER + r")\s*(" + TIME_UNIT + r")\b", re.I)
+# A figure that AMOUNT would take by its tail: '.5 h' as 5 h, and '1 200 h' or "1'200 h" as 200 h.
+# A count beside the hours, such as the 2 000 in '61 h over 2 000 flashcards', has no unit and is
+# not read.
+CLIPPED_AMOUNT = re.compile(r"(?:(?<!\w)[.,]|\d[\s'’](?=\d{3}))(?:" + NUMBER + r")\s*(?:"
+                            + TIME_UNIT + r")\b", re.I)
 H_AND_MIN = re.compile(r"(\d+)\s*h\s*(\d{1,2})\b(?!\s*(?:h|hrs?|hours?)\b)", re.I)
+# A week has 168 hours, so a comma in Hours a week is always decimal.
+FIGURE = re.compile(r"^\s*(" + DECIMAL + r")(?:\s*(?:--|-|–|—|to)\s*(" + DECIMAL + r"))?"
+                    r"(?![.,]?\d)")
+# Where the first clause after the figure ends; the docstring lists the ends. Without the space
+# after a full stop or a colon, 1:30 would end at its colon.
+CLAUSE_END = re.compile(r"[,;(—–]|\s--?\s|[.:]\s")
+STARTS_WITH_TIME_UNIT = re.compile(r"(?:" + TIME_UNIT + r")\b", re.I)
+STARTS_WITH_HOUR_UNIT = re.compile(r"(?:" + HOUR_UNIT + r")\b", re.I)
+# A phrase that names a day: 'a day', 'per day', 'each day', 'every day', 'daily', '/day'.
+DAY_PHRASE = re.compile(r"\b(?:a|per|each|every)\s+day\b|\bdaily\b|/\s*day", re.I)
+WEEK = re.compile(r"\b(?:week|weekly|wk)\b", re.I)
 RATE = re.compile(r"(?<![a-z])[x×]\s*\d|\d\s*[x×](?![a-z])|"
                   r"\b(?:a|per|each|every)\s+(?:week|day|session)\b|/\s*(?:week|day)",
                   re.IGNORECASE)
+
+
+def to_float(text):
+    """A number that NUMBER matched, as a float."""
+    if re.fullmatch(THOUSANDS, text):
+        return float(text.replace(",", ""))
+    return float(text.replace(",", "."))
 
 
 def parse_day(text):
@@ -150,18 +210,35 @@ def parse_day(text):
         return None
 
 
+def loose_shape(text):
+    """Whether text is written 2026, 2026-03 or 2026-03-14, a real date or not."""
+    return bool(re.fullmatch(r"\d{4}(?:-\d{2}(?:-\d{2})?)?", text))
+
+
 def loose_date(text):
-    """2026, 2026-03 or 2026-03-14 as the earliest day it could mean, else None."""
-    text = text.strip()
-    for pattern, suffix in ((r"^\d{4}-\d{2}-\d{2}$", ""), (r"^\d{4}-\d{2}$", "-01"),
-                            (r"^\d{4}$", "-01-01")):
-        if re.match(pattern, text):
-            return parse_day(text + suffix)
-    return None
+    """2026, 2026-03 or 2026-03-14 as the earliest day it could mean, else None. A missing
+    month or day is 01."""
+    return parse_day((text + "-01-01")[:10]) if loose_shape(text) else None
 
 
 def plain(text):
     return text.replace("*", "").replace("_", " ").strip()
+
+
+def template_text(lines):
+    """Text from the templates in plan.md, left in: '<why>', 'https://…', or '…' after a label.
+    A code span, and a web link or an email address in angle brackets, are not template text."""
+    found = []
+    for line in lines:
+        line = plain(re.sub(r"`[^`\n]*`", "", line))
+        for match in re.finditer(r"(?<!\w)<([A-Za-z][^<>\n]*)>", line):
+            inner = match.group(1)
+            if "@" not in inner and not re.match(r"https?:", inner, re.I):
+                found.append(match.group(0))
+        found += re.findall(r"https://(?:…|\.\.\.)", line)
+        if re.search(r":[ \t]*(?:…|\.\.\.)$", line):
+            found.append(line[-40:])
+    return found
 
 
 def empty(value):
@@ -202,20 +279,23 @@ def header_fields(lines):
 
 
 def bullet_fields(lines, names):
-    """'- Name: value' bullets, with indented continuation lines appended."""
+    """'- Name: value' bullets, with indented or numbered continuation lines appended. A
+    numbered item is a continuation at any indent, since it can never start a field, and its
+    marker is not part of the text."""
     wanted = {name.lower(): name for name in names}
-    fields, current = {}, None
+    parts, current = {}, None
     for line in lines:
         match = re.match(r"^\s*[-*+]\s+[*_]{0,2}([A-Za-z][A-Za-z -]*?)[*_]{0,2}\s*:"
                          r"\s*[*_]{0,2}\s*(.*)$", line)
         if match and match.group(1).strip().lower() in wanted:
             current = wanted[match.group(1).strip().lower()]
-            fields[current] = match.group(2).strip()
-        elif current and line.startswith(("  ", "\t")) and line.strip():
-            fields[current] += " " + line.strip()
+            parts[current] = [match.group(2).strip()]
+        elif current and line.strip() and (line.startswith(("  ", "\t"))
+                                           or re.match(r"\s*\d+[.)](?:\s|$)", line)):
+            parts[current].append(re.sub(r"^\d+[.)](?:\s+|$)", "", line.strip()))
         else:
             current = None
-    return fields
+    return {name: " ".join(chunk for chunk in chunks if chunk) for name, chunks in parts.items()}
 
 
 def cells(line):
@@ -296,10 +376,16 @@ def total_hours(text, where, problems):
         problems.append(f"{where}: '{text[:60]}' holds {len(amounts)} amounts. Give one "
                         "total, e.g. '1.5 h'")
         return None
-    if not amounts:
-        problems.append(f"{where}: '{text[:60]}' has no hours in it, e.g. '6 h'")
+    # A number with a unit that no amount took is one the checker cannot read: 0,750 h beside 6 min.
+    with_unit = re.findall(r"\d\s*(?:" + TIME_UNIT + r")\b", main, re.I)
+    if not amounts or len(with_unit) > len(amounts) or CLIPPED_AMOUNT.search(main):
+        if with_unit:
+            problems.append(f"{where}: '{text[:60]}' has a number the checker cannot read. "
+                            "Write hours as '6 h', '1.5 h', '1,5 h' or '2,200 h'")
+        else:
+            problems.append(f"{where}: '{text[:60]}' has no hours in it, e.g. '6 h'")
         return None
-    value, unit = float(amounts[0][0]), amounts[0][1].lower()
+    value, unit = to_float(amounts[0][0]), amounts[0][1].lower()
     return value / 60 if unit.startswith("min") else value
 
 
@@ -396,6 +482,9 @@ def check_evidence(rows, as_of, today, max_age):
         elif MONTH_WORDS.search(published):
             problems.append(f"{where}: Published is '{published}'. Write a date as YYYY-MM or "
                             "YYYY-MM-DD, so it can be compared with today")
+        elif loose_shape(published) and not loose_date(published):
+            problems.append(f"{where}: Published is '{published}', which is not a real date. "
+                            f"If it is a version, write it as 'v{published}'")
         elif (loose_date(published) or today) > today + datetime.timedelta(days=1):
             problems.append(f"{where}: published {published}, after today")
         checked = parse_day(plain(row["checked"]))
@@ -506,14 +595,34 @@ def check_milestones(found, by_id):
 def weekly_hours(text):
     """The first figure, or the low end of a range at the start: '6', '3-5',
     '8, net of two weeks' holiday'. Later numbers are commentary."""
-    match = re.match(r"^\s*(\d+(?:\.\d+)?)(?:\s*(?:-|–|to)\s*(\d+(?:\.\d+)?))?",
-                     plain(text))
+    match = FIGURE.match(plain(text))
     if not match:
         return None, False
-    low = float(match.group(1))
+    low = to_float(match.group(1))
     if match.group(2):
-        low = min(low, float(match.group(2)))
+        low = min(low, to_float(match.group(2)))
     return low, bool(match.group(2))
+
+
+def per_day(text):
+    """Whether Hours a week gives hours per day. The rule is in the docstring of this file."""
+    text = plain(text)
+    figure = FIGURE.match(text)
+    after = text[figure.end():] if figure else text
+    day = DAY_PHRASE.search(after)
+    if not day:
+        return False
+    clause_end = CLAUSE_END.search(after)
+    words = (after[:clause_end.start()] if clause_end else after).strip()
+    # A bare number, with a clause ending straight after it, owns the clause that follows when that
+    # opens with a time unit: '30 (minutes a day)'. With no unit there, what follows is commentary.
+    owned = words or after[clause_end.end():].strip()
+    if not words and not STARTS_WITH_TIME_UNIT.match(owned):
+        return False
+    # A week named before the day makes the day commentary, unless the figure counts something
+    # else, which its words show by opening with anything but an hour unit ('5 days a week'). A
+    # figure in minutes is not hours either, so '90 minutes a week (15 minutes a day)' is refused.
+    return not (WEEK.search(after[:day.start()]) and STARTS_WITH_HOUR_UNIT.match(owned))
 
 
 def check_budget(fields, goal, as_of, total, by_id, prose):
@@ -561,12 +670,16 @@ def check_budget(fields, goal, as_of, total, by_id, prose):
                             f"{'hours a week are' if hours_missing else 'deadline is'} "
                             "missing. Without them it is unknown")
         return problems, notes
-    if re.search(r"\b(?:a|per|each|every)\s+day\b|\bdaily\b|/\s*day", hours_text, re.I):
-        problems.append(f"Hours a week is '{hours_text}'. Give hours a week")
+    if per_day(hours_text):
+        problems.append(f"Hours a week is '{hours_text}'. Give hours a week, e.g. "
+                        "'5 hours a week'")
         return problems, notes
     weekly, ranged = weekly_hours(hours_text)
     if not weekly:
-        problems.append(f"Hours a week is '{hours_text}'. Start it with a number")
+        problems.append(f"Hours a week is '{hours_text}'. " + (
+            "Write the number as 6, 1.5 or 1,5"
+            if weekly is None and re.match(r"\s*\d", plain(hours_text))
+            else "Start it with a number"))
         return problems, notes
     if ranged:
         notes.append(f"Hours a week is '{hours_text}'; the budget uses {weekly:g}, the "
@@ -603,7 +716,7 @@ def check_budget(fields, goal, as_of, total, by_id, prose):
 
 def check_verification(lines, rows, as_of, today):
     text = plain(" ".join(line.strip() for line in lines))
-    head = re.search(r"checked\s+(\d+)\s+claims?\s+on\s+(\d{4}-\d{2}-\d{2})", text, re.I)
+    head = CHECKED.search(text)
     counts = {word: re.search(rf"(\d+)\s+{word}", text, re.I)
               for word in ("upheld", "corrected", "dropped")}
     if not head or not all(counts.values()):
@@ -625,7 +738,8 @@ def check_verification(lines, rows, as_of, today):
                         "Whatever changed since has not been checked")
     if day and day > today + datetime.timedelta(days=1):
         problems.append(f"the fact review is dated {day}, after today")
-    details = [line for line in lines if re.match(r"^\s*[-*+]\s+\S", line)]
+    details = [line for line in lines
+               if re.match(r"^\s*(?:[-*+]|\d+[.)])\s+\S", line) and not CHECKED.search(plain(line))]
     if len(details) < corrected + dropped:
         problems.append(f"Verification counts {corrected} corrected and {dropped} dropped "
                         f"but lists {len(details)}. Give one line for each, saying what "
@@ -658,7 +772,7 @@ def check_no_path(text, header_lines, sections):
                         "is a path")
     if any(re.match(r"^\s*[*_]{0,2}(?:Budget|Effort)\b", line, re.I) for line in header_lines):
         problems.append("a NO PATH plan has no Budget or Effort line")
-    steps = r"(?:M\d|Milestone|Step|Week|Phase|Day|Stage|Module|Lesson|Session)\b"
+    steps = r"(?:M\d+|Milestone|Step|Week|Phase|Day|Stage|Module|Lesson|Session)s?\b"
     heading = re.search(r"^#{3,}\s+[*_]{0,2}" + steps, text, re.M | re.I)
     label = re.search(r"^\s*(?:[-*+]|\d+[.)])?\s*\*\*" + steps, text, re.M | re.I)
     # Versions of the goal may say what each version is and what it takes, so
@@ -724,12 +838,25 @@ def main():
     fields = header_fields(header)
     as_of, verdict, problems, notes = check_header(fields, today, args.max_age_days)
 
+    evidence = section(sections, "evidence") or []
+    rows, table_problems = evidence_rows(evidence)
+    # The lines searched for template text. A quote may hold anything, so the Evidence table is
+    # searched without its quotes.
+    searched = [line for name, lines in sections if name != "evidence" for line in lines]
+    searched += [line for line in evidence if not line.lstrip().startswith("|")]
+    searched += [value for row in rows for column, value in row.items() if column != "quote"]
+    leftover = template_text(header + searched)
+    if leftover:
+        problems.append("template text left in the plan: "
+                        + ", ".join(f"'{item}'" for item in list(dict.fromkeys(leftover))[:4])
+                        + ". Replace it with the plan's own words; put anything that only "
+                        "looks like it in `backticks`")
+
     for name in (PATH_SECTIONS if verdict == "PATH" else NO_PATH_SECTIONS):
         if section(sections, name) is None:
             problems.append(f"no '## {name.capitalize()}' section")
 
-    rows, more = evidence_rows(section(sections, "evidence") or [])
-    problems += more
+    problems += table_problems
     by_id, more, extra = check_evidence(rows, as_of, today, args.max_age_days)
     problems += more
     notes += extra
@@ -757,8 +884,12 @@ def main():
         if checks is not None:
             given = bullet_fields(checks, CHECKS_LINES)
             for name in CHECKS_LINES:
-                if not given.get(name, "").strip():
+                if name not in given:
                     problems.append(f"the Checks section has no '- {name}:' line")
+                elif not given[name]:
+                    problems.append(f"the Checks section's '- {name}:' line is empty. Put its "
+                                    "text on that line, or on the lines directly below it, "
+                                    "indented two spaces or numbered")
         found = milestones(section(sections, "path") or [])
         total, cited, more, extra = check_milestones(found, by_id)
         problems += more

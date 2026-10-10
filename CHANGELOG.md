@@ -39,8 +39,9 @@ named version.
 - Before any plan is delivered, a fresh reviewer, or a separate pass, opens every source and
   returns each claim as upheld, corrected or dropped. The plan records the counts.
 - `learning-path` ships `scripts/path_check.py`, a gate that reads a drafted plan and names each
-  problem it finds. The skill is on the file layout from the start. The intake questions, the
-  research method, the plan format and the review brief live in four files under `references/`.
+  problem it finds. Its cases are in `evals/`, which packaging leaves out. The skill is on the
+  file layout from the start. The intake questions, the research method, the plan format and the
+  review brief live in four files under `references/`.
 
 ### Changed
 
