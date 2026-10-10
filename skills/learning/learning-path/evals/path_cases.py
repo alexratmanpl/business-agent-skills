@@ -337,7 +337,7 @@ PATH_CASES = [
     case(f"a Time written {spelling!a}", [FAR, time_of(2, f"{spelling} (E2)")], 1,
          ["has a number the checker cannot read"])
     for spelling in ("1 200 h", "1 200 H", "1 2000 h", "0,750 h", "1234,567 h", "1'200 h",
-                     "1’200 h", "1 200 h", ",5 h", "1.2.5 h")
+                     "1\u2019200 h", "1\u00a0200 h", ",5 h", "1.2.5 h")
 ] + [
     case("a Time with a zero before a comma and two digits",
          [time_of(1, "0,75 h (estimate: two timed efforts)")], 1, ["milestones add up to 61.75 h"]),
