@@ -1,7 +1,7 @@
 ---
 name: learning-path
 description: Build a learning path to a defined goal in any field — a language, an instrument, a sport, a craft, an exam or licence, a job skill. Use when someone asks how to learn something, or what reaching a level takes and how long. Also use to score practice work they bring back. Learning only — see career-direction, role-fit, interview-prep.
-compatibility: The bundled checker needs code execution; without it, the rules in references/plan.md are applied by hand. The fact review is stronger with a subagent and works without one.
+compatibility: Research needs web access; without it the verdict is NO PATH. The bundled checker needs code execution; without it, the rules in references/plan.md are applied by hand.
 ---
 
 # Learning Path
@@ -15,6 +15,8 @@ Work out what a goal actually demands, prove it from sources, and build only wha
 - **The field sets the bar.** An exam board, a regulator, an employer or a governing body defines what good enough means. Where a regulated route exists, the path follows it.
 - **Honest about the budget.** Say what their hours buy, even when it is less than they asked for.
 - **Performances, not exposure.** A milestone is something they can do that someone else can check.
+- **Report what was found.** Give a cause only where a source gives one. Where sources conflict, give both and say which is better evidenced.
+- **Correct earlier errors plainly, in the plan.**
 
 ## Today's date first
 
@@ -22,17 +24,15 @@ Take it from the environment — the system clock, the conversation, the platfor
 
 ## Asking
 
-Use whatever interactive choice mechanism the environment offers — tappable options where they exist, plain questions otherwise. Run the intake in passes and skip what is answered. `references/intake.md` holds the passes, the questions and what each digs for.
+Use whatever interactive choice mechanism the environment offers — tappable options where they exist, plain questions otherwise. Before the first question, read `references/intake.md`: the passes, the questions and what each digs for. Run the intake in passes and skip what is answered.
 
-Ask for evidence of the starting point rather than a self-rating. Once the standard is known, offer a diagnostic built from its real assessment.
-
-**If nobody is watching** — a background job, a scheduled run, a delegated task in an agentic workspace — do not stall. Do not invent the person. If the request defines the goal, research the standard and the route, and mark the starting point and hours as missing at the top. If it does not, deliver NO PATH with what would define it.
+**If nobody is watching** — a background job, a scheduled run, a delegated task in an agentic workspace — do not stall. Use only what the request says about the person. If the request defines the goal, research the standard and the route, and mark the starting point and hours as missing at the top. If it does not, deliver NO PATH with what would define it.
 
 ## The goal test
 
 Write the goal as seven lines: performance, standard and its judge, conditions, deadline, hours a week, starting point, use. It is defined when the first three let someone else check the result.
 
-If it is not, say so first, in these words: **This goal is not defined enough to build a learning path.** Name the missing lines. Then dig, as `references/intake.md` describes under *When the goal is not defined*. Research what their words mean in practice, and offer two to four concrete versions, each with its judge and its sources.
+If it is not, say so first, in these words: **This goal is not defined enough to build a learning path.** Name the missing lines. Then go back to Asking and dig, as `references/intake.md` describes under *When the goal is not defined*. Before the dig's first search, read `references/research.md`.
 
 Still undefined after that: deliver NO PATH, in the format `references/plan.md` sets out. Never fill the gap with generic activity.
 
@@ -48,7 +48,7 @@ Dated, and from the people who set the standard, in this order:
 4. Every resource the path will use.
 5. What is changing inside their window.
 
-Record each fact in the evidence ledger as you find it, with its quote. `references/research.md` holds the source ladder, what counts as independent, the ledger, and what to do when the standard cannot be verified. It governs the research in the goal test too.
+Before the first search, read `references/research.md`: the source ladder, what counts as independent, the ledger, and what to do when the standard cannot be verified. Record each fact in the evidence ledger as you find it, with its quote.
 
 **Stop when** the standard, its assessment and the effort evidence are each established or declared unestablished, and every resource has been checked. What is still open is a gap: list it and stop.
 
@@ -56,17 +56,17 @@ Record each fact in the evidence ledger as you find it, with its quote. `referen
 
 Set the evidenced effort against their hours: it fits, it is tight, or it is short. When it is short, say what the hours do buy, as a goal of its own. Build for that only if they accept it; otherwise the verdict is NO PATH. If the milestones later need more than the effort, run the verdict again on their total.
 
-## Build the path
+## Write the plan
 
-Work backward from the standard, closing the heaviest gaps first. The exit check mirrors the real assessment. Read `references/plan.md` before writing: the format, and what research on practice supports.
+Before writing any plan, NO PATH included, read `references/plan.md`: the format, and what research on practice supports. A path works backward from the standard, closing the heaviest gaps first. Its exit check mirrors the real assessment.
 
 ## Verify before delivering
 
 Every plan goes through both steps, NO PATH included.
 
-Give the draft to a fresh reviewer: a subagent with no part in writing it. Without one, make a separate pass that opens each source before rereading the claim. Every claim comes back upheld, corrected or dropped. `references/review.md` is its brief, and says how to apply the result.
+Before the review, read the first half of `references/review.md`: the reviewer's brief, and how to apply the result. Give the draft to a fresh reviewer: a subagent with no part in writing it. Without one, make a separate pass that opens each source before rereading the claim. Every claim comes back upheld, corrected or dropped.
 
-Then run `scripts/path_check.py` on the plan — `${CLAUDE_SKILL_DIR}/scripts/path_check.py` in Claude Code — and fix what it names until it passes. A row that changes after the review goes back through it.
+Then run `scripts/path_check.py` on the plan with `python3`, from the skill's folder (`${CLAUDE_SKILL_DIR}` in Claude Code). Pass `--today` with the date you took at the start. **Stop when** it exits 0, every note is acted on, and every row changed after the review has been reviewed again.
 
 ## Deliver
 
@@ -75,9 +75,3 @@ Write it as markdown, `learning-path-TOPIC.md`, and make sure they have it: atta
 ## When they bring work back
 
 Score it with the second half of `references/review.md`.
-
-## Rules
-
-- Where sources conflict, give both and say which is better evidenced.
-- Do not explain a finding by guessing at a cause.
-- Correct earlier errors plainly, in the plan.
