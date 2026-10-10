@@ -18,16 +18,18 @@ It is read in the twenty minutes before a call. Possibly on a phone, possibly by
 
 Readable prose about an unfamiliar subject gets someone as far as asking the question and no further. The answer arrives and there is nothing to say next. Two tests. Can they say what each term means and why it matters? And has each hard part of the domain been matched to something in their own history — the same problem under another name? The second is the cheapest credibility available to anyone entering a new field.
 
-## What disqualifies a question
+## Lines for the weak spot's drill
 
-The advert, press releases and launch posts are marketing too, so a question drawn from where one of them puts its emphasis only sounds researched. Write the fact beside each question while drafting. One with no fact to name is cut, or moved out of the section and labelled as their own interest. That is a fair thing to ask, and not the same as having done the reading.
-
-## Lines worth scripting
-
-Two lines are hard to produce in the moment. An assessor scores both well:
+In any round past a screening call, add two lines to the weak spot's drill. State in the brief that a candidate can recover from a bad start. Most of the round is still ahead.
 
 > I don't know that.
 
-> This got too complex, let me start again.
+This line is for when the interviewer says an answer is wrong and no better one comes to mind. An interviewer can guide someone who admits the gap.
 
-The first opens the discussion rather than closing it, because an assessor can guide someone who says it and cannot guide someone bluffing. The second is the one candidates resist, because dropping their own approach feels like losing. Both are ordinary good judgement, not a rescue move. Script them into the weak-spot answer, with the drill already there.
+> That got too complex. Let me step back and say what I would do.
+
+This line is for when the answer has stopped working. Name the likely problem for this round in place of "too complex". Dropping a position feels like losing. An interviewer can read it as self-awareness.
+
+## What disqualifies a question
+
+The advert, press releases and launch posts are marketing too, so a question drawn from where one of them puts its emphasis only sounds researched. Write the fact beside each question while drafting. One with no fact to name is cut, or moved out of the section and labelled as their own interest. That is a fair thing to ask, and not the same as having done the reading.
