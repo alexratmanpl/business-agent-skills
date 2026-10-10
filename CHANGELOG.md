@@ -4,13 +4,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 [semantic versioning](https://semver.org/).
 
 The version applies to the whole set. The skills release together, so one number identifies a
-known-good combination rather than four lineages to keep in step.
+known-good combination rather than five lineages to keep in step.
 
 No git tag is cut per version. The only published artifact is the `latest` prerelease, which
 CI rebuilds from `master` on every push, so it always holds the newest state rather than a
 named version.
 
 ## [Unreleased]
+
+### Added
+
+- `career-direction`, a fifth skill: where to point a career when no particular job is on the
+  table. It runs a six-pass intake, groups the market into families by the asset each one buys,
+  and reads three to five years ahead without forecasting — every shift has to be visible in
+  something dated and has to name what would prove it wrong. It is on the file layout in
+  `AGENTS.md` from the start, under a declared `SKILL.md` budget of 1,275 words: the intake
+  passes, market craft, horizon discipline and report contract live in four files under
+  `references/`, each read only at the step that needs it.
+- `career-direction` ships `assets/direction-report.html`, one self-contained page holding its own
+  data as JSON, and `scripts/report_check.py`, a gate that reads that same data and fails on what
+  makes a report worthless or unsafe to forward. Its cases, and the page's, are in `evals/`, which
+  packaging leaves out.
+- A privacy rule: the intake stays in the conversation, the market is researched without ever
+  searching the person, and the report carries a first name or initials rather than contact
+  details. The checker enforces the last of the three, for the common shapes of an email address,
+  a phone number, a profile link, a street address and a surname.
 
 ### Changed
 
@@ -22,9 +40,11 @@ named version.
   three. The decisions stay in `SKILL.md`, and nothing was added.
 - `SKILL.md` length is a per-skill budget enforced by `build_skills.py`, replacing a flat cap
   enforced by nothing. The default is 1,000 words; a skill needing more declares `budget:` in
-  its frontmatter, so raising it shows up in the diff. `company-research` declares 1,400 and
-  `interview-prep` 1,150. `wc -w` is no longer the counter: it disagrees with itself across
-  locales by the number of em dashes in the file.
+  its frontmatter, so raising it shows up in the diff. `company-research` declares 1,400,
+  `interview-prep` 1,150 and `career-direction` 1,275. `wc -w` is no longer the counter: it
+  disagrees with itself across locales by the number of em dashes in the file.
+- `AGENTS.md` lists `evals/`, which `build_skills.py` already left out of packaged skills, for the
+  cases that test a skill's own script or page.
 
 ## [1.1.0] - 2026-09-13
 

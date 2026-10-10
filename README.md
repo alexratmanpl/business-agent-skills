@@ -1,8 +1,8 @@
 # Business & Career Skills
 
-Four Agent Skills for business and career work: research a company, judge whether you fit a role,
-prepare for the interview, and get the money right. Honest rather than encouraging — they are
-written to tell someone a stretch is a stretch.
+Five Agent Skills for business and career work: work out which direction to take, research a
+company, judge whether you fit a role, prepare for the interview, and get the money right. Honest
+rather than encouraging — they are written to tell someone a stretch is a stretch.
 
 Each skill is a `SKILL.md` with frontmatter plus the files it needs, following the
 [Agent Skills open standard](https://agentskills.io).
@@ -11,20 +11,22 @@ Each skill is a `SKILL.md` with frontmatter plus the files it needs, following t
 
 | Skill | Does | Bundles |
 | :--- | :--- | :--- |
+| [`career-direction`](skills/careers/career-direction/) | Where to point a career when no particular job is on the table: what someone is actually selling, which role families buy it, and what that is worth in three to five years. Produces a single-file visual report. | `scripts/report_check.py`, `assets/direction-report.html` |
 | [`company-research`](skills/business/company-research/) | What a company really does, how healthy it is, who it competes with, what staff say. Produces a plain-language dossier. | — |
 | [`role-fit`](skills/careers/role-fit/) | Compares a background against a specific job: a verdict, a rough probability, the gaps, and the unusual strength other applicants lack. | — |
 | [`pay-check`](skills/careers/pay-check/) | Local market rate for role, level and contract type; employment-versus-contracting conversion; how to reopen a number already given. | `scripts/rate_calc.py`, `rates-example.json` |
-| [`interview-prep`](skills/careers/interview-prep/) | Preparation at any stage, a one-to-two page brief to read beforehand, and a page for notes during the call. Calls the other three by name when they are installed, and works alone when they are not. | `scripts/plain_check.py`, `interview-record.html` |
+| [`interview-prep`](skills/careers/interview-prep/) | Preparation at any stage, a one-to-two page brief to read beforehand, and a page for notes during the call. Calls `company-research`, `role-fit` and `pay-check` by name when they are installed, and works alone when they are not. | `scripts/plain_check.py`, `interview-record.html` |
 
 Invoke one by name, or describe the task and let the agent choose.
 
-`pay-check` and `interview-prep` carry a `compatibility` line in their frontmatter: their bundled
-scripts need code execution, and each says what to do instead where there is none.
+`career-direction`, `pay-check` and `interview-prep` carry a `compatibility` line in their
+frontmatter: their bundled scripts need code execution, and each says what to do instead where
+there is none.
 
 ## Install
 
 Copy a skill's directory — `SKILL.md` and everything beside it — into wherever the agent reads
-skills from. Packaged `.skill` archives for all four are attached to the `latest` release, which
+skills from. Packaged `.skill` archives for all five are attached to the `latest` release, which
 CI rebuilds from `master` on every push.
 
 ## Layout
@@ -34,6 +36,7 @@ skills/
 ├── business/
 │   └── company-research/
 └── careers/
+    ├── career-direction/
     ├── role-fit/
     ├── pay-check/
     └── interview-prep/
@@ -52,6 +55,15 @@ Drop `--check-only` to write `.skill` archives to `dist/`. CI runs it on every p
 `skills/careers/interview-prep/scripts/plain_check.py` reads a drafted brief — or the skill's own
 prose — for long sentences, abbreviations used before being spelled out, machine phrasing and
 excess length. It reports and exits zero; it is a checklist, not a gate.
+
+`skills/careers/career-direction/scripts/report_check.py` reads a filled direction report and
+fails on what makes one worthless or unsafe to forward; `--help` lists it. That one is a gate,
+because most of those defects are invisible: a mistyped key draws an empty cell and says nothing,
+so the report still looks finished. Its privacy check reads common shapes and can flag something
+harmless, such as an order number that reads as a phone number; the message names the field, and
+rewording it clears the flag. Its cases, and the page's, run with
+`python3 -I skills/careers/career-direction/evals/test_report.py`. The ones that render the
+page need Playwright and a Chromium, and are skipped without them.
 
 Conventions are in [AGENTS.md](AGENTS.md); how to contribute is in
 [CONTRIBUTING.md](CONTRIBUTING.md).

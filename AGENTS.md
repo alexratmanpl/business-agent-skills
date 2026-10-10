@@ -16,6 +16,7 @@ A skill is one directory. Which file a thing belongs in follows from when it is 
 | `references/<topic>.md` | what the agent must **construct** — the shape of an output, how a bundled file works | only at the step that needs it |
 | `scripts/` | what can be **checked** rather than read | run, never read |
 | `assets/` | templates and fixtures the skill ships | as used |
+| `evals/` | cases that test the skill's own script or page | never by the skill; left out of the package |
 
 `SKILL.md` is loaded in full on every run, so its length is a cost paid every time. Every skill
 has a word budget: 1,000 by default, or whatever `budget:` in its frontmatter declares.
