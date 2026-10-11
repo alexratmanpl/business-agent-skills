@@ -22,9 +22,9 @@ Readable prose about an unfamiliar subject gets someone as far as asking the que
 
 In any round past a screening call, add two lines to the weak spot's drill. State in the brief that a candidate can recover from a bad start. Most of the round is still ahead.
 
-> I don't know that.
+> Sorry, I don't know that. Let me think it through out loud.
 
-This line is for when the interviewer says an answer is wrong and no better one comes to mind. An interviewer can guide someone who admits the gap.
+This line is for when the interviewer says an answer is wrong and no better one comes to mind. An interviewer can guide someone who admits the gap and thinks out loud.
 
 > That got too complex. Let me step back and say what I would do.
 
