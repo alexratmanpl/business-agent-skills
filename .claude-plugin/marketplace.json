@@ -9,7 +9,7 @@
     {
       "name": "business-agent-skills",
       "source": "./",
-      "description": "Work out which direction to take, research a company, judge whether you fit a role, prepare for the interview, and get the money right.",
+      "description": "Work out which direction to take, research a company, judge whether you fit a role, prepare for the interview, get the money right, and plan how to learn what a goal demands.",
       "category": "productivity",
       "keywords": [
         "company-research",
@@ -17,7 +17,8 @@
         "job-search",
         "interview",
         "salary",
-        "careers"
+        "careers",
+        "learning-path"
       ]
     }
   ]
