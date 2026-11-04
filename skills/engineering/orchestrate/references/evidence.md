@@ -29,6 +29,13 @@ FIX-LIST items on mid tier (full fable re-reviews were ~$10 of $44); the lead st
 judgment goes to a high-tier advisor subagent (the fable lead was the dearest session in every
 run it appeared in); gate sends a plan summary, not the plan; finished sessions archived.
 
+## Ledger of the runs above, in the COSTS.md format
+| date | project | run | skill ver | risk | lead model | sessions | handovers | workers $ | lead $ | total $ | tokens | time | result |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 2026-11-02 | laptops | 1 | v1 | manual | fable | 12 | 1 | 3.59 | 10.43 | 14.02 | 1251k | 23 min | SHIP, 39 tests |
+| 2026-11-02 | laptops2 | 1 | v2 | 2 low | sonnet | 9 | 0 | 2.39 | 1.13 | 3.52 | 872k | 12 min | SHIP, 31 tests |
+| 2026-11-02 | fx-ui | 1 | v2 | 3 high | sonnet→fable | 14 | 3 | 29.64 | 14.71 | 44.35 | 1672k | 70 min | SHIP, 39 tests, 3 bugs fixed |
+
 ## Limits
 Ceiling is a hook warning, not a hard stop (hard stop only in `claude -p --max-turns` locally).
 Rate limits are account-wide: ≤4 concurrent workers. Workers report at end of turn only;

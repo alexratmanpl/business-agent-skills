@@ -39,6 +39,17 @@ reads), so the card's `read` lists extracts (`sed -n`, `grep`, `node -e`) rather
 files, and no task gets a ceiling under 80k. Add `CALLS` to the card when a task is dominated
 by unbatchable calls (web searches) or when the target repo has no hook.
 
+## Cost accounting
+Every session reports its own usage: `get_session(<id>)` → `external_metadata.usage.cost_usd`
+(list-price equivalent; on a subscription it is rate-limit consumption) and
+`external_metadata.context_usage.used_tokens`. Book it in the same Bash call as the BOARD update:
+- On DONE/HANDOVER/BLOCKED of a worker: fill the BOARD `cost` column as `$<cost_usd>/<used_tokens>k`.
+- At CLOSE: `get_session` with no id for your own cost; LOG
+  `COST total=$<sum> lead=$<own> workers=$<sum of rows> sessions=<n> tokens=<sum>k`; append one row
+  to `projects/COSTS.md` (create from `assets/COSTS.md` if missing); commit with the CLOSE.
+- A lead successor books the predecessor lead's cost at resume (its id is in LEAD-HANDOVER.md).
+The ledger is the comparison across runs: same project, different tier, different skill version.
+
 ## Silent worker (no message by the wave check-in)
 1. `get_session(<id>)`: `status_bucket` and `post_turn_summary`.
 2. `list_events(session_id, kinds=["assistant","result"], limit=100)`: last turn's text.

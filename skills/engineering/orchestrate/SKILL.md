@@ -53,13 +53,14 @@ branch: merges and handovers must be pushed first), then `create_session` per
 bookkeeping event is one Bash call (board, log with `date -u +%H:%M`, commit, push).
 Wave timeouts are in spawn.md. One check-in per wave, delete it when the wave reports. Archiving (`archive_session`) happens on DONE/HANDOVER as §2 says and at
 CLOSE for whatever remains not running, LOG `ARCHIVE <n>`; BRIEF `Keep sessions: yes` turns
-all of it off.
+all of it off. CLOSE also books your own cost, LOGs `COST`, and appends the run to
+`projects/COSTS.md` (spawn.md "Cost accounting").
 
 ## 2. On worker message (first line is the token)
 | token | do |
 |---|---|
-| `DONE <t>` | fetch+merge `agents/<p>/<t>` into lead branch; conflict → do not resolve by hand, spawn a fixer owning the conflicting files; BOARD done; LOG `DONE`; `archive_session(<t>)`; next. Reviewer DONE carries the verdict on line 2 (`SHIP`/`FIX-LIST`/`NO-SHIP`) |
-| `HANDOVER <t>` | merge, push; read `board/<t>/HANDOVER.md`; spawn `<t>b` (then c, d) with CARD `CONTINUE_FROM`; ceiling ×1.5; answer its open questions in the card; archive `<t>`; LOG `RESPAWN`. After 3 successors (2 at high risk) → `BLOCKED` |
+| `DONE <t>` | fetch+merge `agents/<p>/<t>` into lead branch; conflict → do not resolve by hand, spawn a fixer owning the conflicting files; BOARD done + cost (spawn.md "Cost accounting"); LOG `DONE`; `archive_session(<t>)`; next. Reviewer DONE carries the verdict on line 2 (`SHIP`/`FIX-LIST`/`NO-SHIP`) |
+| `HANDOVER <t>` | merge, push; read `board/<t>/HANDOVER.md`; spawn `<t>b` (then c, d) with CARD `CONTINUE_FROM`; ceiling ×1.5; answer its open questions in the card; book `<t>` cost, archive it; LOG `RESPAWN`. After 3 successors (2 at high risk) → `BLOCKED` |
 | `QUESTION <t>` | trivial → answer; else run `advisor` as an Agent subagent (fresh context, tier per spawn.md) with the question + BRIEF; `send_message(worker, "ANSWER: …")`; LOG `DECISION`. Advisor cannot decide, or a 2nd HANDOVER on one task, or NO-SHIP → raise RISK |
 | `BLOCKED <t>` | give missing input or split the task; else LOG `ESCALATE` and tell the human |
 | nothing by check-in | inspect per spawn.md "Silent worker", then act on what you find as above |
@@ -78,7 +79,7 @@ When the hook says you are past ceiling: finish the step in hand, write
 
 ## 5. Report to the human
 Only at CLOSE, `ESCALATE`, or when asked: what shipped, DECISION lines since last report,
-open ESCALATE items, sessions spawned and archived. Three to ten lines. Never forward worker
+open ESCALATE items, sessions spawned and archived, the `COST` line. Three to ten lines. Never forward worker
 transcripts.
 
 ## Hard rules
