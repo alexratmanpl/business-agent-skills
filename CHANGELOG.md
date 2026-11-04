@@ -14,6 +14,22 @@ named version.
 
 ### Added
 
+- `daily-brief`, a seventh skill, in the `business` category: the core of the day in the areas
+  someone follows, in a fixed shape of five to ten sentences and three to five links per area,
+  twice a day, since the last brief. It is the skill-sized sibling of a planned static service
+  of the same shape, rethought for an agent: instead of a server pipeline and browser-side
+  matching, the intake starts from a persona preset in `assets/personas.json` (investor,
+  founder, engineer, policy-watcher, sports-fan, scientist, generalist), so one tap sets the
+  areas, the sources and a few starter interests, and one more question adds specifics and the
+  person's own favourite services. Settings live in a `daily-brief.json` the person keeps, or
+  in a one-line settings string where no file can be kept; nothing about them is sent anywhere.
+  The source list is the editorial decision: `assets/sources.json` by area, with weights, and
+  no general web search for what happened. An interest with nothing to show gets one fixed line
+  rather than a weak match. The word "news" is kept out of the brief on purpose.
+- `daily-brief` ships `scripts/brief_check.py`, a gate on the brief's shape, with its cases in
+  `evals/`. The intake and persona mapping, and the brief and NO BRIEF formats, live in
+  `references/intake.md` and `references/brief.md`, read only at the step that needs them.
+  `SKILL.md` is 834 words against the default budget.
 - `career-direction`, a fifth skill: where to point a career when no particular job is on the
   table. It runs a six-pass intake, groups the market into families by the asset each one buys,
   and reads three to five years ahead without forecasting — every shift has to be visible in

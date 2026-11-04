@@ -1,9 +1,9 @@
 # Business & Career Skills
 
-Six Agent Skills for business and career work: work out which direction to take, research a
-company, judge whether you fit a role, prepare for the interview, get the money right, and plan how
-to learn what a goal demands. Honest rather than encouraging — they are written to tell someone a
-stretch is a stretch.
+Seven Agent Skills for business and career work: work out which direction to take, research a
+company, judge whether you fit a role, prepare for the interview, get the money right, plan how
+to learn what a goal demands, and keep up with the day in a fixed shape. Honest rather than
+encouraging — they are written to tell someone a stretch is a stretch.
 
 Each skill is a `SKILL.md` with frontmatter plus the files it needs, following the
 [Agent Skills open standard](https://agentskills.io).
@@ -14,6 +14,7 @@ Each skill is a `SKILL.md` with frontmatter plus the files it needs, following t
 | :--- | :--- | :--- |
 | [`career-direction`](skills/careers/career-direction/) | Where to point a career when no particular job is on the table: what someone is actually selling, which role families buy it, and what that is worth in three to five years. Produces a single-file visual report. | `scripts/report_check.py`, `assets/direction-report.html` |
 | [`company-research`](skills/business/company-research/) | What a company really does, how healthy it is, who it competes with, what staff say. Produces a plain-language dossier. | — |
+| [`daily-brief`](skills/business/daily-brief/) | The core of the day in the areas someone follows: 5 to 10 sentences and 3 to 5 links per area, twice a day, from a predefined source list plus their own favourite services. Starts from a persona preset so setup is one tap and one question; settings live in a file the person keeps. Says "nothing significant" rather than padding. | `scripts/brief_check.py`, `assets/personas.json`, `assets/sources.json` |
 | [`role-fit`](skills/careers/role-fit/) | Compares a background against a specific job: a verdict, a rough probability, the gaps, and the unusual strength other applicants lack. | — |
 | [`pay-check`](skills/careers/pay-check/) | Local market rate for role, level and contract type; employment-versus-contracting conversion; how to reopen a number already given. | `scripts/rate_calc.py`, `rates-example.json` |
 | [`interview-prep`](skills/careers/interview-prep/) | Preparation at any stage, a one-to-two page brief to read beforehand, and a page for notes during the call. Calls `company-research`, `role-fit` and `pay-check` by name when they are installed, and works alone when they are not. | `scripts/plain_check.py`, `interview-record.html` |
@@ -21,14 +22,14 @@ Each skill is a `SKILL.md` with frontmatter plus the files it needs, following t
 
 Invoke one by name, or describe the task and let the agent choose.
 
-`career-direction`, `pay-check`, `interview-prep` and `learning-path` carry a `compatibility` line
-in their frontmatter: their bundled scripts need code execution, and each says what to do instead
-where there is none.
+`career-direction`, `pay-check`, `interview-prep`, `learning-path` and `daily-brief` carry a
+`compatibility` line in their frontmatter: their bundled scripts need code execution, and each
+says what to do instead where there is none.
 
 ## Install
 
 Copy a skill's directory — `SKILL.md` and everything beside it — into wherever the agent reads
-skills from. Packaged `.skill` archives for all six are attached to the `latest` release, which
+skills from. Packaged `.skill` archives for all seven are attached to the `latest` release, which
 CI rebuilds from `master` on every push.
 
 ## Layout
@@ -36,7 +37,8 @@ CI rebuilds from `master` on every push.
 ```
 skills/
 ├── business/
-│   └── company-research/
+│   ├── company-research/
+│   └── daily-brief/
 ├── careers/
 │   ├── career-direction/
 │   ├── role-fit/
@@ -72,6 +74,12 @@ page need Playwright and a Chromium, and are skipped without them.
 `skills/learning/learning-path/scripts/path_check.py` reads a drafted learning plan and fails on
 the defects `--help` lists. `--help` also says what the script cannot check. Its cases run with
 `python3 -I skills/learning/learning-path/evals/test_path_check.py`.
+
+`skills/business/daily-brief/scripts/brief_check.py` reads a drafted daily brief and fails on
+what makes it not a brief: an area outside five to ten sentences or three to five links, a link
+without a reason, a duplicated or home-page link, a long quote, the word "news", a Following
+block that is neither a match nor the exact silence line, an empty Not read. `--help` says what it
+cannot check. Its cases run with `python3 -I skills/business/daily-brief/evals/test_brief_check.py`.
 
 Conventions are in [AGENTS.md](AGENTS.md); how to contribute is in
 [CONTRIBUTING.md](CONTRIBUTING.md).
