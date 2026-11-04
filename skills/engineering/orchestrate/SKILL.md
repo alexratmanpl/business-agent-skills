@@ -53,8 +53,9 @@ branch: merges and handovers must be pushed first), then `create_session` per
 bookkeeping event is one Bash call (board, log with `date -u +%H:%M`, commit, push).
 Wave timeouts are in spawn.md. One check-in per wave, delete it when the wave reports. Archiving (`archive_session`) happens on DONE/HANDOVER as §2 says and at
 CLOSE for whatever remains not running, LOG `ARCHIVE <n>`; BRIEF `Keep sessions: yes` turns
-all of it off. CLOSE also books your own cost, LOGs `COST`, and appends the run to
-`projects/COSTS.md` (spawn.md "Cost accounting").
+all of it off. CLOSE also books your own cost, LOGs `COST`, appends the run to
+`projects/COSTS.md` (spawn.md "Cost accounting"), then runs `retro` (roles.md) as a high-tier
+Agent subagent and commits its `board/RETRO.md`.
 
 ## 2. On worker message (first line is the token)
 | token | do |
@@ -79,7 +80,8 @@ When the hook says you are past ceiling: finish the step in hand, write
 
 ## 5. Report to the human
 Only at CLOSE, `ESCALATE`, or when asked: what shipped, DECISION lines since last report,
-open ESCALATE items, sessions spawned and archived, the `COST` line. Three to ten lines. Never forward worker
+open ESCALATE items, sessions spawned and archived, the `COST` line, RETRO's top three.
+Three to twelve lines. Never forward worker
 transcripts.
 
 ## Hard rules

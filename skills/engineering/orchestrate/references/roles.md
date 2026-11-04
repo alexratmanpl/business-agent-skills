@@ -25,6 +25,15 @@ Output `projects/<p>/board/<task>/REVIEW.md` (in addition to REPORT.md): per ite
 PASS/FAIL/UNVERIFIED + evidence; defect list (severity, file, owning task); verdict `SHIP` |
 `FIX-LIST` | `NO-SHIP`. Report `DONE <task>` with the verdict on line 2. Fix nothing.
 
+## retro (lead-side Agent subagent at CLOSE, high tier, fresh context)
+Input: `board/LOG.md`, `board/BOARD.md` (with costs), every `board/*/REVIEW.md` and
+`HANDOVER.md`, `projects/COSTS.md`. Output `board/RETRO.md` per `assets/RETRO.md`: at most
+8 improvements to cost or wall time for the NEXT run, ordered by expected saving. Each line
+names its evidence (a LOG line, a BOARD cost, a handover) and the change (brief, plan, card,
+ceiling, tier, skill text). No generic advice; drop any line without a number or a log line.
+State which handovers, respawns, blocked waves and review rounds were avoidable, and what the
+cheapest correct configuration for this project would have been.
+
 ## advisor (lead-side Agent subagent, not a session)
 Input: one QUESTION + BRIEF + files the lead names. Output ≤3 lines: DECISION / WHY / DO.
 Decide; ask back only if the human's intent cannot be inferred.
