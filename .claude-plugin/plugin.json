@@ -1,7 +1,7 @@
 {
   "name": "business-agent-skills",
   "version": "1.1.0",
-  "description": "Six agent skills for business and career work: work out which direction to take, research a company, judge whether you fit a role, prepare for the interview, get the money right, and plan how to learn what a goal demands. Honest rather than encouraging.",
+  "description": "Seven agent skills for business and career work: work out which direction to take, research a company, judge whether you fit a role, prepare for the interview, get the money right, plan how to learn what a goal demands, and keep up with the day in a fixed shape. Honest rather than encouraging.",
   "author": {
     "name": "alexratmanpl",
     "url": "https://github.com/alexratmanpl"
@@ -19,10 +19,13 @@
     "careers",
     "business",
     "learning-path",
-    "learning"
+    "learning",
+    "daily-brief",
+    "briefing"
   ],
   "skills": [
     "./skills/business/company-research",
+    "./skills/business/daily-brief",
     "./skills/careers/career-direction",
     "./skills/careers/role-fit",
     "./skills/careers/pay-check",

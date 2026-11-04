@@ -1,0 +1,61 @@
+{
+  "note": "Presets offered as the first intake question. Each sets areas, source ids from sources.json and a few starter interests the person can drop. The second question adds specifics and favourite services.",
+  "personas": [
+    {
+      "id": "investor",
+      "pitch": "Markets, rates, companies and the policy that moves them.",
+      "areas": ["economy", "politics", "world"],
+      "sources": ["ft-home", "cnbc-economy", "bbc-business", "guardian-business", "nyt-business", "ecb-press", "politico-eu", "bbc-world"],
+      "interests_starter": ["interest rates", "oil prices"],
+      "second_question": "Which markets or assets do you actually hold or watch, and any service you already read for them?"
+    },
+    {
+      "id": "founder",
+      "pitch": "Your sector, your competitors, funding, and the tech that changes the product.",
+      "areas": ["technology", "economy"],
+      "sources": ["verge", "ars-technica", "hn-frontpage", "cnbc-top", "bbc-business", "guardian-technology"],
+      "interests_starter": ["startup funding"],
+      "second_question": "Which sector are you in, which two or three competitors matter, and any newsletter or site you already read?"
+    },
+    {
+      "id": "engineer",
+      "pitch": "Tools, platforms, releases and the occasional outage.",
+      "areas": ["technology", "science"],
+      "sources": ["hn-frontpage", "ars-technica", "verge", "bbc-technology", "nature"],
+      "interests_starter": [],
+      "second_question": "Which stack or ecosystem do you work in, and any feed or site you already follow for it?"
+    },
+    {
+      "id": "policy-watcher",
+      "pitch": "Elections, legislation, regulators and the EU.",
+      "areas": ["politics", "world", "economy"],
+      "sources": ["politico-eu", "bbc-politics", "guardian-politics", "nyt-politics", "bbc-world", "guardian-world", "ecb-press"],
+      "interests_starter": ["european union"],
+      "second_question": "Which countries, institutions or policy areas, and any service you already read for them?"
+    },
+    {
+      "id": "sports-fan",
+      "pitch": "Your team, your league, and the rest only when it is big.",
+      "areas": ["sport"],
+      "sources": ["bbc-sport", "guardian-sport", "espn", "nyt-sports"],
+      "interests_starter": [],
+      "second_question": "Which team and league, and is there a club site or blog you already read?"
+    },
+    {
+      "id": "scientist",
+      "pitch": "Papers, funding, instruments and the science that reached the public.",
+      "areas": ["science", "technology"],
+      "sources": ["nature", "bbc-science", "guardian-science", "nyt-science", "ars-technica"],
+      "interests_starter": [],
+      "second_question": "Which field, and any journal alert or preprint feed you already use?"
+    },
+    {
+      "id": "generalist",
+      "pitch": "A bit of everything, kept short.",
+      "areas": ["world", "economy", "politics", "technology", "sport", "science"],
+      "sources": ["bbc-world", "bbc-business", "bbc-politics", "bbc-technology", "bbc-sport", "bbc-science", "guardian-world", "nyt-world"],
+      "interests_starter": [],
+      "second_question": "Anything specific to follow, and any service you already read?"
+    }
+  ]
+}
