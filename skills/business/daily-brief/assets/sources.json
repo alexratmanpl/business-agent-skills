@@ -1,0 +1,45 @@
+{
+  "note": "The default source list, by area. Weight 1 is a general outlet; 2 is a primary or specialist source. 'paywall' means items contribute headline and link only. These URLs were written from knowledge of each outlet's feeds and were not fetched when this file was committed; a feed that fails is dropped and named under Not read, and this file is the place to correct it.",
+  "areas": {
+    "world": "World affairs outside the person's own politics",
+    "economy": "Markets, central banks, companies, trade",
+    "politics": "Governments, elections, legislation, regulators",
+    "technology": "Platforms, tools, releases, the industry",
+    "sport": "Results and the stories around them",
+    "science": "Research that reached the public, funding, instruments"
+  },
+  "sources": [
+    {"id": "bbc-world", "area": "world", "name": "BBC World", "url": "https://feeds.bbci.co.uk/news/world/rss.xml", "weight": 1},
+    {"id": "guardian-world", "area": "world", "name": "The Guardian World", "url": "https://www.theguardian.com/world/rss", "weight": 1},
+    {"id": "nyt-world", "area": "world", "name": "NYT World", "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "weight": 1, "paywall": true},
+
+    {"id": "bbc-business", "area": "economy", "name": "BBC Business", "url": "https://feeds.bbci.co.uk/news/business/rss.xml", "weight": 1},
+    {"id": "guardian-business", "area": "economy", "name": "The Guardian Business", "url": "https://www.theguardian.com/business/rss", "weight": 1},
+    {"id": "nyt-business", "area": "economy", "name": "NYT Business", "url": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml", "weight": 1, "paywall": true},
+    {"id": "ft-home", "area": "economy", "name": "Financial Times", "url": "https://www.ft.com/rss/home", "weight": 2, "paywall": true},
+    {"id": "cnbc-top", "area": "economy", "name": "CNBC Top News", "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html", "weight": 1},
+    {"id": "cnbc-economy", "area": "economy", "name": "CNBC Economy", "url": "https://www.cnbc.com/id/20910258/device/rss/rss.html", "weight": 1},
+    {"id": "ecb-press", "area": "economy", "name": "ECB press releases", "url": "https://www.ecb.europa.eu/rss/press.html", "weight": 2},
+
+    {"id": "bbc-politics", "area": "politics", "name": "BBC Politics", "url": "https://feeds.bbci.co.uk/news/politics/rss.xml", "weight": 1},
+    {"id": "guardian-politics", "area": "politics", "name": "The Guardian Politics", "url": "https://www.theguardian.com/politics/rss", "weight": 1},
+    {"id": "nyt-politics", "area": "politics", "name": "NYT Politics", "url": "https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml", "weight": 1, "paywall": true},
+    {"id": "politico-eu", "area": "politics", "name": "Politico Europe", "url": "https://www.politico.eu/feed/", "weight": 2},
+
+    {"id": "bbc-technology", "area": "technology", "name": "BBC Technology", "url": "https://feeds.bbci.co.uk/news/technology/rss.xml", "weight": 1},
+    {"id": "guardian-technology", "area": "technology", "name": "The Guardian Technology", "url": "https://www.theguardian.com/technology/rss", "weight": 1},
+    {"id": "verge", "area": "technology", "name": "The Verge", "url": "https://www.theverge.com/rss/index.xml", "weight": 1},
+    {"id": "ars-technica", "area": "technology", "name": "Ars Technica", "url": "https://feeds.arstechnica.com/arstechnica/index", "weight": 2},
+    {"id": "hn-frontpage", "area": "technology", "name": "Hacker News front page", "url": "https://hnrss.org/frontpage", "weight": 1},
+
+    {"id": "bbc-sport", "area": "sport", "name": "BBC Sport", "url": "https://feeds.bbci.co.uk/sport/rss.xml", "weight": 1},
+    {"id": "guardian-sport", "area": "sport", "name": "The Guardian Sport", "url": "https://www.theguardian.com/sport/rss", "weight": 1},
+    {"id": "espn", "area": "sport", "name": "ESPN", "url": "https://www.espn.com/espn/rss/news", "weight": 1},
+    {"id": "nyt-sports", "area": "sport", "name": "NYT Sports", "url": "https://rss.nytimes.com/services/xml/rss/nyt/Sports.xml", "weight": 1, "paywall": true},
+
+    {"id": "bbc-science", "area": "science", "name": "BBC Science & Environment", "url": "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", "weight": 1},
+    {"id": "guardian-science", "area": "science", "name": "The Guardian Science", "url": "https://www.theguardian.com/science/rss", "weight": 1},
+    {"id": "nyt-science", "area": "science", "name": "NYT Science", "url": "https://rss.nytimes.com/services/xml/rss/nyt/Science.xml", "weight": 1, "paywall": true},
+    {"id": "nature", "area": "science", "name": "Nature", "url": "https://www.nature.com/nature.rss", "weight": 2, "paywall": true}
+  ]
+}
