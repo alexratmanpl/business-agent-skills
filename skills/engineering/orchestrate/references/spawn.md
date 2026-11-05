@@ -25,6 +25,7 @@ claude-opus-5-5). The RISK score from §0 picks the column.
 | builder touching money/auth/security/migration files | mid 120k | high 150k | 10 min |
 | reviewer, first review or after NO-SHIP | mid 100k | high 150k | 8 min |
 | re-reviewer (FIX-LIST items + test command) | mid 90k | mid 90k | 8 min |
+| fixer (review items of one task) | mid 100k | mid 100k | 10 min |
 | advisor (Agent subagent, not a session) | mid | high | – |
 | lead | mid 350k | mid 350k (judgment goes to the advisor, not to a dearer lead) | – |
 
@@ -38,13 +39,17 @@ Name the model on every spawn. Worker overhead is 40-60k (protocol + roles + car
 reads), so the card's `read` lists extracts (`sed -n`, `grep`, `node -e`) rather than whole
 files, and no task gets a ceiling under 80k. Add `CALLS` to the card when a task is dominated
 by unbatchable calls (web searches) or when the target repo has no hook.
+Fixer card `read` = its REVIEW.md item lines + extracts of its owned files + the PLAN
+`## Contracts` lines for its interface; nothing else. Reviewer spawn: `clone_depth` =
+`git rev-list --count <DIFF_BASE>..HEAD` + 5, so `DIFF_BASE` exists in its clone.
 
 ## Cost accounting
 Every session reports its own usage: `get_session(<id>)` → `external_metadata.usage.cost_usd`
 (list-price equivalent; on a subscription it is rate-limit consumption) and
 `external_metadata.context_usage.used_tokens`. Book it in the same Bash call as the BOARD update:
 - On DONE/HANDOVER/BLOCKED of a worker: fill the BOARD `cost` column as `$<cost_usd>/<used_tokens>k`.
-- At CLOSE: `get_session` with no id for your own cost; LOG
+- At CLOSE: every LOG `SPAWN` id must have a BOARD cost; missing → `get_session` it now,
+  `$0 never ran` if it never started. Then `get_session` with no id for your own cost; LOG
   `COST total=$<sum> lead=$<own> workers=$<sum of rows> sessions=<n> tokens=<sum>k`; append one row
   to `projects/COSTS.md` (create from `assets/COSTS.md` if missing); commit with the CLOSE.
 - A lead successor books the predecessor lead's cost at resume (its id is in LEAD-HANDOVER.md).
@@ -55,9 +60,11 @@ The ledger is the comparison across runs: same project, different tier, differen
 2. `list_events(session_id, kinds=["assistant","result"], limit=100)`: last turn's text.
 3. Fetch its branch; read `board/<task>/REPORT.md` or `HANDOVER.md`: the message may have
    failed while the file landed.
-4. Failed to start → respawn the same card. Blocked on a permission prompt → the lead's own
-   mode is interactive and workers inherit it: `interrupt_session`, `archive_session`, LOG
-   `ESCALATE`, tell the human to restart the lead in a non-interactive mode (`auto` or
-   `acceptEdits`); a worker cannot be given a mode the lead lacks.
+4. Failed to start → respawn the same card. Blocked on a permission prompt: book `$0 never
+   ran`, `interrupt_session`, `archive_session`, then: other workers in this run did run → the
+   prompt is tool-specific: name the tool from `list_events`, add it to the lead branch's
+   `.claude/settings.json` allow list, respawn, and list the entry in the CLOSE report (it
+   persists). No worker ran → the lead's own mode is interactive and workers inherit it: LOG
+   `ESCALATE`, tell the human to restart the lead in `auto` or `acceptEdits`.
    Still running under ceiling → extend the check-in once; over ceiling → `send_message`
    "HANDOVER now", wait one check-in, then treat as failed.

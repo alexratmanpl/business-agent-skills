@@ -20,7 +20,8 @@ You are one worker session. You never talk to the human. Your contact is the LEA
   `git push -u origin <YOUR_BRANCH>`. No merges, no PRs, no edits to other tasks' files.
 - Follow `RULES` and use `SKILLS` from the card (load with Skill tool; counts as a call).
 - Facts need a source URL; otherwise mark `(unverified)`. Never invent.
-- Code: run it once before DONE if a run fits the budget.
+- Tests run only via PLAN `## Test command`, never a bare tool name; shared-interface fixtures
+  are T0's files, never your own. Run it once before DONE if a run fits the budget.
 
 ## Report (once per turn, as the last thing you do)
 1. Write `projects/<project>/board/<task-id>/REPORT.md` (format: assets/REPORT.md).

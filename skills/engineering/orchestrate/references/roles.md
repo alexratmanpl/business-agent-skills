@@ -9,17 +9,25 @@ Output `projects/<p>/research/<task>.md`. No recommendations unless asked. Unrea
 Input: BRIEF + `research/*`. Output `projects/<p>/plan/PLAN.md` per assets/PLAN.md.
 Tasks: 2-4 parallel builders, DISJOINT file ownership, exact interface contracts between them,
 acceptance criteria that a reviewer can check mechanically, ceiling + model per task
-(SKILL.md §3), one review task listing the review skills from BRIEF/CLAUDE.md.
+(spawn.md), one review task listing the review skills from BRIEF/CLAUDE.md. Contracts ship as
+code: a T0 task owns the shared fixtures/schemas and the committed `## Test command` (may embed
+setup), merged before wave 1. ≥1 acceptance item runs the real end-to-end output path
+(dry run or smoke), never a mock of it.
 
 ## builder
 Implement one PLAN task literally. Only its files. Use `SKILLS` (tdd etc.) where the repo
 rules say so. Ambiguity that changes the result → `QUESTION`; otherwise decide and list it.
-Fixer variant: only the review items in the card, only the files named.
+Never weaken a test or assertion to pass; `QUESTION` instead. Fixer variant: only the review
+items in the card, only the files named.
 
 ## reviewer
 Input: merged lead branch + PLAN acceptance + BRIEF. Run every skill named in `SKILLS`
 (e.g. `mattpocock-skills:code-review`, `agent-skills:review`, `pr-review`); then the PLAN
-checklist. Re-measure anything timing- or network-dependent before calling it FAIL.
+checklist. Setup is the PLAN `## Test command` only; if it cannot run within 3 calls →
+`BLOCKED` with the error (failing tests are FAILs, not BLOCKED); never repair the environment.
+Diff against `DIFF_BASE`: first `git update-ref refs/remotes/origin/HEAD <DIFF_BASE>` so
+diff-based skills see the run's work. A builder's private fixture for a shared interface is a
+FAIL. Re-measure anything timing- or network-dependent before calling it FAIL.
 Re-review card (after a fix): check only the FIX-LIST items and run the test command.
 Output `projects/<p>/board/<task>/REVIEW.md` (in addition to REPORT.md): per item
 PASS/FAIL/UNVERIFIED + evidence; defect list (severity, file, owning task); verdict `SHIP` |
