@@ -49,8 +49,9 @@ review and after a `NO-SHIP`.
 
 Spawn: BOARD row + LOG `SPAWN` + commit + push in ONE Bash call (workers clone the lead
 branch: merges and handovers must be pushed first), then `create_session` per
-`references/spawn.md`, then `send_later(<wave timeout>, "LEAD check-in <tasks>")`. Before the
-first builder spawn LOG `BUILD-BASE <sha>` (the reviewers' `DIFF_BASE`). Every
+`references/spawn.md` (its id goes into the BOARD row at the next bookkeeping call), then
+`send_later(<wave timeout>, "LEAD check-in <tasks>")`. Before the first builder spawn LOG
+`BUILD-BASE <sha>` (the reviewers' `DIFF_BASE`). Every
 bookkeeping event is one Bash call (board, log with `date -u +%H:%M`, commit, push).
 One check-in per wave (timeouts: spawn.md), deleted when it reports. CLOSE archives whatever is not running, LOG `ARCHIVE <n>`; BRIEF `Keep sessions: yes` turns
 archiving off. CLOSE also books your own cost, LOGs `COST`, appends the run to
@@ -63,7 +64,7 @@ Agent subagent and commits its `board/RETRO.md`.
 | `DONE <t>` | fetch+merge `agents/<p>/<t>` into lead branch; conflict → do not resolve by hand, spawn a fixer owning the conflicting files; BOARD done + cost (spawn.md "Cost accounting"); LOG `DONE`; `archive_session(<t>)`; next. Reviewer DONE carries the verdict on line 2 (`SHIP`/`FIX-LIST`/`NO-SHIP`) |
 | `HANDOVER <t>` | merge, push; read `board/<t>/HANDOVER.md`; spawn `<t>b` (then c, d) with CARD `CONTINUE_FROM`; ceiling ×1.5; answer its open questions in the card; book `<t>` cost, archive it; LOG `RESPAWN`. After 3 successors (2 at high risk) → `BLOCKED` |
 | `QUESTION <t>` | trivial → answer; else run `advisor` as an Agent subagent (fresh context, tier per spawn.md) with the question + BRIEF; `send_message(worker, "ANSWER: …")`; LOG `DECISION`. Advisor cannot decide, or a 2nd HANDOVER on one task, or NO-SHIP → raise RISK |
-| `BLOCKED <t>` | give missing input or split the task; a reviewer blocked on the test command → run it on the lead branch yourself, failing → one env fixer before any re-review; else LOG `ESCALATE` and tell the human |
+| `BLOCKED <t>` | give missing input or split the task; reviewer blocked on the test command → spawn.md "Reviewer blocked"; else LOG `ESCALATE` and tell the human |
 | nothing by check-in | inspect per spawn.md "Silent worker", then act on what you find as above |
 Review `FAIL`s: re-verify each yourself before spawning a fixer; waive false alarms with LOG
 `DECISION` (high risk: advisor first). One fixer per owning task per round; cross-task items and

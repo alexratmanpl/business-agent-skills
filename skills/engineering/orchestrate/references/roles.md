@@ -25,7 +25,7 @@ Input: merged lead branch + PLAN acceptance + BRIEF. Run every skill named in `S
 (e.g. `mattpocock-skills:code-review`, `agent-skills:review`, `pr-review`); then the PLAN
 checklist. Setup is the PLAN `## Test command` only; if it cannot run within 3 calls →
 `BLOCKED` with the error (failing tests are FAILs, not BLOCKED); never repair the environment.
-Diff against `DIFF_BASE`: first `git update-ref refs/remotes/origin/HEAD <DIFF_BASE>` so
+Diff against `DIFF_BASE`: first `git update-ref --no-deref refs/remotes/origin/HEAD <DIFF_BASE>` so
 diff-based skills see the run's work. A builder's private fixture for a shared interface is a
 FAIL. Re-measure anything timing- or network-dependent before calling it FAIL.
 Re-review card (after a fix): check only the FIX-LIST items and run the test command.

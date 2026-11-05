@@ -5,7 +5,7 @@
 | path | task |
 ## Contracts
 <interfaces between tasks: exact names, shapes, DOM/API, load order>
-<committed fixture/schema check: path + command; owned by T0, run by every builder before DONE>
+<committed fixture/schema check owned by T0, invoked by `## Test command`>
 ## Test command
 <one committed command that pins the interpreter (e.g. `make test` → `python -m pytest`), may
 embed setup; the only thing builders and reviewers run>
