@@ -9,7 +9,7 @@
     {
       "name": "business-agent-skills",
       "source": "./",
-      "description": "Work out which direction to take, research a company, judge whether you fit a role, prepare for the interview, get the money right, and plan how to learn what a goal demands.",
+      "description": "Work out which direction to take, research a company, judge whether you fit a role, prepare for the interview, get the money right, and plan how to learn what a goal demands, and run a software project through budget-capped agent sessions.",
       "category": "productivity",
       "keywords": [
         "company-research",
@@ -18,7 +18,10 @@
         "interview",
         "salary",
         "careers",
-        "learning-path"
+        "learning-path",
+        "orchestration",
+        "multi-agent",
+        "claude-code"
       ]
     }
   ]

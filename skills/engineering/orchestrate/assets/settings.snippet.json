@@ -1,0 +1,6 @@
+{
+  "hooks": {
+    "PostToolUse": [{"matcher": "", "hooks": [{"type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/orch-ceiling.sh"}]}],
+    "UserPromptSubmit": [{"hooks": [{"type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/orch-ceiling.sh"}]}]
+  }
+}
