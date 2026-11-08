@@ -27,10 +27,9 @@ Read `references/` and `assets/` (fixed formats, never reshaped) at the step tha
    commit, push on the lead branch before the first spawn: workers get only what is committed.
 5. Preflight, before any spawn: (a) every host in BRIEF `network hosts` → one `curl -sI`;
    denied → LOG `ESCALATE` now with the allowlist steps, and ask the human whether to run
-   search-only with facts flagged (unverified). (b) every skill in BRIEF `Skills` must be a
-   Claude Code built-in or exist in the repo (`.claude/skills/<name>/` or `enabledPlugins` in
-   .claude/settings.json); missing → LOG `ESCALATE`; if the human declines, the review is
-   "formally incomplete" in LOG and the CLOSE report.
+   search-only with facts flagged (unverified). (b) every BRIEF `Skills` entry is a Claude Code
+   built-in or in the repo (`.claude/skills/<name>/` or `enabledPlugins`); missing → LOG
+   `ESCALATE`; declined → review "formally incomplete" in LOG and the CLOSE report.
 6. Risk: score BRIEF per the rubric in `assets/BRIEF.md` (one point per signal; ≥3 = high),
    LOG `RISK <n> <signals>`. The score picks the worker tier column in `references/spawn.md`;
    it may be raised later, never lowered. You stay on the mid tier. High:
@@ -82,8 +81,7 @@ When the hook says you are past ceiling: finish the step in hand, write
 
 ## 5. Report to the human
 Only at CLOSE, `ESCALATE`, or when asked: what shipped, DECISION lines since last report,
-open ESCALATE items, sessions spawned and archived, the `COST` line, RETRO's top three.
-Three to twelve lines. Never forward worker
+open ESCALATE items, sessions spawned and archived, the `COST` line, RETRO's top three. Never forward worker
 transcripts.
 
 ## Hard rules
