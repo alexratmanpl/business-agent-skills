@@ -11,3 +11,4 @@
 - <for the lead>
 ## State
 branch: <branch>  last commit: <msg>  pushed: yes|no
+(LEAD handover only) my session id: <session_…>  running workers: <ids>

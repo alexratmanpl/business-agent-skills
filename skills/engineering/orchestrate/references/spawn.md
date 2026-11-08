@@ -34,6 +34,11 @@ the larger ceilings. Ids are the current ones; BRIEF `Models` overrides. Integra
 never haiku. Successor: same role, ceiling ×1.5, same model (haiku → sonnet after one handover);
 at most 3 successors per task, 2 at high risk, then BLOCKED.
 
+## Target repo setup (checked at §0.4, installed on the lead branch)
+- `.claude/hooks/orch-ceiling.sh`: copy of `scripts/orch-ceiling.sh`.
+- `.claude/settings.json`: the hook entries from `assets/settings.snippet.json`.
+- `.gitignore`: a `.orch/` line (each session writes its own ceiling there).
+
 ## Card budgeting
 Name the model on every spawn. Worker overhead is 40-60k (protocol + roles + card + PLAN +
 reads), so the card's `read` lists extracts (`sed -n`, `grep`, `node -e`) rather than whole

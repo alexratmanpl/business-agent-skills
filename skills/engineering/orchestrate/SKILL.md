@@ -12,20 +12,19 @@ You are the LEAD. You talk to the human; workers talk only to you. Workers are c
 (`mcp__claude-code-remote__create_session`), one per task, each on its own branch. State lives in
 git under `projects/<project>/` so any lead can take over.
 
-Read `references/` (protocol, roles, spawn) and `assets/` (fixed formats, never reshaped) at the
-step that needs them.
+Read `references/` and `assets/` (fixed formats, never reshaped) at the step that needs them.
 
 ## 0. Start / resume
 1. `projects/<project>/BRIEF.md` must match `assets/BRIEF.md`. Missing → write it with the
    human, fitting their free text to the template.
 2. If `board/BOARD.md` exists you are resuming: read BOARD, LOG (last 40 lines),
-   `board/LEAD-HANDOVER.md` if present. Else create BOARD and LOG from templates.
+   `board/LEAD-HANDOVER.md` if present, then put your own session id in the BOARD header
+   before any other action (stale headers get live leads archived). Else create BOARD and
+   LOG from templates.
 3. Read the repo's `CLAUDE.md`/`AGENTS.md` once: rules and skill names go into every card
    (`RULES`, `SKILLS` fields).
-4. Hook: the target repo must hold a copy of `scripts/orch-ceiling.sh` at .claude/hooks/ and
-   the hook entries from `assets/settings.snippet.json` in its .claude/settings.json, and
-   `.orch/` in its .gitignore. Missing → add, commit, push on the lead branch before the first
-   spawn: workers get only what is committed.
+4. Target repo setup (spawn.md): hook, settings entries, `.orch/` git-ignored. Missing → add,
+   commit, push on the lead branch before the first spawn: workers get only what is committed.
 5. Preflight, before any spawn: (a) every host in BRIEF `network hosts` → one `curl -sI`;
    denied → LOG `ESCALATE` now with the allowlist steps, and ask the human whether to run
    search-only with facts flagged (unverified). (b) every skill in BRIEF `Skills` must be a
@@ -53,8 +52,9 @@ branch: merges and handovers must be pushed first), then `create_session` per
 `send_later(<wave timeout>, "LEAD check-in <tasks>")`. Before the first builder spawn LOG
 `BUILD-BASE <sha>` (the reviewers' `DIFF_BASE`). Every
 bookkeeping event is one Bash call (board, log with `date -u +%H:%M`, commit, push).
-One check-in per wave (timeouts: spawn.md), deleted when it reports. CLOSE archives whatever is not running, LOG `ARCHIVE <n>`; BRIEF `Keep sessions: yes` turns
-archiving off. CLOSE also books your own cost, LOGs `COST`, appends the run to
+One check-in per wave (timeouts: spawn.md), deleted on report. Archive only sessions listed in this project's BOARD, each after a fresh `get_session` shows it
+not running, never from a remembered list; CLOSE sweeps them, LOG `ARCHIVE <n>`; BRIEF
+`Keep sessions: yes` turns archiving off. CLOSE also books your own cost, LOGs `COST`, appends the run to
 `projects/COSTS.md` (spawn.md "Cost accounting"), then runs `retro` (roles.md) as a high-tier
 Agent subagent and commits its `board/RETRO.md`.
 
@@ -87,6 +87,6 @@ Three to twelve lines. Never forward worker
 transcripts.
 
 ## Hard rules
-Merge only branches whose task reported DONE. Never edit a worker's files yourself; spawn.
+Merge only branches whose task reported DONE. Never edit a worker's files; spawn.
 Never skip review. Never commit to `main`; the lead branch is the integration branch, the
 human merges it. Every DECISION and ESCALATE is a LOG line before anything else happens.
