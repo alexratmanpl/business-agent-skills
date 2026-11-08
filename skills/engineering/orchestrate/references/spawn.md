@@ -10,7 +10,6 @@ create_session(
   permission_mode=<omit to inherit the lead's; never "plan": a worker stalls at the prompt>,
   prompt=<references/protocol.md> + <role section of references/roles.md> + <assets/CARD.md filled>)
 ```
-Lead successor: `title="<project> LEAD"`, `model=<mid id>`, `prompt="/orchestrate <project> --resume"`.
 
 Tiers: low = claude-haiku-5-5, mid = claude-sonnet-5-5, high = claude-fable-5-1 (or
 claude-opus-5-5). The RISK score from §0 picks the column.
@@ -31,8 +30,31 @@ claude-opus-5-5). The RISK score from §0 picks the column.
 
 High-tier models spend ~1.5× the context of mid for the same task (reasoning tokens), hence
 the larger ceilings. Ids are the current ones; BRIEF `Models` overrides. Integration tasks (touch every module) are
-never haiku. Successor: same role, ceiling ×1.5, same model (haiku → sonnet after one handover);
-at most 3 successors per task, 2 at high risk, then BLOCKED.
+never haiku.
+
+## Preflight (run at §0.6, before any spawn)
+- Hosts: every entry in BRIEF `network hosts` gets one `curl -sI`. A refusal from the proxy is
+  "denied"; the lead reports it with the allowlist steps.
+- Skills: every entry in BRIEF `Skills` must be a Claude Code built-in or exist in the repo as
+  `.claude/skills/<name>/` or an `enabledPlugins` entry in `.claude/settings.json` (workers are
+  fresh clones and see no user-level plugins).
+
+## Spawn sequence (lead side, every spawn)
+1. ONE Bash call: BOARD row + LOG `SPAWN` + commit + push. Workers clone the lead branch, so
+   pending merges and handovers must be pushed before this call.
+2. `create_session` as above; its id goes into the BOARD row at the next bookkeeping call.
+3. `send_later(<wave timeout from the tier table>, "LEAD check-in <tasks>")`: one check-in per
+   wave, deleted when the wave reports.
+
+## Successor
+Same role, ceiling ×1.5, same model (haiku → sonnet after one handover); at most 3 successors
+per task, 2 at high risk, then BLOCKED. Task id `<task>b`, then `c`, `d` (title, branch and board dir follow the id); CARD
+`CONTINUE_FROM` = the predecessor's HANDOVER.md.
+
+## Lead succession
+Write `board/LEAD-HANDOVER.md` per `assets/HANDOVER.md` with task-id `LEAD`; commit + push; then
+`create_session(title="<project> LEAD", model=<mid id>, prompt="/orchestrate <project> --resume")`
+(role lead). The successor books your cost at resume (Cost accounting).
 
 ## Target repo setup (checked at §0.4, installed on the lead branch)
 - `.claude/hooks/orch-ceiling.sh`: copy of `scripts/orch-ceiling.sh`.

@@ -6,85 +6,80 @@ compatibility: Needs Claude Code cloud sessions (the claude-code-remote tools cr
 
 # orchestrate: LEAD instructions
 
-All paths below are under `projects/<project>/` unless they start with `.claude/`.
-
-You are the LEAD. You talk to the human; workers talk only to you. Workers are cloud sessions
-(`mcp__claude-code-remote__create_session`), one per task, each on its own branch. State lives in
-git under `projects/<project>/` so any lead can take over.
-
-Read `references/` and `assets/` (fixed formats, never reshaped) at the step that needs them.
+You are the LEAD: you talk to the human, workers talk only to you. A worker is one cloud
+session (`mcp__claude-code-remote__create_session`) per task on its own branch. State lives in
+git under `projects/<project>/` (paths below are relative to it unless they start with
+`.claude/` or `.orch/`) so any lead can take over. Read `references/` and `assets/` (fixed formats, never
+reshaped) at the step that needs them.
 
 ## 0. Start / resume
-1. `projects/<project>/BRIEF.md` must match `assets/BRIEF.md`. Missing → write it with the
-   human, fitting their free text to the template.
-2. If `board/BOARD.md` exists you are resuming: read BOARD, LOG (last 40 lines),
-   `board/LEAD-HANDOVER.md` if present, then put your own session id in the BOARD header
-   before any other action (stale headers get live leads archived). Else create BOARD and
-   LOG from templates.
-3. Read the repo's `CLAUDE.md`/`AGENTS.md` once: rules and skill names go into every card
-   (`RULES`, `SKILLS` fields).
-4. Target repo setup (spawn.md): hook, settings entries, `.orch/` git-ignored. Missing → add,
-   commit, push on the lead branch before the first spawn: workers get only what is committed.
-5. Preflight, before any spawn: (a) every host in BRIEF `network hosts` → one `curl -sI`;
-   denied → LOG `ESCALATE` now with the allowlist steps, and ask the human whether to run
-   search-only with facts flagged (unverified). (b) every BRIEF `Skills` entry is a Claude Code
-   built-in or in the repo (`.claude/skills/<name>/` or `enabledPlugins`); missing → LOG
-   `ESCALATE`; declined → review "formally incomplete" in LOG and the CLOSE report.
-6. Risk: score BRIEF per the rubric in `assets/BRIEF.md` (one point per signal; ≥3 = high),
-   LOG `RISK <n> <signals>`. The score picks the worker tier column in `references/spawn.md`;
-   it may be raised later, never lowered. You stay on the mid tier. High:
-   send a ≤10-line PLAN summary + path as `ESCALATE` and wait for the human before BUILD;
-   every DECISION that alters the plan or waives a review FAIL goes through the advisor first.
-7. Record your session id (`get_session` with no id) in BOARD header. Set your own ceiling:
-   `mkdir -p .orch && echo 350000 > .orch/ceiling` (`.orch/` is git-ignored).
+1. `BRIEF.md` must match `assets/BRIEF.md`; missing → write it with the human from their
+   free text.
+2. `board/BOARD.md` exists → resuming: read BOARD, the last 40 LOG lines, and
+   `board/LEAD-HANDOVER.md` if present; else create BOARD and LOG from the templates. Then,
+   before anything else, put your session id (`get_session`, no id) in the BOARD header:
+   stale headers get live leads archived.
+3. Read the repo's `CLAUDE.md`/`AGENTS.md` once; its rules and skill names go into every
+   card's `RULES` and `SKILLS` fields.
+4. Target repo setup per spawn.md "Target repo setup"; missing → add, commit, push on the
+   lead branch before the first spawn: workers get only what is committed.
+5. Set your own ceiling: `mkdir -p .orch && echo 350000 > .orch/ceiling`.
+6. Preflight per spawn.md "Preflight" before any spawn. Host denied → LOG `ESCALATE` now with
+   the allowlist steps; ask the human whether to run search-only with facts flagged
+   `(unverified)`. Skill missing → LOG `ESCALATE`; human declines → the review is "formally
+   incomplete" (it needs every skill in BRIEF/`CLAUDE.md`): say so in LOG and the CLOSE report.
+7. Risk: score BRIEF by the rubric in `assets/BRIEF.md` (one point per signal, ≥3 = high), LOG
+   `RISK <n> <signals>`. It picks the worker tier column in spawn.md; §2 may raise it, nothing
+   lowers it; you stay on the mid tier. High: after PLAN, send a ≤10-line summary + the PLAN
+   path as `ESCALATE`; wait for the human before BUILD; DECISIONs that alter the plan
+   or waive a review FAIL go through the advisor first.
 
 ## 1. Loop
 RESEARCH → PLAN → BUILD → REVIEW → (FIX → RE-REVIEW)×≤2 → CLOSE. Skip RESEARCH when BRIEF
-`Unspecified` is empty. One planner. Builders in parallel, ≤4 concurrent. Review is mandatory
-and formally incomplete without the skills named in BRIEF/CLAUDE.md. Re-review after a fix
-covers the FIX-LIST items and the test command only; the full checklist runs on the first
-review and after a `NO-SHIP`.
+`Unspecified` is empty. One planner; builders in parallel, ≤4 concurrent. Review is formally
+incomplete without the skills named in BRIEF/`CLAUDE.md`. First review and any review after
+`NO-SHIP`: full checklist; re-review after a fix: FIX-LIST items and the
+test command only.
 
-Spawn: BOARD row + LOG `SPAWN` + commit + push in ONE Bash call (workers clone the lead
-branch: merges and handovers must be pushed first), then `create_session` per
-`references/spawn.md` (its id goes into the BOARD row at the next bookkeeping call), then
-`send_later(<wave timeout>, "LEAD check-in <tasks>")`. Before the first builder spawn LOG
-`BUILD-BASE <sha>` (the reviewers' `DIFF_BASE`). Every
-bookkeeping event is one Bash call (board, log with `date -u +%H:%M`, commit, push).
-One check-in per wave (timeouts: spawn.md), deleted on report. Archive only sessions listed in this project's BOARD, each after a fresh `get_session` shows it
-not running, never from a remembered list; CLOSE sweeps them, LOG `ARCHIVE <n>`; BRIEF
-`Keep sessions: yes` turns archiving off. CLOSE also books your own cost, LOGs `COST`, appends the run to
-`projects/COSTS.md` (spawn.md "Cost accounting"), then runs `retro` (roles.md) as a high-tier
-Agent subagent and commits its `board/RETRO.md`.
+Each bookkeeping event is one Bash call: BOARD, LOG line stamped `date -u +%H:%M`, commit,
+push. Spawn per spawn.md "Spawn sequence" (LOG `SPAWN`; one check-in per wave, deleted on
+report). Before the first builder spawn LOG `BUILD-BASE <sha>` (the reviewers' `DIFF_BASE`).
+
+Archive only sessions in this project's BOARD, each after a fresh `get_session` shows it not
+running, never from memory; BRIEF `Keep sessions: yes` turns archiving off.
+
+CLOSE: spawn.md "Cost accounting" (LOG `COST`); sweep remaining sessions, LOG
+`ARCHIVE <n>`; run `retro` (roles.md) as a high-tier Agent subagent; commit `board/RETRO.md`.
 
 ## 2. On worker message (first line is the token)
 | token | do |
 |---|---|
-| `DONE <t>` | fetch+merge `agents/<p>/<t>` into lead branch; conflict → do not resolve by hand, spawn a fixer owning the conflicting files; BOARD done + cost (spawn.md "Cost accounting"); LOG `DONE`; `archive_session(<t>)`; next. Reviewer DONE carries the verdict on line 2 (`SHIP`/`FIX-LIST`/`NO-SHIP`) |
-| `HANDOVER <t>` | merge, push; read `board/<t>/HANDOVER.md`; spawn `<t>b` (then c, d) with CARD `CONTINUE_FROM`; ceiling ×1.5; answer its open questions in the card; book `<t>` cost, archive it; LOG `RESPAWN`. After 3 successors (2 at high risk) → `BLOCKED` |
-| `QUESTION <t>` | trivial → answer; else run `advisor` as an Agent subagent (fresh context, tier per spawn.md) with the question + BRIEF; `send_message(worker, "ANSWER: …")`; LOG `DECISION`. Advisor cannot decide, or a 2nd HANDOVER on one task, or NO-SHIP → raise RISK |
-| `BLOCKED <t>` | give missing input or split the task; reviewer blocked on the test command → spawn.md "Reviewer blocked"; else LOG `ESCALATE` and tell the human |
-| nothing by check-in | inspect per spawn.md "Silent worker", then act on what you find as above |
-Review `FAIL`s: re-verify each yourself before spawning a fixer; waive false alarms with LOG
-`DECISION` (high risk: advisor first). One fixer per owning task per round; cross-task items and
-merge conflicts → one fixer owning the named files (spawn.md fixer row).
+| `DONE <t>` | fetch+merge `agents/<p>/<t>` into the lead branch; conflict → fixer owning the conflicting files; BOARD done + cost (spawn.md "Cost accounting"); LOG `DONE`; `archive_session(<t>)`. A reviewer's line 2 is the verdict: `SHIP` / `FIX-LIST` / `NO-SHIP` |
+| `HANDOVER <t>` | merge, push; read `board/<t>/HANDOVER.md`; spawn `<t>b` (then c, d) per spawn.md "Successor", CARD `CONTINUE_FROM`, open questions answered in the card; book cost, archive `<t>`; LOG `RESPAWN`. Successor cap hit → BOARD `partial merged`, handle as `BLOCKED`, name it in the CLOSE report |
+| `QUESTION <t>` | trivial → answer; else `advisor` (roles.md) as a fresh-context Agent subagent, tier per spawn.md, with the question + BRIEF; `send_message(worker, "ANSWER: …")`; LOG `DECISION` |
+| `BLOCKED <t>` | supply the missing input or split the task; reviewer blocked on the test command → spawn.md "Reviewer blocked"; else LOG `ESCALATE` and tell the human |
+| nothing by check-in | inspect per spawn.md "Silent worker", then act as above |
+
+Raise RISK when the advisor cannot decide, a task hits its 2nd HANDOVER, or a review says
+`NO-SHIP`. Review `FAIL`s: re-verify each yourself before spawning a fixer; waive false alarms
+with LOG `DECISION` (high risk: advisor first). One fixer per owning task per round;
+cross-task items and merge conflicts → one fixer owning the named files (spawn.md fixer row).
 
 ## 3. Budgets and models
-Ceiling = context tokens; the hook warns at ceiling and every 20k after. Ceilings, model ids,
-wave timeouts and card budgeting rules: `references/spawn.md`, read at every spawn.
+Ceiling = context tokens; the hook warns at it and every 20k after. Ceilings, model ids,
+wave timeouts, card budgeting: spawn.md, read at every spawn.
 
 ## 4. Lead succession
-When the hook says you are past ceiling: finish the step in hand, write
-`board/LEAD-HANDOVER.md` (assets/HANDOVER.md, task-id LEAD), commit+push, then
-`create_session` per `references/spawn.md` (role lead, prompt `/orchestrate <project>
---resume`), LOG `LEAD-SUCCESSION <new id>`, tell the human the new session id, stop.
+Past ceiling (hook warning): finish the step in hand, hand over per spawn.md "Lead
+succession", LOG `LEAD-SUCCESSION <new id>`, tell the human the new session id, stop.
 
 ## 5. Report to the human
-Only at CLOSE, `ESCALATE`, or when asked: what shipped, DECISION lines since last report,
-open ESCALATE items, sessions spawned and archived, the `COST` line, RETRO's top three. Never forward worker
-transcripts.
+Only at CLOSE, on `ESCALATE`, or when asked: what shipped, DECISION lines since the last
+report, open ESCALATE items, sessions spawned and archived, the `COST` line, RETRO's top
+three. Never forward worker transcripts.
 
 ## Hard rules
-Merge only branches whose task reported DONE. Never edit a worker's files; spawn.
-Never skip review. Never commit to `main`; the lead branch is the integration branch, the
-human merges it. Every DECISION and ESCALATE is a LOG line before anything else happens.
+Merge only branches whose task reported DONE or HANDOVER (the latter only seeds the successor). Never edit a worker's files or
+hand-resolve its conflicts; spawn. Never skip review. Never commit to `main`: the lead branch
+is the integration branch, merged by the human. Every DECISION and ESCALATE is a LOG line
+before anything else happens.
