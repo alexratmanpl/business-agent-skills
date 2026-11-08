@@ -1,8 +1,9 @@
 # Business & Career Skills
 
-Six Agent Skills for business and career work: work out which direction to take, research a
+Seven Agent Skills for business, career and engineering work: work out which direction to take, research a
 company, judge whether you fit a role, prepare for the interview, get the money right, and plan how
-to learn what a goal demands. Honest rather than encouraging — they are written to tell someone a
+to learn what a goal demands — plus one that runs a software project through a team of
+budget-capped agent sessions. Honest rather than encouraging — they are written to tell someone a
 stretch is a stretch.
 
 Each skill is a `SKILL.md` with frontmatter plus the files it needs, following the
@@ -18,17 +19,18 @@ Each skill is a `SKILL.md` with frontmatter plus the files it needs, following t
 | [`pay-check`](skills/careers/pay-check/) | Local market rate for role, level and contract type; employment-versus-contracting conversion; how to reopen a number already given. | `scripts/rate_calc.py`, `rates-example.json` |
 | [`interview-prep`](skills/careers/interview-prep/) | Preparation at any stage, a one-to-two page brief to read beforehand, and a page for notes during the call. Calls `company-research`, `role-fit` and `pay-check` by name when they are installed, and works alone when they are not. | `scripts/plain_check.py`, `interview-record.html` |
 | [`learning-path`](skills/learning/learning-path/) | A learning path to a defined goal in any field, built from dated research that every milestone cites. Tests the goal first, sets the hours against the evidence, and returns no path rather than a guessed one. | `scripts/path_check.py` |
+| [`orchestrate`](skills/engineering/orchestrate/) | Runs a project unattended on a Claude subscription: a lead session spawns short cloud worker sessions (research, plan, build, review), merges their branches, answers their questions and respawns a successor when one runs out of budget. Fixed file formats for brief, board, log and handover. | `scripts/orch-ceiling.sh`, `references/`, `assets/` |
 
 Invoke one by name, or describe the task and let the agent choose.
 
-`career-direction`, `pay-check`, `interview-prep` and `learning-path` carry a `compatibility` line
-in their frontmatter: their bundled scripts need code execution, and each says what to do instead
-where there is none.
+`career-direction`, `pay-check`, `interview-prep`, `learning-path` and `orchestrate` carry a
+`compatibility` line in their frontmatter: their bundled scripts need code execution (and
+`orchestrate` needs Claude Code cloud sessions), and each says what to do instead where there is none.
 
 ## Install
 
 Copy a skill's directory — `SKILL.md` and everything beside it — into wherever the agent reads
-skills from. Packaged `.skill` archives for all six are attached to the `latest` release, which
+skills from. Packaged `.skill` archives for all seven are attached to the `latest` release, which
 CI rebuilds from `master` on every push.
 
 ## Layout
@@ -42,8 +44,10 @@ skills/
 │   ├── role-fit/
 │   ├── pay-check/
 │   └── interview-prep/
-└── learning/
-    └── learning-path/
+├── learning/
+│   └── learning-path/
+└── engineering/
+    └── orchestrate/
 ```
 
 Categories organise this repository only. Installing flattens them, so skill names must be unique

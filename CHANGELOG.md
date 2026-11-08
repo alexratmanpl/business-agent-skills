@@ -14,6 +14,14 @@ named version.
 
 ### Added
 
+- `orchestrate`, a seventh skill and the first in a new `engineering` category: a lead session
+  runs a software project unattended on a Claude subscription by spawning short cloud worker
+  sessions (research, plan, build, review), merging their branches, answering their questions
+  and respawning a successor from a handover file when one crosses its context ceiling. Fixed
+  formats for brief, plan, task card, board, log, handover and report live in `assets/`; the
+  worker protocol and roles in `references/`; the ceiling hook in `scripts/`. Tested end to end
+  on an eleven-worker run (see `references/evidence.md`).
+
 - `career-direction`, a fifth skill: where to point a career when no particular job is on the
   table. It runs a six-pass intake, groups the market into families by the asset each one buys,
   and reads three to five years ahead without forecasting — every shift has to be visible in

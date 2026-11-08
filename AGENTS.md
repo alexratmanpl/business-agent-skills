@@ -1,6 +1,6 @@
 # Agent instructions
 
-Six Agent Skills for business and career work, built on the
+Seven Agent Skills for business, career and engineering work, built on the
 [Agent Skills open standard](https://agentskills.io).
 
 Skills live at `skills/<category>/<skill-name>/SKILL.md`. Categories organise the repo only —
